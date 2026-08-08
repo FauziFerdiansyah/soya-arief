@@ -2534,13 +2534,22 @@ document.addEventListener("DOMContentLoaded", () => StickerPopupManager.init());
 
 
 
-/* Footer heart: a cupid celebration built from Fluent Emoji artwork (MIT).
-   The overlay and its images are created on first click, so the invitation's
-   initial load stays untouched. See assets/images/cupid/ATTRIBUTION.md. */
+/* Footer heart: a lightweight Canvas cupid sequence.
+   It is built only after the footer-heart click and uses no Font Awesome,
+   external artwork, or demo controls. */
 const CupidHeartAnimation = {
   overlay: null,
+  canvas: null,
+  context: null,
+  frame: null,
   dismissTimer: null,
+  soundTimers: [],
+  audioContext: null,
+  particles: [],
+  startTime: 0,
+  lastFrameTime: 0,
   duration: 4200,
+  reducedMotion: false,
 
   init() {
     const trigger = document.querySelector('.sintia-foot-love');
@@ -2553,49 +2562,533 @@ const CupidHeartAnimation = {
     const overlay = document.createElement('div');
     overlay.className = 'cupid-overlay';
     overlay.setAttribute('aria-hidden', 'true');
-    overlay.innerHTML = `
-      <div class="cupid-stage">
-        <div class="cupid-actor">
-          <img class="cupid-angel-art" src="assets/images/cupid/baby-angel.svg" alt="" decoding="async">
-          <svg class="cupid-bow" viewBox="0 0 60 120" aria-hidden="true">
-            <path class="cupid-bow-limb" d="M14 8c26 22 26 82 0 104"/>
-            <path class="cupid-bow-cord" d="M14 8L40 60L14 112"/>
-          </svg>
-        </div>
-        <svg class="cupid-dart" viewBox="0 0 140 30" aria-hidden="true">
-          <path class="cupid-dart-shaft" d="M14 15H120"/>
-          <path class="cupid-dart-head" d="M138 15l-20-9v18Z"/>
-          <path class="cupid-dart-fletch" d="M14 15L0 4v22Z"/>
-        </svg>
-        <div class="cupid-target">
-          <img class="cupid-heart-art whole" src="assets/images/cupid/red-heart.svg" alt="" decoding="async">
-          <img class="cupid-heart-art pierced" src="assets/images/cupid/heart-with-arrow.svg" alt="" decoding="async">
-        </div>
-        <div class="cupid-sparkles" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
-      </div>`;
-
+    overlay.innerHTML = '<canvas class="cupid-canvas" aria-hidden="true"></canvas>';
     document.body.appendChild(overlay);
+
+    this.canvas = overlay.querySelector('.cupid-canvas');
+    this.context = this.canvas.getContext('2d');
+    window.addEventListener('resize', () => this.resizeCanvas(), { passive: true });
+    this.resizeCanvas();
     return overlay;
   },
 
-  play() {
-    if (!this.overlay) {
-      this.overlay = this.build();
+  resizeCanvas() {
+    if (!this.canvas || !this.context) return;
+
+    const bounds = this.canvas.getBoundingClientRect();
+    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = Math.max(1, Math.round(bounds.width * pixelRatio));
+    this.canvas.height = Math.max(1, Math.round(bounds.height * pixelRatio));
+    this.context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  },
+
+  getAudioContext() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return null;
+
+    try {
+      this.audioContext ??= new AudioContext();
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume().catch(() => {});
+      }
+      return this.audioContext;
+    } catch {
+      return null;
+    }
+  },
+
+  playTone(frequency, duration, { endFrequency = frequency, type = 'sine', volume = 0.02, delay = 0 } = {}) {
+    const context = this.audioContext;
+    if (!context || context.state !== 'running') return;
+
+    const start = context.currentTime + delay;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, start);
+    oscillator.frequency.exponentialRampToValueAtTime(Math.max(endFrequency, 1), start + duration);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + Math.min(duration * 0.2, 0.05));
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(start);
+    oscillator.stop(start + duration + 0.03);
+  },
+
+  playBowPull() {
+    this.playTone(120, 0.5, { endFrequency: 350, type: 'sine', volume: 0.025 });
+  },
+
+  playArrowLaunch() {
+    this.playTone(800, 0.25, { endFrequency: 150, type: 'triangle', volume: 0.035 });
+  },
+
+  playHeartImpact() {
+    [523.25, 659.25, 783.99, 1046.5].forEach((frequency, index) => {
+      this.playTone(frequency, 1.2, {
+        endFrequency: frequency * 0.96,
+        type: 'sine',
+        volume: 0.022,
+        delay: index * 0.06
+      });
+    });
+  },
+
+  clearSoundTimers() {
+    this.soundTimers.forEach((timer) => clearTimeout(timer));
+    this.soundTimers = [];
+  },
+
+  scheduleSound(callback, delay) {
+    this.soundTimers.push(setTimeout(callback, delay));
+  },
+
+  clamp(value, minimum, maximum) {
+    return Math.min(Math.max(value, minimum), maximum);
+  },
+
+  lerp(start, end, amount) {
+    return start + (end - start) * amount;
+  },
+
+  easeOutCubic(amount) {
+    return 1 - Math.pow(1 - this.clamp(amount, 0, 1), 3);
+  },
+
+  drawHeart(context, x, y, size, pierced, pulse, shake = 0) {
+    context.save();
+    // Impact shake, as in the reference sequence.
+    context.translate(x + (Math.random() - .5) * shake, y + (Math.random() - .5) * shake);
+    context.scale(pulse, pulse);
+    context.shadowColor = pierced ? 'rgba(205, 68, 81, .75)' : 'rgba(101, 11, 4, .45)';
+    context.shadowBlur = pierced ? 34 : 20;
+
+    const gradient = context.createRadialGradient(-size * .22, -size * .25, size * .08, 0, 0, size);
+    if (pierced) {
+      gradient.addColorStop(0, '#ffd0c6');
+      gradient.addColorStop(.4, '#d9424f');
+      gradient.addColorStop(1, '#5a0a05');
+    } else {
+      gradient.addColorStop(0, '#ffd9d2');
+      gradient.addColorStop(.4, '#cb4b55');
+      gradient.addColorStop(1, '#650b04');
+    }
+    context.fillStyle = gradient;
+    context.beginPath();
+    const scale = size / 15;
+    context.moveTo(0, -5 * scale);
+    context.bezierCurveTo(-10 * scale, -18 * scale, -20 * scale, -2 * scale, 0, 15 * scale);
+    context.bezierCurveTo(20 * scale, -2 * scale, 10 * scale, -18 * scale, 0, -5 * scale);
+    context.closePath();
+    context.fill();
+
+    // Surface highlight.
+    context.shadowBlur = 0;
+    context.fillStyle = 'rgba(255, 255, 255, .35)';
+    context.beginPath();
+    context.ellipse(-size * .3, -size * .3, size * .18, size * .09, -Math.PI / 4, 0, Math.PI * 2);
+    context.fill();
+
+    // The arrow embeds through the heart: shaft entering left, tip exiting right.
+    if (pierced) {
+      context.save();
+      context.rotate(.12);
+
+      context.save();
+      context.translate(size * .35, 0);
+      context.strokeStyle = '#d89c40';
+      context.lineWidth = Math.max(3, size * .045);
+      context.lineCap = 'round';
+      context.shadowColor = 'rgba(255, 222, 143, .7)';
+      context.shadowBlur = 6;
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.lineTo(size * .28, 0);
+      context.stroke();
+      context.fillStyle = '#c64049';
+      context.beginPath();
+      context.moveTo(size * .28, -size * .07);
+      context.lineTo(size * .42, 0);
+      context.lineTo(size * .28, size * .07);
+      context.closePath();
+      context.fill();
+      context.restore();
+
+      context.save();
+      context.translate(-size * .8, 0);
+      this.drawArrowGraphic(context, size * .8);
+      context.restore();
+
+      context.restore();
+    }
+    context.restore();
+  },
+
+  drawArrowGraphic(context, length = 80) {
+    context.save();
+    // Gold shaft.
+    context.strokeStyle = '#d89c40';
+    context.lineWidth = Math.max(2.5, length * .045);
+    context.lineCap = 'round';
+    context.shadowColor = '#ffde8f';
+    context.shadowBlur = 6;
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(length, 0);
+    context.stroke();
+
+    // Heart-shaped arrowhead.
+    const head = Math.max(7, length * .14);
+    context.fillStyle = '#c64049';
+    context.shadowColor = 'rgba(198, 64, 73, .85)';
+    context.shadowBlur = 10;
+    context.beginPath();
+    context.moveTo(length + head, 0);
+    context.bezierCurveTo(length + head * 1.2, -head * .8, length + head * .2, -head, length - head * .2, -head * .3);
+    context.bezierCurveTo(length - head * .6, -head, length - head * 1.2, -head * .4, length - head * .2, 0);
+    context.bezierCurveTo(length - head * 1.2, head * .4, length - head * .6, head, length - head * .2, head * .3);
+    context.bezierCurveTo(length + head * .2, head, length + head * 1.2, head * .8, length + head, 0);
+    context.fill();
+
+    // Fletching.
+    const fletch = Math.max(7, length * .16);
+    context.fillStyle = '#f4e1c3';
+    context.shadowBlur = 0;
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(-fletch, -fletch * .66);
+    context.lineTo(-fletch * .5, 0);
+    context.lineTo(-fletch, fletch * .66);
+    context.closePath();
+    context.fill();
+    context.restore();
+  },
+
+  drawArrow(context, x, y, angle, length = 80) {
+    context.save();
+    context.translate(x, y);
+    context.rotate(angle);
+    this.drawArrowGraphic(context, length);
+    context.restore();
+  },
+
+  drawWing(context, side, sweep) {
+    context.save();
+    context.scale(side, 1);
+    context.rotate(-.3 + sweep * side);
+    const gradient = context.createLinearGradient(0, -60, 80, 20);
+    gradient.addColorStop(0, '#ffffff');
+    gradient.addColorStop(.7, '#f7e6cb');
+    gradient.addColorStop(1, '#d8a65c');
+    context.fillStyle = gradient;
+    context.shadowColor = 'rgba(255, 255, 255, .55)';
+    context.shadowBlur = 10;
+    context.beginPath();
+    context.moveTo(-10, -30);
+    context.bezierCurveTo(-50, -80, -90, -40, -100, 10);
+    context.bezierCurveTo(-80, 30, -50, 40, -10, -10);
+    context.closePath();
+    context.fill();
+
+    // Feather strands.
+    context.strokeStyle = 'rgba(216, 166, 92, .95)';
+    context.lineWidth = 1.5;
+    context.shadowBlur = 0;
+    context.beginPath();
+    context.moveTo(-70, -30);
+    context.quadraticCurveTo(-50, 0, -20, -10);
+    context.moveTo(-85, -10);
+    context.quadraticCurveTo(-60, 15, -30, 0);
+    context.stroke();
+    context.restore();
+  },
+
+  drawAngel(context, x, y, scale, pull, time, targetX, targetY) {
+    context.save();
+    context.translate(x, y);
+    context.scale(scale, scale);
+    const wingSweep = Math.sin(time * .008) * .18;
+    this.drawWing(context, -1, wingSweep);
+
+    // Halo.
+    context.save();
+    context.strokeStyle = '#ffde8f';
+    context.lineWidth = 3.5;
+    context.shadowColor = '#ffde8f';
+    context.shadowBlur = 13;
+    context.beginPath();
+    context.ellipse(0, -70, 22, 7, 0, 0, Math.PI * 2);
+    context.stroke();
+    context.restore();
+
+    // Dress and gold trim.
+    context.fillStyle = '#fffdf8';
+    context.strokeStyle = '#d8a65c';
+    context.lineWidth = 2.5;
+    context.beginPath();
+    context.moveTo(-15, -20);
+    context.quadraticCurveTo(-28, 22, -34, 55);
+    context.quadraticCurveTo(0, 64, 34, 55);
+    context.quadraticCurveTo(28, 22, 15, -20);
+    context.closePath();
+    context.fill();
+    context.stroke();
+    context.strokeStyle = 'rgba(216, 166, 92, .85)';
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(-21, 28);
+    context.quadraticCurveTo(0, 35, 21, 28);
+    context.stroke();
+
+    // Full face from the supplied Canvas illustration: skin, curls, eyes, blush, and smile.
+    context.fillStyle = '#fed7aa';
+    context.beginPath();
+    context.arc(0, -42, 20, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#d39438';
+    for (let angle = -Math.PI; angle < .1; angle += .5) {
+      context.beginPath();
+      context.arc(Math.cos(angle) * 20, -42 + Math.sin(angle) * 20, 6, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.fillStyle = '#9a3412';
+    context.beginPath();
+    context.arc(-6, -44, 2.35, 0, Math.PI * 2);
+    context.arc(8, -44, 2.35, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = 'rgba(230, 99, 117, .52)';
+    context.beginPath();
+    context.arc(-11, -37, 4, 0, Math.PI * 2);
+    context.arc(13, -37, 4, 0, Math.PI * 2);
+    context.fill();
+    context.strokeStyle = '#9a3412';
+    context.lineWidth = 1.8;
+    context.lineCap = 'round';
+    context.beginPath();
+    context.arc(1, -37, 5, .15 * Math.PI, .85 * Math.PI);
+    context.stroke();
+
+    this.drawWing(context, 1, wingSweep);
+    const aim = Math.atan2(targetY - y, targetX - x) * .18;
+    const pullDistance = pull * 25;
+    context.save();
+    context.rotate(aim);
+    context.strokeStyle = '#d89c40';
+    context.lineWidth = 5;
+    context.lineCap = 'round';
+    context.shadowColor = '#ffde8f';
+    context.shadowBlur = 8;
+    context.beginPath();
+    context.arc(34, 0, 44, -.45 * Math.PI, .45 * Math.PI);
+    context.stroke();
+
+    const topX = 34 + Math.cos(-.45 * Math.PI) * 44;
+    const topY = Math.sin(-.45 * Math.PI) * 44;
+    const bottomX = 34 + Math.cos(.45 * Math.PI) * 44;
+    const bottomY = Math.sin(.45 * Math.PI) * 44;
+
+    // Bow limb tips.
+    context.fillStyle = '#c64049';
+    context.beginPath();
+    context.arc(topX, topY, 5, 0, Math.PI * 2);
+    context.arc(bottomX, bottomY, 5, 0, Math.PI * 2);
+    context.fill();
+
+    // Bowstring.
+    context.strokeStyle = 'rgba(255, 253, 248, .95)';
+    context.lineWidth = 1.5;
+    context.shadowBlur = 0;
+    context.beginPath();
+    context.moveTo(topX, topY);
+    context.lineTo(34 - pullDistance, 0);
+    context.lineTo(bottomX, bottomY);
+    context.stroke();
+
+    if (pull < .99) this.drawArrow(context, 34 - pullDistance, 0, 0, 62);
+
+    // Hands: one on the grip, one on the string.
+    context.fillStyle = '#fed7aa';
+    context.beginPath();
+    context.arc(34, 5, 6, 0, Math.PI * 2);
+    context.fill();
+    context.beginPath();
+    context.arc(34 - pullDistance, 0, 5, 0, Math.PI * 2);
+    context.fill();
+    context.restore();
+    context.restore();
+  },
+
+  createImpactBurst(x, y, scale = 1) {
+    const colors = ['#c64049', '#ffde8f', '#f2a3b3', '#ffffff'];
+    for (let index = 0; index < 40; index += 1) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (Math.random() * 8 + 2) * 60 * scale;
+      this.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: (Math.random() * 5 + 2) * scale,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        life: 1,
+        decay: Math.random() * 1.2 + .6,
+        type: 'spark'
+      });
     }
 
+    // Floating mini hearts.
+    for (let index = 0; index < 12; index += 1) {
+      this.particles.push({
+        x: x + (Math.random() - .5) * 30 * scale,
+        y: y + (Math.random() - .5) * 30 * scale,
+        vx: (Math.random() - .5) * 3 * 60 * scale,
+        vy: (-Math.random() * 4 - 2) * 60 * scale,
+        size: (Math.random() * 12 + 10) * scale,
+        color: '#c64049',
+        life: 1,
+        decay: .5,
+        type: 'heart'
+      });
+    }
+  },
+
+  // Glowing trail behind the arrow in flight.
+  createArrowTrail(x, y, scale = 1) {
+    this.particles.push({
+      x,
+      y: y + (Math.random() - .5) * 6 * scale,
+      vx: -Math.random() * 2 * 60 * scale,
+      vy: (Math.random() - .5) * 1.5 * 60 * scale,
+      size: (Math.random() * 4 + 1) * scale,
+      color: '#ffde8f',
+      life: .9,
+      decay: 1.8,
+      type: 'spark'
+    });
+  },
+
+  drawParticles(context, delta) {
+    this.particles = this.particles.filter((particle) => {
+      particle.x += particle.vx * delta;
+      particle.y += particle.vy * delta;
+      particle.life -= particle.decay * delta;
+      if (particle.life <= 0) return false;
+
+      context.save();
+      context.globalAlpha = Math.max(0, particle.life);
+      if (particle.type === 'heart') {
+        context.translate(particle.x, particle.y);
+        context.fillStyle = particle.color;
+        context.shadowColor = '#e8657a';
+        context.shadowBlur = 10;
+        context.beginPath();
+        const scale = particle.size / 10;
+        context.moveTo(0, -3 * scale);
+        context.bezierCurveTo(-5 * scale, -10 * scale, -12 * scale, -1 * scale, 0, 8 * scale);
+        context.bezierCurveTo(12 * scale, -1 * scale, 5 * scale, -10 * scale, 0, -3 * scale);
+        context.fill();
+      } else {
+        context.fillStyle = particle.color;
+        context.shadowColor = particle.color;
+        context.shadowBlur = 8;
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        context.fill();
+      }
+      context.restore();
+      return true;
+    });
+  },
+
+  render(currentTime) {
+    if (!this.context || !this.canvas || !this.overlay.classList.contains('is-playing')) return;
+
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    const elapsed = currentTime - this.startTime;
+    const delta = Math.min((currentTime - this.lastFrameTime) / 1000, .05);
+    this.lastFrameTime = currentTime;
+    const context = this.context;
+    const unit = Math.min(width / 900, height / 520);
+    const sceneScale = unit * 1.34;
+    const targetX = width * .74;
+    const targetY = height * .51;
+    const entered = this.easeOutCubic(elapsed / 1250);
+    const angelX = this.lerp(-170 * sceneScale, width * .25, entered);
+    const angelY = height * .57 + Math.sin(elapsed * .006) * 10 * sceneScale;
+    const pull = this.clamp((elapsed - 1400) / 720, 0, 1);
+    const launchProgress = this.clamp((elapsed - 2250) / 610, 0, 1);
+    const pierced = elapsed >= 2860;
+    const fade = elapsed > this.duration - 350 ? this.clamp((this.duration - elapsed) / 350, 0, 1) : 1;
+
+    context.clearRect(0, 0, width, height);
+    context.save();
+    context.globalAlpha = fade;
+    const background = context.createRadialGradient(width * .5, height * .45, 0, width * .5, height * .45, Math.max(width, height) * .68);
+    background.addColorStop(0, 'rgba(255, 244, 214, .98)');
+    background.addColorStop(1, 'rgba(255, 255, 255, .98)');
+    context.fillStyle = background;
+    context.fillRect(0, 0, width, height);
+
+    const heartbeat = 1 + Math.sin(elapsed * (pierced ? .012 : .006)) * (pierced ? .08 : .05);
+    const impactScale = pierced ? 1 + Math.max(0, .35 - (elapsed - 2860) / 620) : 1;
+    const shake = pierced ? Math.max(0, 18 * sceneScale * (1 - (elapsed - 2860) / 620)) : 0;
+    this.drawHeart(context, targetX, targetY, 110 * sceneScale, pierced, heartbeat * impactScale, shake);
+    this.drawAngel(context, angelX, angelY, sceneScale, pull, elapsed, targetX, targetY);
+
+    if (launchProgress > 0 && launchProgress < 1) {
+      const startX = angelX + 52 * sceneScale;
+      const startY = angelY;
+      const arrowX = this.lerp(startX, targetX - 50 * sceneScale, launchProgress);
+      const arrowY = this.lerp(startY, targetY, launchProgress);
+      this.createArrowTrail(arrowX, arrowY, sceneScale);
+      this.drawArrow(context, arrowX, arrowY, Math.atan2(targetY - startY, targetX - startX), 78 * sceneScale);
+    }
+
+    if (pierced && !this.hasImpacted) {
+      this.hasImpacted = true;
+      this.createImpactBurst(targetX, targetY, sceneScale);
+    }
+    this.drawParticles(context, delta);
+    context.restore();
+
+    if (elapsed < this.duration) {
+      this.frame = requestAnimationFrame((time) => this.render(time));
+    }
+  },
+
+  stop() {
+    cancelAnimationFrame(this.frame);
+    clearTimeout(this.dismissTimer);
+    this.clearSoundTimers();
+    this.overlay?.classList.remove('is-playing');
+  },
+
+  play() {
+    if (!this.overlay) this.overlay = this.build();
     if (this.overlay.classList.contains('is-playing')) return;
 
-    // Restart cleanly when replayed.
-    this.overlay.classList.remove('is-playing');
-    void this.overlay.offsetWidth;
+    this.getAudioContext();
+    this.clearSoundTimers();
+    this.resizeCanvas();
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.startTime = performance.now() - (this.reducedMotion ? 2860 : 0);
+    this.lastFrameTime = this.startTime;
+    this.particles = [];
+    this.hasImpacted = false;
     this.overlay.classList.add('is-playing');
 
-    clearTimeout(this.dismissTimer);
-    this.dismissTimer = setTimeout(() => {
-      this.overlay.classList.remove('is-playing');
-    }, this.duration);
+    if (this.reducedMotion) {
+      this.scheduleSound(() => this.playHeartImpact(), 0);
+    } else {
+      this.scheduleSound(() => this.playBowPull(), 1400);
+      this.scheduleSound(() => this.playArrowLaunch(), 2250);
+      this.scheduleSound(() => this.playHeartImpact(), 2860);
+    }
+
+    const playDuration = this.reducedMotion ? 900 : this.duration;
+    this.frame = requestAnimationFrame((time) => this.render(time));
+    this.dismissTimer = setTimeout(() => this.stop(), playDuration);
   }
 };
 

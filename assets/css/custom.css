@@ -365,10 +365,11 @@ PENTING: Hanya bagian ini yang bisa di-scroll, left-side tetap fixed
   transform: translateZ(0); /* GPU acceleration tanpa mengganggu layout */
 }
 
-/* Custom scrollbar untuk right side */
+/* Keep the invitation pane scrollable on every viewport; the scrollbar itself
+   remains visually hidden below through the WebKit scrollbar rule. */
 .right-side {
   scrollbar-gutter: stable hidden;
-  overflow-y: hidden; /* Safari lama */
+  overflow-y: auto;
 }
 @media only screen and (min-width: 961px) {
 .right-side {
@@ -2301,7 +2302,7 @@ font-weight: var(--font-weight-bold);
   padding: 48px 32px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 15px;
   background-color: var(--bg-light-primary);
   border-radius: 999px;
   align-items: center;
@@ -2318,7 +2319,7 @@ font-weight: var(--font-weight-bold);
 }
 
 .footnote-body .footnote-title {
-  font-size: calc(var(--font-size-4xl) + 5px + 6px);
+  font-size: calc(var(--font-size-4xl) + 10px + 6px);
 }
 
 .footnote-body p, .footnote-body h2 {
@@ -2425,6 +2426,7 @@ font-weight: var(--font-weight-bold);
   align-items: center;
   justify-content: space-around;
   gap: 24px; */
+  overflow: unset;
 }
 
 .welcome-header {
@@ -2435,6 +2437,7 @@ font-weight: var(--font-weight-bold);
   justify-content: center;
   align-items: center;
   gap: 20px;
+  overflow: unset;
 }
 
 .welcome-header h1 {
