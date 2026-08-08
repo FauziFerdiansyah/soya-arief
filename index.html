@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- ... existing code ... -->
+    <title>The Wedding of Soya & Arief</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="assets/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="assets/favicon/site.webmanifest">
+    
+    <!-- Performance Optimizations -->
+    <meta name="theme-color" content="#650b04">
+    <meta name="description" content="Sabtu, 5 September 2026 | Wedding Invitation">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Open Graph (Facebook, WhatsApp, etc.) -->
+    <meta property="og:title" content="The Wedding of Soya & Arief">
+    <meta property="og:description" content="Sabtu, 5 September 2026 | Wedding Invitation">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+        <meta property="og:image" content="assets/images/prewed/square.jpg">
+    <meta property="og:image:secure_url" content="assets/images/prewed/square.jpg">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="300">
+    <meta property="og:image:height" content="300">
+    <meta property="og:image:alt" content="Soya & Arief">
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Wedding of Soya & Arief">
+    <meta name="twitter:description" content="Sabtu, 5 September 2026 | Wedding Invitation">
+    <meta name="twitter:image" content="assets/images/prewed/square.jpg">
+    <meta name="twitter:image:alt" content="Soya & Arief">
+    
+    <!-- Preconnect untuk external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- DNS Prefetch untuk performa -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    
+    <!-- Critical CSS - Load dengan prioritas tinggi -->
+    <!-- Normalize CSS - Local untuk performa optimal -->
+    <link rel="stylesheet" href="assets/css/normalize.css" importance="high">
+    
+    <!-- Main CSS - Root variables dan AOS initialization -->
+    <link rel="stylesheet" href="assets/css/main.css" importance="high">
+    
+    <!-- Google Fonts - Work Sans dengan display=swap untuk performa -->
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS CSS - CDN untuk library besar -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- lightGallery CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/css/lightgallery-bundle.min.css">
+
+    <!-- Custom CSS - Project specific styles -->
+    <link rel="stylesheet" href="assets/css/custom.css">
+
+    <!-- Lazy Load CSS - Progressive image loading -->
+    <link rel="stylesheet" href="assets/css/lazyload.css">
+
+    <!-- Sintia reference template + local adapter -->
+    <link rel="stylesheet" href="assets/css/sintia-template.css">
+    <link rel="stylesheet" href="assets/css/sintia-adapter.css">
+
+    <!-- Firebase -->
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { 
+        getFirestore,
+        collection,
+        addDoc,
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc,
+        serverTimestamp,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs
+    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCffYw2s4r3d4RB1Io0kYH41-8nu9qspm8",
+        authDomain: "wedding-web-alfira-fauzi.firebaseapp.com",
+        projectId: "wedding-web-alfira-fauzi",
+        storageBucket: "wedding-web-alfira-fauzi.firebasestorage.app",
+        messagingSenderId: "260951532899",
+        appId: "1:260951532899:web:76d14d2972ce8b7cc99f56"
+    };
+
+    // Init ✅
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // lempar ke global
+    window.db = db;
+    window.firebaseApp = app;
+
+    window.firestore = {
+        collection,
+        addDoc,
+        doc,
+        getDoc,
+        setDoc,
+        updateDoc,
+        serverTimestamp,
+        query,
+        where,
+        orderBy,
+        limit,
+        getDocs
+    };
+
+    console.log("✅ Firebase initialized (clean)");
+</script>
+    
+    <!-- Resource hints untuk JavaScript -->
+    <link rel="modulepreload" href="assets/js/main.js">
+    <link rel="modulepreload" href="assets/js/custom.js">
+</head>
+<body class="sintia original">
+
+  <!-- ===== PRELOADER ===== -->
+  <div id="preloader">
+    <img src="assets/images/loading.gif" alt="Loading...">
+  </div>
+    <div class="container kat-page__side-to-side">
+        <section class="welcome-section top-cover" data-aos="fade-up" data-aos-duration="100" data-aos-delay="100">
+            <div class="sintia-rumah-gadang" aria-hidden="true">
+                <div class="image-wrap" data-aos="fade-up" data-aos-duration="1500" data-aos-delay="200">
+                    <img src="assets/images/sintia/orn-topcover-1.png" alt="">
+                </div>
+            </div>
+            <div class="sintia-coconut-tree left" aria-hidden="true">
+                <div class="image-wrap" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="1500">
+                    <img src="assets/images/sintia/pohon.png" alt="">
+                </div>
+            </div>
+            <div class="sintia-coconut-tree right" aria-hidden="true">
+                <div class="image-wrap" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="1700">
+                    <img src="assets/images/sintia/pohon.png" alt="">
+                </div>
+            </div>
+            <div class="sintia-flowers bottom-01 left" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+            <div class="sintia-flowers bottom-02 left" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+            <div class="sintia-flowers bottom-01 right" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+            <div class="sintia-flowers bottom-02 right" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+            <div class="ornaments-wrapper">
+                <div class="orn-tc-6">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-11.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-5">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-06.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-4">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-13.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-3">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-21.png" alt="Ornament">
+                    </div>
+                </div>
+
+                <div class="orn-tc-9">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-29.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-10">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-11.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-11">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-30.png" alt="Ornament">
+                    </div>
+                </div>
+            </div>
+            <div class="welcome-content">
+                <div class="welcome-body">
+                    <div class="welcome-header">
+                        <p class="welcome-title-main" data-aos="fade-down" data-aos-duration="600" data-aos-delay="150">
+                            THE WEDDING OF
+                        </p>
+                        <h1 class="latin-title" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="400">
+                            Soya &amp; Arief
+                        </h1>
+                        <div class="welcome-details">
+                            <p data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Kepada Yth.</p>
+                            <p data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Bapak/Ibu/Saudara/i</p>
+                            <p class="welcome-guest-name guest-name" data-aos="fade-up" data-aos-duration="500" data-aos-delay="700">Nama Tamu</p>
+                        </div>
+                        <div class="welcome-open-invitation" data-aos="fade-down" data-aos-duration="500" data-aos-delay="750">
+                            <button type="button" class="welcome-open-action action-btn" id="startToExplore">
+                                <i class="icon-mail"></i>
+                                Buka Undangan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ornaments-wrapper">
+                <div class="orn-tc-7">
+                    <div class="image-wrap aos-init aos-animate" data-aos="fade-down" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-27.png" alt="Ornament">
+                    </div>
+                </div>
+
+
+                <div class="orn-tc-8">
+                    <div class="image-wrap aos-init aos-animate" data-aos="fade-down" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-28.png" alt="Ornament">
+                    </div>
+                </div>
+
+                <div class="orn-tc-1">
+                    <div class="image-wrap aos-init aos-animate" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-25.png" alt="Ornament">
+                    </div>
+                </div>
+                <div class="orn-tc-2">
+                    <div class="image-wrap aos-init aos-animate" data-aos="fade-up" data-aos-duration="500" data-aos-delay="300">
+                        <img src="assets/images/ornaments/Orn-26.png" alt="Ornament">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+        <!-- Left Side - Fixed -->
+        <aside class="left-side primary-pane">
+            <div class="pane-inner">
+                <div class="sintia-coconut-tree left" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="1500">
+                        <img src="assets/images/sintia/pohon.png" alt="">
+                    </div>
+                </div>
+                <div class="sintia-coconut-tree right" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="1700">
+                        <img src="assets/images/sintia/pohon.png" alt="">
+                    </div>
+                </div>
+                <div class="sintia-flowers bottom-01 left" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="1700">
+                        <img src="assets/images/sintia/onr-footnote.png" alt="">
+                    </div>
+                </div>
+                <div class="sintia-flowers bottom-02 left" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="700" data-aos-delay="1700">
+                        <img src="assets/images/sintia/onr-footnote.png" alt="">
+                    </div>
+                </div>
+                <div class="sintia-flowers bottom-01 right" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="500" data-aos-delay="1700">
+                        <img src="assets/images/sintia/onr-footnote.png" alt="">
+                    </div>
+                </div>
+                <div class="sintia-flowers bottom-02 right" aria-hidden="true">
+                    <div class="image-wrap" data-aos="fade-up" data-aos-duration="700" data-aos-delay="1700">
+                        <img src="assets/images/sintia/onr-footnote.png" alt="">
+                    </div>
+                </div>
+                <div class="left-content pane-details">
+                    <h2 class="pane-title" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="700">Soya &amp; Arief</h2>
+                    <p class="pane-date" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">Sabtu, 5 September 2026</p>
+                    <div class="pane-guest wedding-details" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="1100">
+                        <p>Kepada Yth.</p>
+                        <p>Bapak/Ibu/Saudara/i</p>
+                        <p class="wedding-guest-name guest-name">Nama Tamu</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Side - Scrollable -->
+        <main class="right-side secondary-pane">
+            <section class="hero-section cover" data-aos="zoom-in-down" data-aos-duration="700" data-aos-delay="150">
+                <div class="sintia-batik-separator" aria-hidden="true">
+                    <div class="image-wrap"><img src="assets/images/sintia/batik.png" alt=""></div>
+                </div>
+                <div class="cover-bg " data-aos="zoom-out" data-aos-duration="2000" data-aos-delay="200"></div>
+                <div class="hero-content">
+                    <div class="hero-header">
+                        <div class="logo-wrap" data-aos="fade-down" data-aos-duration="700" data-aos-delay="150">
+                            <img src="assets/images/af.png"
+                                alt="AF" class="logo">
+                        </div>
+                    </div>
+                    <div class="hero-body">
+                        
+                    <div class="sintia-butterfly" aria-hidden="true">
+                        <div class="image-wrap" data-aos="fade-down-right" data-aos-duration="1200" data-aos-delay="400">
+                            <img src="assets/images/sintia/kupu-kupu.png" alt="">
+                        </div>
+                    </div>
+                            <div class="image-body-frame" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                            <img src="assets/images/prewed/img-001.jpg" alt="Soya dan Arief" class="wedding-image">
+                        </div>
+                    </div>
+                    <div class="hero-footer">
+                        <p data-aos="fade-down" data-aos-duration="1200" data-aos-delay="550">
+                            Wedding Invitation
+                        </p>
+                        <h2 class="latin-title" data-aos="fade-in" data-aos-duration="1200" data-aos-delay="200">
+                            Soya & Arief
+                        </h2>
+                        <p class="bottom-text" data-aos="face-down" data-aos-duration="1200" data-aos-offset="50">
+                            #SoyaArief
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="quote-section quote-wrap" data-aos="zoom-in-down" data-aos-duration="700" data-aos-delay="150">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="quote-content">
+                    <div class="ornaments-wrapper">
+                    
+                        <div class="orn-quote-6 right">
+                            <div class="image-wrap " data-aos="fade-in" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-06.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-6 left ">
+                            <div class="image-wrap " data-aos="fade-in" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-06.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-5 right">
+                            <div class="image-wrap " data-aos="fade-in" data-aos-duration="400"
+                                data-aos-delay="500">
+                                <img src="assets/images/ornaments/Orn-05.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-5 left ">
+                            <div class="image-wrap " data-aos="fade-in" data-aos-duration="400"
+                                data-aos-delay="500">
+                                <img src="assets/images/ornaments/Orn-05.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-4 right">
+                            <div class="image-wrap " data-aos="fade-up" data-aos-duration="400"
+                                data-aos-delay="500">
+                                <img src="assets/images/ornaments/Orn-04.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-4 left ">
+                            <div class="image-wrap " data-aos="fade-up" data-aos-duration="400"
+                                data-aos-delay="500">
+                                <img src="assets/images/ornaments/Orn-04.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-2 right">
+                            <div class="image-wrap " data-aos="fade-up-right" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-02.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-2 left ">
+                            <div class="image-wrap " data-aos="fade-up-right" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-02.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-3 center ">
+                            <div class="image-wrap " data-aos="fade-up-right" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-03.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-1 right">
+                            <div class="image-wrap " data-aos="fade-up-left" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-01.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-quote-1 left ">
+                            <div class="image-wrap " data-aos="fade-up-left" data-aos-duration="600"
+                                data-aos-delay="400">
+                                <img src="assets/images/ornaments/Orn-01.png"
+                                    alt="Ornament">
+                            </div>
+                        </div>
+                    
+                    </div>
+                    <div class="quote-area">
+                        <p data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">“Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar
+                        kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada
+                        yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.”</p>
+                        <p data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150"><strong> (QS. Ar-Rum: 21) </strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bridegroom-section couple-wrap" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="bridegroom-content">
+                    <div class="bridegroom-header" data-aos="zoom-in" data-aos-duration="600">
+                        <h2 class="latin-title">The Wedding Of</h2>
+                        <p>Bismillahirrahmanirrahim. Dengan memohon rahmat dan ridho Allah SWT, kami bermaksud mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami:</p>
+                    </div>
+                    <div class="bridegroom-body">
+                    <div class="sintia-butterfly" aria-hidden="true">
+                        <div class="image-wrap" data-aos="fade-down-right" data-aos-duration="1200" data-aos-delay="400">
+                            <img src="assets/images/sintia/kupu-kupu.png" alt="">
+                        </div>
+                    </div>
+                        <div class="bridegroom-image" data-aos="fade-left" data-aos-duration="600" data-aos-delay="200">
+                            <img src="assets/images/prewed/groom.jpg" alt="Groom">
+                        </div>
+                        <div class="bridegroom-caption">
+                            <div class="bridegroom-info-data">
+                                <h2 class="latin-title" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief</h2>
+                                <p class="bridegroom-name" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief Fadillah</p>
+                                <p class="bridegroom-parents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
+                                    Putra pertama dari Bapak Zefriadi & Ibu Barkiah
+                                </p>
+                                <div class="bridegroom-link-instagram" data-aos="fade-in" data-aos-duration="800" data-aos-delay="200">
+                                    <a href="https://www.instagram.com/arief_fd_/" target="_blank" class="bridegroom-link">
+                                        <i class="icon-instagram"></i>
+                                        @arief_fd_
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bridegroom-separator">
+                            <div data-aos="fade-up" data-aos-duration="500" data-aos-delay="400">
+                                <h2 class="bridegroom-separator-text">&amp;</h2>
+                            </div>
+                        </div>
+                        <div class="bridegroom-image" data-aos="fade-right" data-aos-duration="600" data-aos-delay="200">
+                            <img src="assets/images/prewed/bride.jpg" alt="Bride">
+                        </div>
+                        <div class="bridegroom-caption">
+                            <div class="bridegroom-info-data">
+                                <h2 class="latin-title" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya</h2>
+                                <p class="bridegroom-name" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya Amanda
+                                </p>
+                                <p class="bridegroom-parents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
+                                    Putri ketiga dari Bapak Budhi Kristianto & Ibu Cut Dewi Astuti Hasan
+                                </p>
+                                <div class="bridegroom-link-instagram" data-aos="fade-in" data-aos-duration="800" data-aos-delay="200">
+                                    <a href="https://www.instagram.com/soyaamnda/" target="_blank" class="bridegroom-link">
+                                        <i class="icon-instagram"></i>
+                                        @soyaamnda
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="date-section save-date-wrap" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="save-date">
+                    <div class="save-date-head" data-aos="fade-up" data-aos-duration="1200">
+                        <h2 class="latin-title save-date-title">Save The Date</h2>
+                    </div>
+                    <div class="save-date-body">
+                        <div class="save-date-icon-wrap top" aria-hidden="true" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="200">
+                            <img class="save-date-icon" src="assets/images/sintia/save-date-flourish.svg" alt="">
+                        </div>
+                        <div class="countdown" data-target-date="2026-09-05T08:00:00+07:00">
+                            <div class="count-item" data-aos="fade-right" data-aos-duration="1200" data-aos-delay="600">
+                                <h2 class="count-num count-day">00</h2>
+                                <small class="count-text">Hari</small>
+                            </div>
+                            <div class="count-item" data-aos="fade-down" data-aos-duration="1200" data-aos-delay="500">
+                                <h2 class="count-num count-hour">00</h2>
+                                <small class="count-text">Jam</small>
+                            </div>
+                            <div class="count-item" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="500">
+                                <h2 class="count-num count-minute">00</h2>
+                                <small class="count-text">Menit</small>
+                            </div>
+                            <div class="count-item" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="600">
+                                <h2 class="count-num count-second">00</h2>
+                                <small class="count-text">Detik</small>
+                            </div>
+                        </div>
+                        <div class="add-to-calendar-wrap add-to-calendar-date" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="800">
+                            <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Soya+%26+Arief&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Soya+dan+Arief." target="_blank" rel="nofollow" id="addToCalendar">Tambahkan ke Kalender</a>
+                        </div>
+                        <div class="save-date-icon-wrap bottom" aria-hidden="true" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">
+                            <img class="save-date-icon" src="assets/images/sintia/save-date-flourish.svg" alt="">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="agenda-section agenda-wrap" data-aos="fade-up" data-aos-duration="800" data-aos-delay="150">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="agenda-content sintia-agenda-inner">
+                    <div class="agenda-header agenda-head">
+                        <div class="sintia-butterfly second" aria-hidden="true">
+                            <div class="image-wrap" data-aos="fade-down-right" data-aos-duration="1200" data-aos-delay="400">
+                                <img src="assets/images/sintia/kupu-kupu-2.png" alt="">
+                            </div>
+                        </div>
+                        <h2 class="latin-title agenda-title" data-aos="zoom-in" data-aos-duration="1500">Wedding Day</h2>
+                        <p class="agenda-description" data-aos="fade-up" data-aos-duration="1200">Dengan memohon rahmat dan ridho Allah SWT, kami akan menyelenggarakan pernikahan yang Insya Allah dilaksanakan pada:</p>
+                    </div>
+                    <div class="agenda-body">
+                        <div class="event-item" data-aos="fade-up" data-aos-duration="1200">
+                            <div class="section-group bottom">
+                                <div class="event-header sintia-event-head">
+                                    <h2 class="event-day" data-aos="fade-up" data-aos-duration="1000">Sabtu</h2>
+                                    <p class="event-date" data-aos="fade-up" data-aos-duration="1000">5 September 2026</p>
+                                </div>
+                                <div class="sintia-section-separator bottom" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                                </div>
+                            </div>
+                            <div class="event-content">
+                                <div class="agenda-corner top left" aria-hidden="true">
+                                    <div class="image-wrap" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                                        <img src="assets/images/sintia/agenda-corner.svg" alt="">
+                                    </div>
+                                </div>
+                                <div class="agenda-corner top right" aria-hidden="true">
+                                    <div class="image-wrap" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                                        <img src="assets/images/sintia/agenda-corner.svg" alt="">
+                                    </div>
+                                </div>
+                                <div class="agenda-corner bottom left" aria-hidden="true">
+                                    <div class="image-wrap" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                                        <img src="assets/images/sintia/agenda-corner.svg" alt="">
+                                    </div>
+                                </div>
+                                <div class="agenda-corner bottom right" aria-hidden="true">
+                                    <div class="image-wrap" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="200">
+                                        <img src="assets/images/sintia/agenda-corner.svg" alt="">
+                                    </div>
+                                </div>
+                                <div class="activity-wrap same-location">
+                                    <div class="activity-item">
+                                        <div class="activity-content">
+                                            <div class="activity-header activity-head">
+                                                <div data-aos="zoom-in" data-aos-duration="1200">
+                                                    <i class="icon-ring activity-icon"></i>
+                                                </div>
+                                                <h3 class="activity-title" data-aos="zoom-in" data-aos-duration="1200">Akad Nikah</h3>
+                                                <p class="activity-time" data-aos="fade-up" data-aos-duration="1000">08.00 WIB s.d. selesai</p>
+                                            </div>
+                                            <div class="event-details activity-details" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                                                <p class="event-hall">Aula Kampus Widuri</p>
+                                                <p class="event-address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
+                                                <p class="event-city">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
+                                                <div class="event-link-wrap" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300">
+                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank">
+                                                        <i class="icon-map"></i>
+                                                        Buka di Maps
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-content">
+                                            <div class="activity-header activity-head">
+                                                <div data-aos="zoom-in" data-aos-duration="1200">
+                                                    <i class="icon-party activity-icon"></i>
+                                                </div>
+                                                <h3 class="activity-title" data-aos="zoom-in" data-aos-duration="1200">Resepsi</h3>
+                                                <p class="activity-time" data-aos="fade-up" data-aos-duration="1000">11.00 - 14.00 WIB</p>
+                                            </div>
+                                            <div class="event-details activity-details" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
+                                                <p class="event-hall">Aula Kampus Widuri</p>
+                                                <p class="event-address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
+                                                <p class="event-city">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
+                                                <div class="event-link-wrap" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300">
+                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank">
+                                                        <i class="icon-map"></i>
+                                                        Buka di Maps
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="rsvp-section rsvp-wrap" data-aos="fade-up" data-aos-duration="800" data-aos-delay="500">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="rsvp-content">
+
+                    <!-- HEADER -->
+                    <div class="rsvp-header">
+                    <h2 class="latin-title" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200">
+                        RSVP
+                    </h2>
+                    <div class="rsvp-info">
+                        <p class="info-text">Mohon konfirmasi kehadiran Anda sebelum,</p>
+                        <p class="info-date">Sabtu, 5 September 2026</p>
+                    </div>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="rsvp-body">
+
+                    <!-- ✅ DESCRIPTION (MUNCUL JIKA SUDAH RSVP) -->
+                    <div class="rsvp-description" style="display:none">
+                        <div class="rsvp-message">
+                            <div class="rsvp-message-content">
+
+                                <h4 class="rsvp-message-title status-title">
+                                    <i class="icon-present-rsvp status-icon"></i>
+                                    <span class="status-title-text">Status Kehadiran</span>
+                                </h4>
+
+                                <p class="rsvp-message-text status-desc">
+                                    <!-- diisi dinamis via JS -->
+                                </p>
+
+                            </div>
+                        </div>
+
+                        <div class="rsvp-action">
+                            <button class="action-btn action-rsvp">
+                                <i class="icon-confirm-rsvp"></i>
+                                Ubah Kehadiran
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- ✅ FORM (MUNCUL SAAT BELUM RSVP ATAU “UBAH”) -->
+                    <div class="rsvp-form">
+                        <form id="rsvp-form-data">
+
+                        <!-- Nama -->
+                        <div class="form-input">
+                            <input
+                            class="form-input-field"
+                            type="text"
+                            id="name"
+                            name="name"
+                            placeholder="Nama Anda"
+                            required
+                            autocomplete="off"
+                            />
+                        </div>
+
+                        <!-- Status hadir -->
+                        <div class="rsvp-status-wrap">
+                            <p class="rsvp-status-caption">Apakah Anda akan hadir?</p>
+                            <div class="rsvp-confirm-wrap">
+
+                            <label>
+                                <input type="radio" name="confirm" value="yes" />
+                                <div class="rsvp-confirm-btn going">
+                                <i class="icon-confirm-yes-rsvp"></i>
+                                Akan Hadir
+                                </div>
+                            </label>
+
+                            <label>
+                                <input type="radio" name="confirm" value="no" />
+                                <div class="rsvp-confirm-btn not-going">
+                                <i class="icon-confirm-no-rsvp"></i>
+                                Tidak Hadir
+                                </div>
+                            </label>
+
+                            </div>
+                        </div>
+
+                        <!-- Jumlah orang -->
+                        <div class="rsvp-amount-wrap">
+                            <p class="rsvp-amount-caption">Jumlah Orang Yang Akan Datang</p>
+                            <div class="rsvp-amount-controller">
+                            <button type="button" class="toggle-btn minus">−</button>
+                            <input
+                                type="text"
+                                name="people"
+                                id="people"
+                                value="1"
+                                readonly
+                            />
+                            <button type="button" class="toggle-btn plus">+</button>
+                            </div>
+                        </div>
+
+                        <!-- Kirim -->
+                        <div class="rsvp-confirm-wrap rsvp-confirm-btn-wrap">
+                            <button type="submit" class="rsvp-confirm-btn confirm action-btn">
+                            <i class="icon-plane"></i>
+                            Kirim Konfirmasi
+                            </button>
+                        </div>
+
+                        </form>
+                    </div>
+
+                    </div>
+                </div>
+            </section>
+
+
+            <section class="photo-section photo-wrap" data-aos="fade-up" data-aos-duration="700" data-aos-delay="150">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="photo-content">
+                    <div class="photo-header" data-aos="fade-up" data-aos-duration="700" data-aos-delay="150">
+                        <h2 class="latin-title">Photo Gallery</h2>
+                    </div>
+                    <div class="photo-body">
+                        <div id="lightgallery" class="gallery-photos">
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK02905-1.jpg">
+                                    <img src="assets/images/prewed/MLK02905-1.jpg" alt="Soya & Arief 1" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK02974-2.jpg">
+                                    <img src="assets/images/prewed/MLK02974-2.jpg" alt="Soya & Arief 2" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03265-3.jpg">
+                                    <img src="assets/images/prewed/MLK03265-3.jpg" alt="Soya & Arief 3" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03238-4.jpg">
+                                    <img src="assets/images/prewed/MLK03238-4.jpg" alt="Soya & Arief 4" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03256-5.jpg">
+                                    <img src="assets/images/prewed/MLK03256-5.jpg" alt="Soya & Arief 5" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03258-6.jpg">
+                                    <img src="assets/images/prewed/MLK03258-6.jpg" alt="Soya & Arief 6" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03284-7.jpg">
+                                    <img src="assets/images/prewed/MLK03284-7.jpg" alt="Soya & Arief 7" class="img-photo">
+                                </a>
+                            </span>
+                            <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
+                                <a href="assets/images/prewed/MLK03285-8.jpg">
+                                    <img src="assets/images/prewed/MLK03285-8.jpg" alt="Soya & Arief 8" class="img-photo">
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="gift-section wedding-gift-wrap" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="gift-content">
+                    <div class="gift-wrapper">
+                        <div class="gift-header" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
+                            <h2 class="latin-title">Wedding Gift</h2>
+                            <p>Terima kasih telah menambah semangat kegembiraan pernikahan kami dengan kehadiran dan hadiah indah Anda</p>
+                        </div>
+                        <div class="gift-body">
+                            <div class="gift-section-action">
+                                <button class="gift-action" data-type="transfer" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                                    <i class="icon-card"></i>
+                                    Transfer
+                                </button>
+                                <button class="gift-action" data-type="gift" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                                    <i class="icon-gift"></i>
+                                    Kirim Kado
+                                </button>
+                            </div>
+                            <div class="gift-section-body">
+                                <div class="area-data-transfer" data-aos="fade-up" data-aos-duration="800" style="display: none;">
+                                    <p class="gift-desc">Silakan transfer hadiah melalui nomor rekening berikut:</p>
+                                    <div class="gift-card-body">
+                                        <div class="gift-card-item">
+                                            <div class="info-card">
+                                                <h2 class="gift-card-title">SHOPEEPAY</h2>
+                                                <h3 class="gift-card-number" data-remote="rekening-1">08996530109</h3>
+                                                <h4 class="gift-card-name">soyaamanda122</h4>
+                                            </div>
+                                            <div class="action-info-card">
+                                                <button class="copy-action" data-copy="rekening-1">
+                                                    <i class="icon-copy"></i>
+                                                    Salin Rekening
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="gift-card-item">
+                                            <div class="info-card">
+                                                <h2 class="gift-card-title">BANK BCA</h2>
+                                                <h3 class="gift-card-number" data-remote="rekening-2">7655312871</h3>
+                                                <h4 class="gift-card-name">Arief Fadillah</h4>
+                                            </div>
+                                            <div class="action-info-card">
+                                                <button class="copy-action" data-copy="rekening-2">
+                                                    <i class="icon-copy"></i>
+                                                    Salin Rekening
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="area-data-gift" data-aos="fade-up" data-aos-duration="800" style="display: none;">
+                                    <h2 class="gift-send-title">Kirim Kado</h2>
+                                    <p class="gift-desc">Anda dapat mengirim kado ke:</p>
+                                    <div class="gift-send-body">
+                                        <h3 class="gift-send-name">Soya Amanda</h3>
+                                        <p class="gift-send-address" data-remote="address">
+                                            Perumahan Bumi Sawangan Indah 2, Jalan Masjid III Blok D3 No. 110,
+                                            Sawangan, Kota Depok, Jawa Barat 16518, Indonesia
+                                        </p>
+                                    </div>
+                                    <div class="action-address-card">
+                                    <button class="copy-action" data-copy="address">
+                                        <i class="icon-copy"></i>
+                                        Salin Alamat
+                                    </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wish-section wedding-wish-wrap" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="wish-content">
+                    <div class="ornaments-wrapper">
+                        <div class="orn-top-wrap">
+                            <div class="orn-lf-3 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-08.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-3 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-08.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-2 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="550">
+                                    <img src="assets/images/ornaments/Orn-06.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-2 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="550">
+                                    <img src="assets/images/ornaments/Orn-06.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-1 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-22.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-1 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-22.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="orn-bottom-wrap">
+                            <div class="orn-lf-3 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-08.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-3 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-08.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-2 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="550">
+                                    <img src="assets/images/ornaments/Orn-06.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-2 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="550">
+                                    <img src="assets/images/ornaments/Orn-06.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-1 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-22.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-1 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-22.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wish-area">
+                        <div class="wish-header">
+                            <h2 class="latin-title" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">Best Wishes</h2>
+                            <p class="wish-description" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">Silakan kirimkan ucapan dan doa terbaikmu di sini, sebagai tanda kasih di hari bahagia kami:</p>
+                        </div>
+                        <div class="wish-body">
+                            <form id="wish-form" class="wish-form">
+                                <div class="form-wish">
+                                    <input type="text" class="form-input-field wish-input" id="nama" name="nama" placeholder="Isikan Nama Anda" required>
+                                    <textarea id="pesan" class="form-input-field wish-input" name="pesan" placeholder="Berikan Ucapan Terbaik" rows="4" required></textarea>
+                                    <!-- Area sticker terpilih (tampil di bawah textarea komentar) -->
+                                    <div id="selectedStickers" class="selected-stickers"></div>
+                                    <button class="btn-sticker" type="button">
+                                        <i class="icon-emoticon"></i>
+                                        Sticker
+                                    </button>
+                                </div>
+                                <button type="submit" class="action-btn">
+                                    <i class="icon-plane"></i>
+                                    Kirim Ucapan
+                                </button>
+                            </form>
+                            <div class="wish-list" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                                <!-- Daftar ucapan akan ditampilkan di sini -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ornaments-wrapper">
+                        <div class="orn-top-wrap">
+                            <div class="orn-lf-5 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-23.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-5 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-23.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-4 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-13.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-4 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-13.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="orn-bottom-wrap">
+                            <div class="orn-lf-5 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-23.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-5 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-23.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-4 left">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-13.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                            <div class="orn-lf-4 right">
+                                <div class="image-wrap" data-aos="fade-up" data-aos-duration="600"
+                                    data-aos-delay="400">
+                                    <img src="assets/images/ornaments/Orn-13.png"
+                                        alt="Ornament">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="note-section notes-container" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="note-content">
+                    <div class="note-header">
+                        <h2 class="latin-title" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
+                            Ucapan Akhir
+                        </h2>
+                        <p class="note-description" data-aos="fade-up" data-aos-duration="600">
+                            Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
+                            <br><br>
+                            Atas kehadiran dan doa restunya, kami mengucapkan terima kasih.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="footnote-section footnote-wrap" data-aos="fade-in" data-aos-duration="700" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                    <div class="sintia-foot-flower orn-1 left" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+                    <div class="sintia-foot-flower orn-1 right" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+                    <div class="sintia-foot-flower orn-2 left" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+                    <button class="sintia-foot-love" type="button" aria-label="Mainkan animasi cupid">♥</button>
+                    <div class="sintia-foot-flower orn-2 right" aria-hidden="true"><img src="assets/images/sintia/onr-footnote.png" alt=""></div>
+                <div class="footnote-content">
+                    <div class="ornaments-wrapper">
+                        <div class="orn-event-3">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-17.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-9">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-19.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-7">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-16.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-8">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-20.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-6">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-18.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-5">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-06.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-4">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-11.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-2">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-16.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-14">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-21.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-13">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-20.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-12">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-11.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-11">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-05.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-10">
+                            <div class="image-wrap" data-aos="fade-left" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-06.png" alt="Ornament">
+                            </div>
+                        </div>
+                        <div class="orn-event-1">
+                            <div class="image-wrap" data-aos="fade-right" data-aos-duration="400" data-aos-delay="300">
+                                <img src="assets/images/ornaments/Orn-15.png" alt="Ornament">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footnote-body">
+                        <div class="logo-wrap" data-aos="fade-in" data-aos-duration="700" data-aos-delay="100">
+                            <img src="assets/images/af.png"
+                                alt="AF" class="logo">
+                        </div>
+                        <p class="top-text" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                            Wedding Invitation
+                        </p>
+                        <h2 class="latin-title footnote-title" >
+                            Soya & Arief
+                        </h2>
+                        <p class="bottom-text" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100" data-aos-offset="50">
+                            #SoyaArief
+                        </p>
+                        <p>05.09.2026</p>
+                    </div>
+                </div>
+                <section class="footer sintia-footer" id="footer-to-top">
+                    <div class="footer-inner">
+                        <p>Soya & Arief</p>
+                        <i class="icon-up"></i>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <!-- Popup Wish Fullscreen -->
+    <div id="wishPopup" class="wish-popup" aria-hidden="true" inert>
+        <div class="wish-popup-inner">
+            <button class="popup-close"><i class="icon-times"></i></button>
+            <h3 class="popup-title">Semua Ucapan & Doa</h3>
+            <div class="wish-popup-body">
+                <div id="wishPopupList" class="wish-popup-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup Sticker Fullscreen -->
+    <div id="stickerPopup" class="sticker-popup" aria-hidden="true" inert>
+        <div class="sticker-popup-inner">
+            <button class="popup-close"><i class="icon-times"></i></button>
+
+            <h3 class="popup-title">Daftar Sticker</h3>
+
+            <div class="sticker-popup-body">
+                <div id="stickerGrid" class="sticker-grid"></div>
+            </div>
+
+            <div class="popup-footer">
+                <button id="chooseStickers" class="action-btn">
+                    <i class="icon-emoticon"></i>
+                    Pilih Sticker
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="backsound" preload="auto" loop playsinline>
+        <source src="assets/music/backsound.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Audio control circle - Dipindahkan ke dalam container agar z-index bekerja dengan benar -->
+    <button id="audioCircle" class="audio-circle" type="button" aria-label="Audio control">
+        <i class="icon-audio"></i>
+    </button>
+
+    <!-- JavaScript Libraries - CDN untuk library besar dengan optimasi loading -->
+    
+    <!-- jQuery - CDN dengan fallback dan defer loading -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" 
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" 
+            crossorigin="anonymous" 
+            defer></script>
+    
+    <!-- AOS JavaScript - CDN dengan defer loading -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+    
+    <!-- lightGallery JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.1/lightgallery.min.js" defer></script>
+    
+    <!-- Lazy Load JavaScript - Load first untuk image optimization -->
+    <script src="assets/js/lazyload.js"></script>
+    
+    <!-- Main JavaScript - Library initialization dengan defer -->
+    <script src="assets/js/main.js" defer></script>
+    
+    <!-- Custom JavaScript - Project specific functionality dengan defer -->
+    <script src="assets/js/custom.js" defer></script>
+    
+    <!-- Performance monitoring script -->
+    <script>
+        // Performance monitoring untuk debugging
+        window.addEventListener('load', function() {
+            if (performance.getEntriesByType) {
+                const perfData = performance.getEntriesByType('navigation')[0];
+                console.log('📊 Page Load Performance:', {
+                    'DOM Content Loaded': Math.round(perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart) + 'ms',
+                    'Load Complete': Math.round(perfData.loadEventEnd - perfData.loadEventStart) + 'ms',
+                    'Total Load Time': Math.round(perfData.loadEventEnd - perfData.navigationStart) + 'ms'
+                });
+            }
+        });
+        
+        // Error tracking untuk debugging
+        window.addEventListener('error', function(e) {
+            console.error('🚨 JavaScript Error:', e.error);
+        });
+        
+        // Unhandled promise rejection tracking
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('🚨 Unhandled Promise Rejection:', e.reason);
+        });
+    </script>
+</body>
+</html>

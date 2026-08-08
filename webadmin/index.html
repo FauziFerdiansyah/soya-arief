@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Box Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyCffYw2s4r3d4RB1Io0kYH41-8nu9qspm8",
+        authDomain: "wedding-web-alfira-fauzi.firebaseapp.com",
+        projectId: "wedding-web-alfira-fauzi",
+        storageBucket: "wedding-web-alfira-fauzi.firebasestorage.app",
+        messagingSenderId: "260951532899",
+        appId: "1:260951532899:web:76d14d2972ce8b7cc99f56"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      window.db = getFirestore(app);   // ✅ simpan global
+    </script>
+
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-primary-light border-right" id="sidebar-wrapper">
+          <div class="sidebar-heading text-white"><img src="assets/img/logo-af.png" height="40" alt="logo"></div>
+          <div class="list-group list-group-flush">
+              <a href="#" class="list-group-item list-group-item-action bg-primary-light active" data-menu="guests"><i class="ri-contacts-book-fill"></i> Buat Tamu Undangan</a>
+              <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="rsvp"><i class="ri-pass-valid-line"></i> RSVP</a>
+              <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="comments"><i class="ri-chat-smile-2-line"></i> Comments</a>
+          </div>
+      </div>
+      <!-- /#sidebar-wrapper -->
+
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+          <button class="btn btn-primary" id="menu-toggle"><i class="ri-menu-fold-fill"></i></button>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+              <!-- <li class="nav-item active">
+                <a class="nav-link" href="https://akademi.co.id/" target="_blank"><i class="ri-earth-fill"></i> Akademi.co.id</a>
+              </li> -->
+            </ul>
+          </div>
+        </nav>
+
+        <div class="container px-lg-5 py-lg-2 position-relative">
+          <div class="mt-4 pb-5" id="guestsSection">
+            <!-- Tabs -->
+            <ul class="nav nav-tabs" id="guestTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="list-tab" data-bs-toggle="tab" data-bs-target="#listUndangan" type="button" role="tab" aria-controls="listUndangan" aria-selected="true">
+                  <i class="ri-list-check-2"></i> List Undangan
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#tambahUndangan" type="button" role="tab" aria-controls="tambahUndangan" aria-selected="false">
+                  <i class="ri-user-add-line"></i> Tambah Undangan
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="invitation-tab" data-bs-toggle="tab" data-bs-target="#formInvitation" type="button" role="tab" aria-controls="formInvitation" aria-selected="false">
+                  <i class="ri-message-3-line"></i> Form Invitation
+                </button>
+              </li>
+              <li class="nav-item ms-auto" role="presentation">
+                <button class="btn btn-primary btn-sm me-2" id="exportGuestsBtn" type="button">
+                  <i class="ri-download-2-line"></i> Export Excel
+                </button>
+                <button class="btn btn-success btn-sm" id="importGuestsBtn" type="button">
+                  <i class="ri-file-excel-2-line"></i> Import Data
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab contents -->
+            <div class="tab-content mt-3" id="guestTabsContent">
+              <!-- List Undangan -->
+              <div class="tab-pane fade show active" id="listUndangan" role="tabpanel" aria-labelledby="list-tab">
+                <div class="card card-border mb-lg-5 mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="fs-6 mb-0">List Tamu Undangan</h2>
+                        </div>
+
+                        <!-- ✅ Filter Section -->
+                        <div class="row mb-3 align-items-center">
+                            <!-- Search Input -->
+                            <div class="col-md-3 mb-2">
+                                <input 
+                                    type="text" 
+                                    id="searchGuest" 
+                                    class="form-control" 
+                                    placeholder="🔍 Cari nama tamu..."
+                                >
+                            </div>
+
+                            <!-- Filter Undangan Dari -->
+                            <div class="col-md-3 mb-2">
+                                <select id="filterSource" class="form-select">
+                                    <option value="">Semua Undangan Dari</option>
+                                    <option value="CPP">CPP</option>
+                                    <option value="CPW">CPW</option>
+                                    <option value="Ayah">Ayah</option>
+                                    <option value="Bunda">Bunda</option>
+                                    <option value="Mama Fira">Mama Fira</option>
+                                    <option value="Mama Fauzi">Mama Fauzi</option>
+                                    <option value="Ayah Fauzi">Ayah Fauzi</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <!-- Filter Checkboxes -->
+                            <div class="col-md-5 mb-2">
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterVipTable" value="vipTable">
+                                        <label class="form-check-label" for="filterVipTable">
+                                            <i class="ri-vip-fill text-primary"></i> VIP Table
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterVipSouvenir" value="vipSouvenir">
+                                        <label class="form-check-label" for="filterVipSouvenir">
+                                            <i class="ri-vip-diamond-fill text-info"></i> VIP Souvenir
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterOpened" value="opened">
+                                        <label class="form-check-label" for="filterOpened">
+                                            <i class="ri-eye-line text-success"></i> Sudah Dilihat
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterRsvp" value="rsvp">
+                                        <label class="form-check-label" for="filterRsvp">
+                                            <i class="ri-check-line text-success"></i> RSVP Hadir
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="filterBelumDikirim" value="belumDikirim">
+                                        <label class="form-check-label" for="filterBelumDikirim">
+                                            <i class="ri-mail-send-line text-warning"></i> Belum Dikirim
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reset Button -->
+                            <div class="col-md-2 mb-2 d-flex gap-2 align-items-center">
+                                <button id="resetFilters" class="btn btn-sm btn-outline-secondary" title="Reset Filter">
+                                    <i class="ri-refresh-line"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th width="50" class="text-center"><i class="ri-eye-line"></i></th>
+                                        <th class="sortable" data-sort="name">
+                                            <div class="sortheader">
+                                              <span>Nama Tamu</span>
+                                              <i class="ri-arrow-up-down-line sort-icon"></i>
+                                            </div>
+                                        </th>
+                                        <th class="sortable" data-sort="maxGuests">
+                                            <div class="sortheader">
+                                              <span>Jumlah</span>
+                                              <i class="ri-arrow-up-down-line sort-icon"></i>
+                                            </div>
+                                        </th>
+                                        <th>No HP</th>
+                                        <th class="sortable" data-sort="source">
+                                            <div class="sortheader">
+                                              <span>Dari</span>
+                                              <i class="ri-arrow-up-down-line sort-icon"></i>
+                                            </div>
+                                        </th>
+                                        <th class="sortable" data-sort="opened">
+                                            <div class="sortheader">
+                                              <span>Dilihat</span>
+                                              <i class="ri-arrow-up-down-line sort-icon"></i>
+                                            </div>
+                                        </th>
+                                        <th class="sortable" data-sort="sendCount">
+                                            <div class="sortheader">
+                                              <span>Dikirim</span>
+                                              <i class="ri-arrow-up-down-line sort-icon"></i>
+                                            </div>
+                                        </th>
+                                        <th width="200" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="guestTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center text-muted">Belum ada data tamu.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination & Per Page Controls -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <!-- Per Page Selector (Kiri) -->
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="text-muted" style="font-size: 14px;">(<i class="ri-list-check-2"></i> <strong id="totalDataGuest">0</strong> Data)</span>
+                                <label class="mb-0 text-muted" style="font-size: 14px;">Tampilkan:</label>
+                                <select id="perPageSelect" class="form-select form-select-sm" style="width: 65px;">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                                <span class="text-muted" style="font-size: 14px;">data per halaman</span>
+                            </div>
+
+                            <!-- Pagination (Kanan) -->
+                            <nav>
+                                <ul id="paginationGuest" class="pagination pagination-sm mb-0"></ul>
+                            </nav>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+              <!-- Tambah Undangan -->
+              <div class="tab-pane fade" id="tambahUndangan" role="tabpanel" aria-labelledby="add-tab">
+                <h1 class="mt-4 mb-2 fs-6">Tambah Tamu Undangan</h1>
+                <p class="fw-light" style="font-size: 14px;">Isi form untuk menambahkan tamu undangan.</p>
+                <div class="card card-border mb-lg-5 mb-3">
+                  <div class="card-body">
+                    <form id="qrForm" class="row">
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-group-line"></i> Nama Tamu<i class="ri-asterisk req-input text-danger"></i></label>
+                          <input type="text" name="guestName" class="form-control" id="urlInput" placeholder="Nama / Nama & Nama" required>
+                          <div id="urlError" class="text-danger mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-coupon-3-line"></i> Jumlah Tamu<i class="ri-asterisk req-input text-danger"></i></label>
+                          <input type="number" name="guestCount" class="form-control" id="urlInput" value="1" min="1" max="10" required>
+                          <div id="urlError" class="text-danger mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-contacts-line"></i> Nomor Handphone</label>
+                          <input type="text" name="guestPhone" class="form-control" id="urlInput" placeholder="08xxxxxxxxx">
+                          <div class="form-text">Opsional - Untuk kirim WhatsApp</div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-instagram-line"></i> Username Instagram</label>
+                          <div class="input-group">
+                            <span class="input-group-text">@</span>
+                            <input type="text" name="guestInstagram" class="form-control" placeholder="username" id="instagramInput">
+                          </div>
+                          <div class="form-text">Opsional - Tanpa @ di depan</div>
+                        </div>
+                        <!-- <div class="mb-4">
+                          <label for="descInput" class="form-label">Deskripsi (Opsional)</label>
+                          <textarea id="descInput" class="form-control" placeholder="Tuliskan deskripsi informasi terkait ujian atau keterangan lainnya..."></textarea>
+                        </div> -->
+                      </div>
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-id-card-line"></i> Tamu Undangan Dari</label>
+
+                          <select name="guestSource" class="form-select form-control" id="guestFromSelect">
+                            <option value="" selected>Pilih undangan dari...</option>
+                            <option value="CPP">CPP</option>
+                            <option value="CPW">CPW</option>
+                            <option value="Ayah">Ayah</option>
+                            <option value="Bunda">Bunda</option>
+                            <option value="Mama Fira">Mama Fira</option>
+                            <option value="Mama Fauzi">Mama Fauzi</option>
+                            <option value="Ayah Fauzi">Ayah Fauzi</option>
+                            <option value="Lainnya">Lainnya</option>
+                          </select>
+                          <div id="urlError" class="text-danger mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="urlInput" class="form-label"><i class="ri-sticky-note-add-line"></i> Keterangan Undangan Dari</label>
+                          <input type="text" name="guestSourceNote" class="form-control" id="urlInput" placeholder="Keterangan undangan dari...">
+                          <div id="urlError" class="text-danger mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label"><i class="ri-vip-crown-line"></i> Status VIP</label>
+                          <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" name="guestTableVip" id="tableVipYes" value="true">
+                              <label class="form-check-label" for="tableVipYes">
+                                <i class="ri-restaurant-line"></i> VIP Table
+                              </label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" name="guestSouvenirVip" id="souvenirVipYes" value="true">
+                              <label class="form-check-label" for="souvenirVipYes">
+                                <i class="ri-gift-line"></i> VIP Souvenir
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- <div class="form-settings mt-3 mb-2">
+                          <div class="form-text d-flex flex-row align-items-start gap-1">
+                            <i class="ri-information-2-line text-primary"></i> <p class="text-primary"><strong>Tambah Keterangan Tamu Undangan</strong> <br>Isikan informasi terkait tamu undangan dari siapa.</p>
+                          </div>
+                          <div class="mt-2">
+                            <label for="inputInPassword" class="form-label"><i class="ri-lock-password-line"></i> Password Masuk (Opsional)</label>
+                            <input type="text" class="form-control" id="inputInPassword" placeholder="">
+                          </div>
+                          <div class="mt-4">
+                            <label for="inputOutPassword" class="form-label"><i class="ri-lock-unlock-line"></i> Password Keluar (Opsional)</label>
+                            <input type="text" class="form-control" id="inputOutPassword" placeholder="">
+                          </div>
+                          <div class="sticky-action-button">
+                            <button type="reset" class="btn btn-outline-danger d-none" id="reset-form"><i class="ri-eraser-line"></i> Bersihkan Form</button>
+                            <button type="submit" class="btn btn-primary"><i class="ri-qr-code-line"></i> Buat QR Code</button>
+                          </div>
+                        </div> -->
+                      </div>
+                      <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary"><i class="ri-save-3-line"></i> Simpan Tamu</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Form Invitation -->
+              <div class="tab-pane fade" id="formInvitation" role="tabpanel" aria-labelledby="invitation-tab">
+                <h1 class="mt-4 mb-2 fs-6">Template Undangan WhatsApp</h1>
+                <p class="fw-light" style="font-size: 14px;">Edit template pesan undangan yang akan dikirim via WhatsApp.</p>
+                <div class="card card-border mb-lg-5 mb-3">
+                  <div class="card-body">
+                    <form id="invitationForm">
+                      <div class="mb-3">
+                        <label for="invitationTemplate" class="form-label">
+                          <i class="ri-message-3-line"></i> Template Pesan Undangan
+                        </label>
+                        <textarea id="invitationTemplate" class="form-control" rows="15"></textarea>
+                        <div class="form-text mt-2">
+                          <i class="ri-information-line"></i> Gunakan <code>[Nama Tamu]</code> untuk nama tamu dan <code>[Link Undangan]</code> untuk URL undangan.
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary" id="resetTemplate">
+                          <i class="ri-refresh-line"></i> Reset ke Default
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                          <i class="ri-save-3-line"></i> Simpan Template
+                        </button>
+                      </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <h2 class="fs-6 mb-3">Preview & Kirim Undangan</h2>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="previewGuestSelect" class="form-label">
+                            <i class="ri-user-line"></i> Pilih Tamu
+                          </label>
+                          <select id="previewGuestSelect" class="form-select">
+                            <option value="">-- Pilih Tamu --</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label class="form-label">
+                            <i class="ri-phone-line"></i> Nomor WhatsApp
+                          </label>
+                          <input type="text" id="previewPhone" class="form-control" readonly placeholder="Pilih tamu terlebih dahulu">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">
+                        <i class="ri-eye-line"></i> Preview Pesan
+                      </label>
+                      <div id="previewMessage" class="border rounded p-3 bg-light" style="white-space: pre-wrap; min-height: 200px; font-family: monospace; font-size: 14px;">
+                        Pilih tamu untuk melihat preview pesan...
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                      <button type="button" class="btn btn-success" id="sendWhatsApp" disabled>
+                        <i class="ri-whatsapp-line"></i> Kirim via WhatsApp
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RSVP Section -->
+          <div class="mt-4 pb-5" id="rsvpSection" style="display: none;">
+            <h1 class="fs-5 mb-3"><i class="ri-pass-valid-line"></i> RSVP Management</h1>
+            
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+              <div class="col-md-3 mb-3">
+                <div class="card border-primary">
+                  <div class="card-body text-center">
+                    <i class="ri-group-line fs-1 text-primary"></i>
+                    <h3 class="mt-2 mb-0" id="totalGuests">0</h3>
+                    <p class="text-muted mb-0">Total Tamu</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card border-success">
+                  <div class="card-body text-center">
+                    <i class="ri-checkbox-circle-line fs-1 text-success"></i>
+                    <h3 class="mt-2 mb-0" id="totalHadir">0</h3>
+                    <p class="text-muted mb-0">Hadir</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card border-danger">
+                  <div class="card-body text-center">
+                    <i class="ri-close-circle-line fs-1 text-danger"></i>
+                    <h3 class="mt-2 mb-0" id="totalTidakHadir">0</h3>
+                    <p class="text-muted mb-0">Tidak Hadir</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="card border-secondary">
+                  <div class="card-body text-center">
+                    <i class="ri-question-line fs-1 text-secondary"></i>
+                    <h3 class="mt-2 mb-0" id="totalBelumKonfirmasi">0</h3>
+                    <p class="text-muted mb-0">Belum Konfirmasi</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card card-border mb-lg-5 mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="fs-6 mb-0">Daftar RSVP</h2>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="row mb-3 align-items-center">
+                  <div class="col-md-5 mb-2">
+                    <input type="text" id="searchRsvp" class="form-control" placeholder="🔍 Cari nama tamu...">
+                  </div>
+                  <div class="col-md-4 mb-2">
+                    <select id="filterRsvpStatus" class="form-select">
+                      <option value="">Semua Status</option>
+                      <option value="yes">Hadir</option>
+                      <option value="no">Tidak Hadir</option>
+                      <option value="pending">Belum Konfirmasi</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 mb-2">
+                    <button id="resetRsvpFilters" class="btn btn-sm btn-outline-secondary w-100">
+                      <i class="ri-refresh-line"></i> Reset
+                    </button>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-striped table-bordered table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th width="50" class="text-center"><i class="ri-eye-line"></i></th>
+                        <th class="sortable-rsvp" data-sort="name">
+                          <div class="sortheader">
+                            <span>Nama Tamu</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th class="sortable-rsvp" data-sort="rsvpStatus">
+                          <div class="sortheader">
+                            <span>Status RSVP</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th class="sortable-rsvp" data-sort="rsvpCount">
+                          <div class="sortheader">
+                            <span>Jumlah Hadir</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th class="sortable-rsvp" data-sort="maxGuests">
+                          <div class="sortheader">
+                            <span>Max Tamu</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th>No HP</th>
+                        <th>Dari</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rsvpTableBody">
+                      <tr>
+                        <td colspan="7" class="text-center text-muted">Belum ada data RSVP.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted" style="font-size: 14px;">(<i class="ri-list-check-2"></i> <strong id="totalDataRsvp">0</strong> Data)</span>
+                    <label class="mb-0 text-muted" style="font-size: 14px;">Tampilkan:</label>
+                    <select id="perPageRsvp" class="form-select form-select-sm" style="width: 65px;">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span class="text-muted" style="font-size: 14px;">data per halaman</span>
+                  </div>
+                  <nav>
+                    <ul id="paginationRsvp" class="pagination pagination-sm mb-0"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments Section -->
+          <div class="mt-4 pb-5" id="commentsSection" style="display: none;">
+            <h1 class="fs-5 mb-3"><i class="ri-chat-smile-2-line"></i> Comments Management</h1>
+            <div class="card card-border mb-lg-5 mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="fs-6 mb-0">Daftar Comments</h2>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="row mb-3 align-items-center">
+                  <div class="col-md-6 mb-2">
+                    <input type="text" id="searchComment" class="form-control" placeholder="🔍 Cari nama atau komentar...">
+                  </div>
+                  <div class="col-md-4 mb-2">
+                    <select id="filterCommentSticker" class="form-select">
+                      <option value="">Semua Sticker</option>
+                      <option value="stc-a-1.gif">🎉 Sticker 1</option>
+                      <option value="stc-a-2.gif">💐 Sticker 2</option>
+                      <option value="stc-a-3.gif">🎊 Sticker 3</option>
+                      <option value="stc-a-4.gif">💝 Sticker 4</option>
+                      <option value="stc-a-5.gif">🌸 Sticker 5</option>
+                      <option value="stc-a-6.gif">🎈 Sticker 6</option>
+                      <option value="stc-a-7.gif">💖 Sticker 7</option>
+                      <option value="stc-a-8.gif">🥳 Sticker 8</option>
+                      <option value="stc-a-9.gif">🌹 Sticker 9</option>
+                      <option value="stc-a-10.gif">🎁 Sticker 10</option>
+                      <option value="stc-a-11.gif">💕 Sticker 11</option>
+                      <option value="stc-a-12.gif">🌺 Sticker 12</option>
+                      <option value="stc-a-13.gif">✨ Sticker 13</option>
+                      <option value="stc-a-14.gif">🎀 Sticker 14</option>
+                      <option value="stc-a-15.gif">💐 Sticker 15</option>
+                      <option value="stc-a-16.gif">🌷 Sticker 16</option>
+                      <option value="stc-a-17.gif">🎊 Sticker 17</option>
+                      <option value="stc-a-18.gif">💫 Sticker 18</option>
+                    </select>
+                  </div>
+                  <div class="col-md-2 mb-2">
+                    <button id="resetCommentFilters" class="btn btn-sm btn-outline-secondary w-100">
+                      <i class="ri-refresh-line"></i> Reset
+                    </button>
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-striped table-bordered table-hover align-middle">
+                    <thead>
+                      <tr>
+                        <th width="50" class="text-center"><i class="ri-eye-line"></i></th>
+                        <th class="sortable-comment" data-sort="name">
+                          <div class="sortheader">
+                            <span>Nama</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th>Komentar</th>
+                        <th class="sortable-comment" data-sort="sticker">
+                          <div class="sortheader">
+                            <span>Sticker</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                        <th class="sortable-comment" data-sort="createdAt">
+                          <div class="sortheader">
+                            <span>Tanggal</span>
+                            <i class="ri-arrow-up-down-line sort-icon"></i>
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="commentTableBody">
+                      <tr>
+                        <td colspan="5" class="text-center text-muted">Belum ada komentar.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="text-muted" style="font-size: 14px;">(<i class="ri-list-check-2"></i> <strong id="totalDataComment">0</strong> Data)</span>
+                    <label class="mb-0 text-muted" style="font-size: 14px;">Tampilkan:</label>
+                    <select id="perPageComment" class="form-select form-select-sm" style="width: 65px;">
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span class="text-muted" style="font-size: 14px;">data per halaman</span>
+                  </div>
+                  <nav>
+                    <ul id="paginationComment" class="pagination pagination-sm mb-0"></ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- ======================
+    ✅ EDIT GUEST MODAL
+    ======================= -->
+    <div class="modal fade" id="editGuestModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="ri-edit-line"></i> Edit Tamu Undangan
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            <form id="editGuestForm" class="row">
+
+              <input type="hidden" name="editGuestId">
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Nama Tamu <span class="text-danger">*</span></label>
+                  <input type="text" name="editGuestName" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Jumlah Tamu <span class="text-danger">*</span></label>
+                  <input type="number" name="editGuestCount" class="form-control" min="1" max="10" required>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Nomor Handphone</label>
+                  <input type="text" name="editGuestPhone" class="form-control">
+                  <div class="form-text">Opsional - Untuk kirim WhatsApp</div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"><i class="ri-instagram-line"></i> Username Instagram</label>
+                  <div class="input-group">
+                    <span class="input-group-text">@</span>
+                    <input type="text" name="editGuestInstagram" class="form-control" placeholder="username">
+                  </div>
+                  <div class="form-text">Opsional - Tanpa @ di depan</div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label">Tamu Undangan Dari</label>
+                  <select name="editGuestSource" class="form-select">
+                    <option value="">Pilih...</option>
+                    <option value="CPP">CPP</option>
+                    <option value="CPW">CPW</option>
+                    <option value="Ayah">Ayah</option>
+                    <option value="Bunda">Bunda</option>
+                    <option value="Mama Fira">Mama Fira</option>
+                    <option value="Mama Fauzi">Mama Fauzi</option>
+                    <option value="Ayah Fauzi">Ayah Fauzi</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Keterangan Undangan Dari</label>
+                  <input type="text" name="editGuestSourceNote" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"><i class="ri-vip-crown-line"></i> Status VIP</label>
+                  <div class="d-flex flex-column gap-2">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="editGuestTableVip" id="editTableVipYes" value="true">
+                      <label class="form-check-label" for="editTableVipYes">
+                        <i class="ri-restaurant-line"></i> VIP Table
+                      </label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="editGuestSouvenirVip" id="editSouvenirVipYes" value="true">
+                      <label class="form-check-label" for="editSouvenirVipYes">
+                        <i class="ri-gift-line"></i> VIP Souvenir
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button class="btn btn-primary" id="saveEditGuest">
+              <i class="ri-save-3-line"></i> Simpan Perubahan
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================
+    ✅ IMPORT GUESTS MODAL
+    ======================= -->
+    <div class="modal fade" id="importGuestsModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <i class="ri-file-excel-2-line"></i> Import Data Tamu
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+
+          <div class="modal-body">
+            
+            <!-- Info & Instructions -->
+            <div class="alert alert-info">
+              <h6 class="alert-heading"><i class="ri-information-line"></i> Format File</h6>
+              <p class="mb-2">Upload file CSV atau Excel (.xlsx) dengan format kolom berikut:</p>
+              <ol class="mb-2">
+                <li><strong>Nama Tamu</strong> - Nama lengkap tamu (wajib)</li>
+                <li><strong>Jumlah Tamu</strong> - Angka (1-10)</li>
+                <li><strong>Nomor Handphone</strong> - Format: +62xxx atau 08xxx (opsional, auto-convert)</li>
+                <li><strong>Instagram</strong> - Username tanpa @ (opsional, @ akan dihapus otomatis)</li>
+                <li><strong>Tamu Undangan Dari</strong> - CPP/CPW/Alfira/Fauzi/dll</li>
+                <li><strong>Keterangan Undangan Dari</strong> - Keterangan tambahan</li>
+                <li><strong>Table</strong> - VIP atau Reguler</li>
+                <li><strong>Souvenir</strong> - VIP atau Reguler</li>
+              </ol>
+              <p class="mb-0"><small><strong>Catatan:</strong> Phone & Instagram keduanya opsional. Jika tidak diisi, button WhatsApp/Instagram tidak akan muncul.</small></p>
+            </div>
+
+            <!-- Download Template -->
+            <div class="mb-3">
+              <button type="button" class="btn btn-outline-primary btn-sm" id="downloadTemplate">
+                <i class="ri-download-line"></i> Download Template CSV
+              </button>
+            </div>
+
+            <!-- File Upload -->
+            <div class="mb-3">
+              <label class="form-label">Pilih File</label>
+              <input type="file" class="form-control" id="importFile" accept=".csv,.xlsx,.xls">
+              <div class="form-text">Format: CSV atau Excel (.xlsx, .xls)</div>
+            </div>
+
+            <!-- Preview Area -->
+            <div id="importPreview" style="display: none;">
+              <h6>Preview Data (5 baris pertama):</h6>
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered">
+                  <thead id="importPreviewHead"></thead>
+                  <tbody id="importPreviewBody"></tbody>
+                </table>
+              </div>
+              <p class="text-muted"><small>Total: <span id="importTotalRows">0</span> baris</small></p>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            <button class="btn btn-success" id="processImport" disabled>
+              <i class="ri-upload-line"></i> Import Data
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- TinyMCE -->
+    <script src="assets/package/tinymce/tinymce.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SheetJS for Excel/CSV parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- Custom JS -->
+    <script type="module" src="assets/js/script.js"></script>
+</body>
+</html>

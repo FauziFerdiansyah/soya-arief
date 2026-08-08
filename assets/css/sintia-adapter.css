@@ -1,0 +1,3438 @@
+/* Sintia template adapter for the existing Soya & Arief markup. */
+body.sintia.original {
+  --background-primary: #650b04;
+  --background-primary-rgb: 101, 11, 4;
+  --background-secondary: #f4e1c3;
+  --background-secondary-rgb: 244, 225, 195;
+  --background-tertiary: #501817;
+  --text-primary: #ffde8f;
+  --text-secondary: #f4e1c3;
+  --text-tertiary: #650b04;
+  --button-text-primary: #ffde8f;
+  --button-background-primary: #650b04;
+  --button-text-secondary: #650b04;
+  --button-background-secondary: #ffde8f;
+  --bg-primary: #650b04;
+  --bg-tertiary: #501817;
+  --bg-light-primary: #ffde8f;
+  --bg-secondary: #f4e1c3;
+  --white: #f4e1c3;
+  --font-base: "Playfair Display", serif;
+  --font-latin: "Alex Brush", cursive;
+  background: var(--background-primary);
+  color: var(--text-secondary);
+}
+
+body.sintia .latin-title,
+body.sintia section h2,
+body.sintia section h3 {
+  font-family: "Alex Brush", cursive;
+  font-style: normal;
+  font-weight: 400;
+}
+
+body.sintia section p,
+body.sintia button,
+body.sintia input,
+body.sintia textarea,
+body.sintia a {
+  font-family: "Playfair Display", serif;
+}
+
+.ornaments-wrapper,
+.ornament-area,
+.section-ornament {
+  display: none !important;
+}
+
+.container.kat-page__side-to-side {
+  background: var(--background-primary);
+}
+
+.left-side.primary-pane {
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/bg-topcover-desktop-min.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.left-side.primary-pane::before {
+  background-image: url("../images/sintia/texture.png");
+  background-size: cover;
+  opacity: .16;
+}
+
+.left-side .couple-names h2,
+.left-side .wedding-date p,
+.left-side .wedding-details p {
+  color: var(--text-tertiary);
+  text-shadow: none;
+}
+
+.left-side .couple-names h2 {
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(4rem, 7vw, 7.5rem);
+}
+
+.right-side.secondary-pane {
+  background: var(--background-primary);
+}
+
+.welcome-section.top-cover {
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/bg-topcover.png");
+  background-position: 0 -20px;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.welcome-section.top-cover > .ornaments-wrapper {
+  display: none !important;
+}
+
+.welcome-section .welcome-content {
+  z-index: 4;
+}
+
+.welcome-section .welcome-header h1,
+.welcome-section .welcome-header p,
+.welcome-section .welcome-details p {
+  color: var(--text-tertiary);
+}
+
+.welcome-section .welcome-header h1 {
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(3.3rem, 14vw, 5rem);
+  line-height: 1;
+}
+
+.welcome-section .welcome-title-main {
+  letter-spacing: .12em;
+}
+
+.welcome-section .welcome-open-action {
+  border-radius: 12px;
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
+  box-shadow: none;
+}
+.sintia-rumah-gadang {
+  position: absolute;
+  left: 50%;
+  bottom: -15%;
+  width: 100%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.sintia-coconut-tree {
+  position: absolute;
+  width: 50%;
+  z-index: 2;
+}
+
+.sintia-coconut-tree.left {
+  left: -27%;
+  bottom: 30%;
+  transform: scaleX(-1) rotate(-11deg);
+}
+
+.sintia-coconut-tree.right {
+  right: -27%;
+  top: 0;
+  overflow-y: visible;
+  overflow-x: visible;
+}
+
+.sintia-coconut-tree.right, .sintia-coconut-tree.right .image-wrap {
+  overflow-y: visible;
+  overflow-x: visible;
+}
+
+.sintia-coconut-tree img {
+  width: 100%;
+  animation: sintia-goyang 7s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+.sintia-flowers {
+  position: absolute;
+  width: 31%;
+  z-index: 3;
+}
+
+.sintia-flowers img {
+  width: 100%;
+  animation: sintia-bungagoyang 3s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+.sintia-flowers.bottom-01.left { bottom: 0; left: -5%; }
+.sintia-flowers.bottom-01.right { bottom: 0; right: -5%; transform: scaleX(-1); }
+.sintia-flowers.bottom-02.left { bottom: -11%; left: 55px; transform: scaleX(-1); }
+.sintia-flowers.bottom-02.right { bottom: -11%; right: 55px; }
+
+.hero-section.cover {
+  min-height: var(--body-height);
+  padding: 0 0 60px;
+  background-color: var(--background-primary);
+  overflow: hidden;
+}
+
+.hero-section .cover-bg,
+.hero-section .hero-content::before {
+  display: none;
+}
+
+.sintia-batik-separator {
+  width: 100%;
+  height: 90px;
+  position: relative;
+  z-index: 3;
+}
+
+.sintia-batik-separator .image-wrap {
+  width: 100%;
+  height: 100%;
+  background: url("../images/sintia/batik.png") repeat-x center/contain;
+}
+
+.sintia-batik-separator img {
+  opacity: 0;
+}
+
+.hero-section .hero-content {
+  position: relative;
+  width: 100%;
+  min-height: calc(var(--body-height) - 90px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-section .hero-header {
+  padding: 10px 10px 0;
+  gap: 4px;
+}
+
+.hero-section .hero-header p,
+.hero-section .hero-footer p {
+  color: var(--text-secondary);
+}
+
+.hero-section .hero-body {
+  width: 100%;
+  height: 420px;
+  max-width: 400px;
+  margin: 20px auto 10px;
+}
+
+.hero-section .hero-body .image-body-frame {
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: url("../images/sintia/bg-watercolor.png") no-repeat center/100% 100%;
+  box-shadow: none;
+}
+
+.hero-section .hero-body .image-body-frame img {
+  border-radius: 0;
+  -webkit-mask: url("../images/sintia/water-color-cover.png") center/100% 100% no-repeat;
+  mask: url("../images/sintia/water-color-cover.png") center/100% 100% no-repeat;
+}
+
+.hero-section .hero-footer {
+  gap: 8px;
+  padding: 20px 10px;
+}
+
+.hero-section .hero-footer p {
+  margin-bottom: 0px;
+}
+
+.hero-section .hero-footer .latin-title {
+  color: var(--text-primary);
+  font-size: clamp(2.8rem, 9vw, 4rem);
+  margin-block: 0px;
+}
+
+.sintia-butterfly {
+  position: absolute;
+  left: 25px;
+  top: -40px;
+  width: 55px;
+  z-index: 8;
+}
+
+.sintia-butterfly img {
+  width: 100%;
+  animation: sintia-kupu-kupu 7s ease-in-out infinite;
+  transform-origin: 100% 100%;
+}
+.sintia-section-separator {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.sintia-section-separator img {
+  display: block;
+  width: auto;
+  height: 60px;
+  max-width: none;
+}
+
+.quote-section.quote-wrap {
+  min-height: 400px;
+  padding: 30px 24px;
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/texture.png");
+  background-size: 100%;
+  text-align: center;
+}
+
+.quote-section .quote-content {
+  max-width: 580px;
+  min-height: 350px;
+  padding: 0;
+}
+
+.quote-section .sintia-section-separator img {
+  margin-top: 0px;
+}
+
+.quote-section .quote-area {
+  padding: 0px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  backdrop-filter: none;
+}
+
+.quote-section .quote-area h2,
+.quote-section .quote-area p,
+.quote-section .quote-area strong {
+  color: var(--text-tertiary);
+}
+
+.bridegroom-section.couple-wrap {
+  padding: 50px 0 70px;
+  background-color: var(--background-primary);
+}
+
+.bridegroom-section .bridegroom-content {
+  padding: 0;
+}
+
+.bridegroom-section .bridegroom-header {
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 20px 28px 38px;
+}
+
+.bridegroom-section .bridegroom-header p,
+.bridegroom-section .bridegroom-parents,
+.bridegroom-section .bridegroom-link {
+  color: var(--text-secondary);
+}
+
+.bridegroom-section .bridegroom-body {
+  position: relative;
+}
+
+.bridegroom-section .bridegroom-body > .sintia-butterfly {
+  left: auto;
+  right: 35%;
+  top: 0;
+  width: 30px;
+  transform: scaleX(-1);
+}
+
+.bridegroom-section .bridegroom-image {
+  width: min(100%, 400px);
+  height: 420px;
+  padding: 28px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: url("../images/sintia/bg-watercolor.png") no-repeat center/100% 100%;
+  box-shadow: none;
+}
+
+.bridegroom-section .bridegroom-image img {
+  border-radius: 0;
+  -webkit-mask: url("../images/sintia/water-color-mempelai.png") center/100% 100% no-repeat;
+  mask: url("../images/sintia/water-color-mempelai.png") center/100% 100% no-repeat;
+}
+
+.bridegroom-caption {
+  padding: 12px 24px 28px;
+}
+
+.bridegroom-name {
+  color: var(--text-primary) !important;
+  font-family: "Alex Brush", cursive;
+  font-size: 2rem;
+}
+
+.bridegroom-link {
+  border-bottom-color: var(--text-secondary);
+}
+
+.bridegroom-separator {
+  margin: 24px auto 42px;
+}
+
+.bridegroom-separator-text {
+  color: var(--text-secondary) !important;
+  font-family: "Playfair Display", serif !important;
+  font-size: 50px !important;
+}
+
+.story-section.love-story {
+  padding: 8px 0 60px;
+  background-color: var(--background-primary);
+}
+
+.story-section .story-content {
+  width: 100%;
+  max-width: 1024px;
+}
+
+.story-section .story-header {
+  margin: 0;
+  padding: 24px 16px;
+}
+
+.story-section .story-header p {
+  color: var(--text-secondary);
+}
+
+.story-list {
+  display: block;
+}
+
+.story-card,
+.story-card.story-card-reverse {
+  position: relative;
+  display: block;
+  width: min(90vw, 400px);
+  height: 500px;
+  margin: 0 auto 28px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.story-card .story-image-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.story-card-reverse .story-image-wrap {
+  order: 0;
+}
+
+.story-card .story-copy {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 100%;
+  max-height: 170px;
+  padding: 44px 20px 18px;
+  overflow-y: auto;
+  text-align: left;
+  background: linear-gradient(transparent, rgba(244,225,195,.98) 34%);
+}
+
+.story-card .story-copy::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 150px;
+  z-index: -1;
+  background: url("../images/sintia/orn-lovestory.png") no-repeat bottom center/100% auto;
+  opacity: .38;
+}
+
+.story-copy h3,
+.story-copy p,
+.story-copy .story-number {
+  color: var(--text-tertiary) !important;
+}
+
+.story-copy h3 {
+  margin: 4px 0 6px;
+  padding: 0;
+  border: 0;
+  font-family: "Playfair Display", serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+}
+
+.story-copy p {
+  margin: 0;
+  font-size: 1rem !important;
+}
+.date-section.save-date-wrap {
+  min-height: 100vh;
+  margin: 0;
+  padding: 40px 0 80px;
+  background-color: var(--background-primary);
+}
+
+.date-section .date-header {
+  padding: 20px 0;
+}
+
+.date-section .date-body {
+  max-width: 620px;
+}
+
+.date-section .save-date {
+  max-width: 420px;
+}
+
+.countdown {
+  gap: 0;
+}
+
+.countdown .count-item {
+  width: 25%;
+  min-width: 82px;
+  padding: 16px 4px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.count-item .count-num,
+.count-item .count-text {
+  color: var(--text-primary);
+}
+
+.to-calendar,
+.event-link,
+.action-btn,
+.copy-action,
+.gift-section-action .gift-action,
+.rsvp-confirm-btn.confirm,
+.btn-sticker {
+  border-radius: 12px;
+  background: var(--button-background-secondary);
+  color: var(--button-text-secondary);
+  box-shadow: none;
+}
+
+.agenda-section.agenda-wrap {
+  padding: 10px 0 90px;
+  background-color: var(--background-primary);
+}
+
+.agenda-section .agenda-header {
+  margin-bottom: 10px;
+  padding: 20px 28px;
+}
+
+.agenda-section .agenda-description {
+  color: var(--text-secondary);
+}
+
+.agenda-section .agenda-body {
+  position: relative;
+}
+
+.agenda-section .agenda-body > .sintia-butterfly {
+  left: auto;
+  right: 55px;
+  top: 30px;
+  width: 30px;
+  transform: scaleX(-1);
+}
+
+.event-header {
+  margin: 34px auto 44px;
+}
+
+.event-header .event-schedule-wrapper .event-day {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.activity-wrap {
+  padding: 0 28px;
+  gap: 56px;
+}
+
+.activity-item,
+.activity-item:first-of-type {
+  margin: 0 auto;
+}
+
+.activity-content {
+  min-height: 510px;
+  max-height: none;
+  padding: 70px 38px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/orn-acara.png"), url("../images/sintia/texture.png");
+  background-position: center, center;
+  background-repeat: no-repeat, repeat;
+  background-size: 100% 100%, 100%;
+  box-shadow: none;
+}
+
+.activity-content h3,
+.activity-content p,
+.activity-content .activity-time,
+.activity-content .event-hall {
+  color: var(--text-tertiary);
+}
+
+.activity-content .event-link {
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
+}
+
+.rsvp-section.rsvp-wrap {
+  min-height: 760px;
+  padding: 70px 28px;
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/texture.png");
+  background-size: cover;
+}
+
+.rsvp-section.rsvp-wrap::before,
+.gift-section.wedding-gift-wrap::before {
+  display: none;
+}
+
+.rsvp-content {
+  max-width: 600px;
+  padding: 38px 24px;
+  border-radius: 16px;
+  background: transparent;
+}
+
+.rsvp-section h2,
+.rsvp-section p,
+.rsvp-section .rsvp-status-caption,
+.rsvp-section .rsvp-amount-caption {
+  color: var(--text-tertiary);
+}
+
+.form-input-field {
+  border: 1px solid var(--background-primary);
+  background: rgba(255,255,255,.52);
+  color: var(--text-tertiary);
+}
+
+.rsvp-confirm-btn {
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
+}
+
+.rsvp-confirm-btn.going.active,
+.rsvp-confirm-btn.not-going.active {
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
+}
+
+.photo-section.photo-wrap {
+  padding: 10px 0 70px;
+  background-color: var(--background-primary);
+  background-image: url("../images/sintia/texture-body-min.png");
+  background-size: 100%;
+}
+
+.photo-content .photo-header {
+  padding: 24px 20px 34px;
+}
+
+.gallery-photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.gallery-photos span {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.gallery-photos .img-photo {
+  border-radius: 0;
+}
+.gift-section.wedding-gift-wrap {
+  padding: 10px 0 20px;
+  background-color: var(--background-secondary);
+  background-image: url("../images/sintia/texture.png");
+  background-size: 100%;
+}
+
+.gift-content {
+  padding: 30px 24px;
+}
+
+.gift-content::before {
+  display: none;
+}
+
+.gift-wrapper {
+  padding: 30px 3px 20px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.gift-section h2,
+.gift-section h3,
+.gift-section h4,
+.gift-section p {
+  color: var(--text-tertiary);
+}
+
+.gift-section-action .gift-action {
+  border-color: var(--background-primary);
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
+}
+
+.gift-section-action .gift-action.gift-action-active {
+  background: var(--button-background-secondary);
+  color: var(--button-text-secondary);
+}
+
+.gift-card-item,
+.gift-send-body {
+  overflow: hidden;
+  border: 0;
+  border-radius: 12px;
+  background: var(--background-primary);
+}
+
+.gift-card-item::before,
+.gift-send-body::before {
+  background-image: url("../images/sintia/texture-body-min.png");
+  opacity: .28;
+}
+
+.gift-card-item h2,
+.gift-card-item h3,
+.gift-card-item h4,
+.gift-send-body h3,
+.gift-send-body p {
+  color: var(--text-secondary);
+}
+
+.wish-section.wedding-wish-wrap {
+  padding: 0px;
+  background-color: var(--background-primary);
+  background-image: url("../images/sintia/texture-body-min.png");
+  background-size: 100%;
+}
+
+.wish-area {
+  padding: 32px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.wish-description {
+  color: var(--text-secondary);
+}
+
+.wish-input {
+  border: 0;
+  border-radius: 50px;
+  background: var(--text-secondary);
+  color: var(--text-tertiary);
+}
+
+.wish-input::placeholder {
+  color: rgba(101,11,4,.7);
+}
+
+.wish-item {
+  border-radius: 12px;
+  background: var(--background-secondary);
+  color: var(--text-tertiary);
+}
+
+.wish-comment-name,
+.wish-comment-text,
+.wish-comment-time,
+.wish-comment-counter-header {
+  color: var(--text-tertiary);
+}
+
+.note-section.notes-container {
+  padding: 50px 24px;
+  background-color: var(--background-primary);
+  background-image: url("../images/sintia/texture-body-min.png");
+  background-size: 100%;
+}
+
+.note-content {
+  max-width: 640px;
+  padding: 20px;
+  border-top: 1px solid rgba(255,222,143,.45);
+  border-bottom: 1px solid rgba(255,222,143,.45);
+}
+
+.note-description {
+  color: var(--text-secondary);
+}
+
+.footnote-section.footnote-wrap {
+  min-height: 700px;
+  margin: 0;
+  padding: 70px 24px 130px;
+  background-color: var(--background-primary);
+  background-image: url("../images/sintia/texture-body-min.png");
+  background-size: 100%;
+}
+
+.footnote-section .footnote-content {
+  min-height: 560px;
+}
+
+.footnote-content .footnote-body {
+  z-index: 2;
+  padding: 52px 28px 100px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.sintia-foot-flower {
+  position: absolute;
+  bottom: 0;
+  width: 41%;
+  z-index: 1;
+}
+
+.sintia-foot-flower img {
+  width: 100%;
+  animation: sintia-bungagoyang 3s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+.sintia-foot-flower.orn-1.left { left: 0; transform: translateX(-20%); }
+.sintia-foot-flower.orn-1.right { right: 0; transform: translateX(20%) scaleX(-1); }
+.sintia-foot-flower.orn-2.left { left: 0; transform: translate(20%,39%) scaleX(-1); }
+.sintia-foot-flower.orn-2.right { right: 0; transform: translate(-20%,39%); }
+
+.footer {
+  background: var(--background-secondary);
+}
+
+.footer-inner p {
+  color: var(--text-tertiary);
+}
+@keyframes sintia-goyang {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-10deg); }
+}
+
+@keyframes sintia-bungagoyang {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(5deg); }
+}
+
+@keyframes sintia-kupu-kupu {
+  0% { transform: translate(0) scale(1) skew(0deg); }
+  10% { transform: translate(5px,-10px) scale(.8) skew(-5deg,-5deg); }
+  20% { transform: translate(5px,-10px) scale(1) skew(0deg); }
+  30% { transform: translate(5px,-10px) scale(.8) skew(-5deg,-5deg); }
+  40% { transform: translate(5px,-10px) scale(1) skew(0deg); }
+  50% { transform: translate(-15px,-15px) scale(.8) skew(-5deg,-5deg); }
+  60% { transform: translate(-15px,-15px) scale(1) skew(0deg); }
+  70% { transform: translate(-15px,-15px) scale(.8) skew(-5deg,-5deg); }
+  80% { transform: translate(-15px,-15px) scale(1) skew(0deg); }
+  90% { transform: translate(0) scale(.8) skew(-5deg,-5deg); }
+  100% { transform: translate(0) scale(1) skew(0deg); }
+}
+
+@media (min-width: 961px) {
+  .welcome-section.top-cover {
+    display: none !important;
+  }
+
+  .activity-content {
+    min-height: 620px;
+  }
+}
+
+@media (max-width: 960px) {
+  .welcome-section.top-cover {
+    display: flex !important;
+  }
+
+  .left-side.primary-pane {
+    transform: translateX(-100%) !important;
+  }
+
+  .right-side.secondary-pane {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-section .hero-body {
+    width: 100%;
+    height: 105vw;
+    max-height: 420px;
+    margin-top: 35px;
+  }
+
+  .bridegroom-section .bridegroom-image {
+    width: 100%;
+    height: 105vw;
+    max-height: 420px;
+  }
+
+  .quote-section.quote-wrap {
+    min-height: 400px;
+  }
+
+  .activity-wrap {
+    padding: 0 20px;
+  }
+
+  .activity-content {
+    min-height: 500px;
+    padding: 62px 28px;
+  }
+
+  .gift-section-action {
+    gap: 8px;
+  }
+
+  .gift-section-action .gift-action {
+    min-width: 0;
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sintia-coconut-tree img,
+  .sintia-flowers img,
+  .sintia-butterfly img,
+  .sintia-foot-flower img {
+    animation: none !important;
+  }
+}
+
+/* Component typography safeguards against Sintia's global heading scale. */
+body.sintia .activity-title {
+  font-size: 2.25rem !important;
+}
+
+body.sintia .gift-card-title {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1.05rem !important;
+  text-align: left;
+}
+
+body.sintia .gift-card-number {
+  margin: 0;
+  font-size: 1.65rem !important;
+  text-align: left;
+}
+
+body.sintia .gift-card-name,
+body.sintia .gift-send-name {
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+  font-size: 1rem !important;
+}
+
+body.sintia .gift-send-title {
+  font-size: 1.6rem !important;
+}
+
+body.sintia .rsvp-message-title,
+body.sintia .status-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem !important;
+}
+
+body.sintia .wish-comment-count {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 1rem !important;
+  text-align: left;
+}
+
+body.sintia .popup-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem !important;
+}
+
+body.sintia .footer-inner p {
+  font-size: 1rem;
+}
+
+/* ===== Sintia refinement: hierarchy, contrast, RSVP, and footer ===== */
+body.sintia.original {
+  --ink: #650b04;
+  --wine: #501817;
+  --paper: #f4e1c3;
+  --gold: #ffde8f;
+}
+
+body.sintia :focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* The fixed side no longer needs an extra content wrapper. */
+.left-side .left-content {
+  display: grid;
+  place-items: center;
+}
+
+.left-side .couple-names,
+.left-side .wedding-date,
+.left-side .wedding-details {
+  width: 100%;
+}
+
+/* Save The Date: matched Sintia composition — title, flourish, timer, CTA, flourish. */
+.date-section.save-date-wrap {
+  display: block;
+  min-height: auto;
+  padding: 42px 0 64px;
+}
+
+.date-section.save-date-wrap .sintia-section-separator {
+  margin-bottom: 8px;
+}
+
+.date-section.save-date-wrap .save-date {
+  width: min(100%, 500px);
+  max-width: none;
+  padding: 0 20px;
+}
+
+.date-section.save-date-wrap .save-date-head {
+  padding: 20px 0 18px;
+  text-align: center;
+}
+
+.date-section.save-date-wrap .save-date-head h2 {
+  margin: 0;
+  margin-bottom: 20px;
+  color: var(--gold);
+  font-size: clamp(2.6rem, 10vw, 3.7rem);
+}
+
+.date-section.save-date-wrap .save-date-body {
+  width: 100%;
+}
+
+.sintia-date-flourish {
+  width: 100%;
+  height: 44px;
+  margin: 0 auto 14px;
+  overflow: hidden;
+}
+
+.sintia-date-flourish img {
+  display: block;
+  width: auto;
+  height: 44px;
+  max-width: none;
+  margin: 0 auto;
+}
+
+.sintia-date-flourish.bottom {
+  margin: 20px auto 0;
+  transform: scaleY(-1);
+}
+
+.date-section.save-date-wrap .countdown {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
+  margin: 0 auto 20px;
+}
+
+.date-section.save-date-wrap .countdown .count-item {
+  min-width: 0;
+  padding: 8px 3px;
+  text-align: center;
+}
+
+.date-section.save-date-wrap .count-num {
+  margin: 0 0 3px;
+  color: var(--gold);
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2rem, 9vw, 3.3rem) !important;
+  font-weight: 400;
+}
+
+.date-section.save-date-wrap .count-text {
+  color: var(--paper);
+  font-family: "Playfair Display", serif;
+  font-size: .85rem;
+  letter-spacing: .03em;
+}
+
+.date-section.save-date-wrap .add-to-calendar-date {
+  display: flex;
+  justify-content: center;
+}
+
+.to-calendar,
+.action-btn,
+.copy-action,
+.gift-section-action .gift-action,
+.btn-sticker {
+  border: 1px solid transparent;
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.to-calendar:hover,
+.to-calendar:focus-visible,
+.action-btn:hover,
+.action-btn:focus-visible,
+.copy-action:hover,
+.copy-action:focus-visible,
+.gift-section-action .gift-action:hover,
+.gift-section-action .gift-action:focus-visible,
+.btn-sticker:hover,
+.btn-sticker:focus-visible {
+  background: var(--paper);
+  border-color: var(--gold);
+  color: var(--ink);
+  opacity: 1;
+}
+
+/* Wedding Event follows the Sintia day/date hierarchy and ornate dark cards. */
+.agenda-section.agenda-wrap {
+  padding: 18px 0 76px;
+}
+
+.agenda-section .agenda-header {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 28px 28px 14px;
+  text-align: center;
+}
+
+.agenda-section .agenda-header h2 {
+  margin-bottom: 8px;
+  color: var(--gold);
+  font-size: clamp(2.6rem, 10vw, 3.7rem);
+}
+
+.agenda-section .agenda-description {
+  max-width: 340px;
+  margin: 0 auto;
+  color: var(--paper);
+}
+
+.event-header.sintia-event-head {
+  margin: 26px auto 28px;
+  padding: 0;
+}
+
+.event-header .event-schedule-wrapper .event-day {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--gold);
+}
+
+.event-header .event-day > span {
+  color: var(--gold);
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.event-header .event-day > small {
+  color: var(--paper);
+  font-family: "Playfair Display", serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.activity-wrap {
+  gap: 28px;
+}
+
+.activity-content {
+  min-height: 470px;
+  padding: 62px 32px 50px;
+  border: 1px solid rgba(255,222,143,.62);
+  border-radius: 0;
+  background-color: var(--wine);
+  background-image: url("../images/sintia/orn-acara.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.activity-content h3,
+.activity-content p,
+.activity-content .activity-time,
+.activity-content .event-hall,
+.activity-content .event-address,
+.activity-content .event-city {
+  color: var(--paper);
+}
+
+.activity-content .activity-title {
+  color: var(--gold);
+}
+
+.activity-content .icon-ring,
+.activity-content .icon-party {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+.activity-content .event-link {
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.activity-content .event-link:hover,
+.activity-content .event-link:focus-visible {
+  background: transparent;
+  color: var(--gold);
+  opacity: 1;
+}
+
+.activity-content .event-link:hover .icon-map,
+.activity-content .event-link:focus-visible .icon-map {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* RSVP has a separate high-contrast paper card so every state remains readable. */
+.rsvp-section.rsvp-wrap {
+  min-height: auto;
+  padding: 50px 20px 70px;
+  background-color: var(--paper);
+  background-image: url("../images/sintia/texture.png");
+  background-size: 100%;
+  background-repeat: repeat;
+}
+
+.rsvp-section.rsvp-wrap .sintia-section-separator {
+  margin-bottom: 18px;
+}
+
+.rsvp-section .rsvp-content {
+  width: min(100%, 540px);
+  margin: 0 auto;
+  padding: 34px 24px 30px;
+  border: 1px solid rgba(101,11,4,.24);
+  border-radius: 16px;
+  background: rgba(255,247,233,.92);
+  box-shadow: 0 16px 36px rgba(80,24,23,.16);
+}
+
+.rsvp-section .rsvp-header {
+  text-align: center;
+}
+
+.rsvp-section .rsvp-header h2 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: clamp(2.45rem, 10vw, 3.35rem);
+}
+
+.rsvp-section .rsvp-info {
+  gap: 3px;
+  margin-bottom: 24px;
+}
+
+.rsvp-section .rsvp-info p,
+.rsvp-section .rsvp-status-caption,
+.rsvp-section .rsvp-amount-caption,
+.rsvp-section .rsvp-message-text,
+.rsvp-section .status-title {
+  color: var(--ink);
+}
+
+.rsvp-section .info-date {
+  color: var(--wine) !important;
+  font-weight: 700;
+}
+
+.rsvp-section .rsvp-form {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.rsvp-section .form-input-field {
+  border: 1px solid rgba(101,11,4,.4);
+  border-radius: 12px;
+  background: #fffdf8;
+  color: var(--ink);
+}
+
+.rsvp-section .form-input-field:focus {
+  border-color: var(--wine);
+  background: #fff;
+}
+
+.rsvp-section .form-input-field::placeholder {
+  color: rgba(101,11,4,.62);
+}
+
+.rsvp-section .rsvp-status-wrap {
+  margin: 24px auto;
+}
+
+.rsvp-section .rsvp-status-caption,
+.rsvp-section .rsvp-amount-caption {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.rsvp-section .rsvp-confirm-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.rsvp-section .rsvp-confirm-wrap label {
+  min-width: 0;
+}
+
+.rsvp-section .rsvp-confirm-btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--wine);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.rsvp-section .rsvp-confirm-btn:hover,
+.rsvp-section .rsvp-confirm-btn:focus-visible,
+.rsvp-section .rsvp-confirm-btn.going.active,
+.rsvp-section .rsvp-confirm-btn.not-going.active {
+  border-color: var(--wine);
+  background: var(--wine);
+  color: var(--gold);
+}
+
+.rsvp-section .rsvp-confirm-btn.going.active .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn.not-going.active .icon-confirm-no-rsvp {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+.rsvp-section .rsvp-amount-wrap {
+  margin: 24px 0;
+}
+
+.rsvp-section .rsvp-amount-controller {
+  gap: 14px;
+}
+
+.rsvp-section .toggle-btn {
+  border: 1px solid var(--wine);
+  background: var(--wine);
+  color: var(--gold);
+}
+
+.rsvp-section .toggle-btn:hover,
+.rsvp-section .toggle-btn:focus-visible {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.rsvp-section #people {
+  border-color: rgba(101,11,4,.4);
+  background: #fffdf8;
+  color: var(--ink);
+}
+
+.rsvp-section .rsvp-confirm-btn-wrap {
+  display: block;
+  width: 100%;
+  margin: 26px 0 0;
+  padding: 20px 0 0;
+  left: auto;
+  border-top: 1px solid rgba(101,11,4,.22);
+}
+
+.rsvp-section .rsvp-confirm-btn.confirm,
+.rsvp-section .action-rsvp {
+  border-color: var(--wine);
+  background: var(--wine);
+  color: var(--gold);
+}
+
+.rsvp-section .rsvp-confirm-btn.confirm:hover,
+.rsvp-section .rsvp-confirm-btn.confirm:focus-visible,
+.rsvp-section .action-rsvp:hover,
+.rsvp-section .action-rsvp:focus-visible {
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.rsvp-section .rsvp-message-content {
+  width: 100%;
+  left: auto;
+  border-color: rgba(101,11,4,.25);
+}
+
+.rsvp-section .rsvp-message-content::before {
+  background-image: url("../images/sintia/texture.png");
+  opacity: .12;
+}
+
+/* Avoid ornament overlap in the closing panel while retaining its original corner animation. */
+.footnote-section.footnote-wrap {
+  min-height: 650px;
+  padding: 64px 24px 148px;
+}
+
+.footnote-section .footnote-content {
+  width: min(100%, 560px);
+  min-height: 420px;
+  z-index: 3;
+}
+
+.footnote-content .footnote-body {
+  position: relative;
+  z-index: 4;
+  min-height: 420px;
+  padding: 0px 30px 54px;
+}
+
+.sintia-foot-flower {
+  width: 26%;
+  bottom: 10px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sintia-foot-flower.orn-1.left { left: -6%; transform: none; }
+.sintia-foot-flower.orn-1.right { right: -6%; transform: scaleX(-1); }
+.sintia-foot-flower.orn-2.left { left: 3%; bottom: -6%; transform: scaleX(-1); }
+.sintia-foot-flower.orn-2.right { right: 3%; bottom: -6%; transform: none; }
+
+.footnote-body .top-text,
+.footnote-body .bottom-text,
+.footnote-body > p,
+.footnote-body .footnote-title {
+  position: relative;
+  z-index: 5;
+}
+
+@media (max-width: 480px) {
+  .rsvp-section.rsvp-wrap {
+    padding-inline: 14px;
+  }
+
+  .rsvp-section .rsvp-content {
+    padding: 30px 18px 26px;
+  }
+
+  .rsvp-section .rsvp-confirm-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .rsvp-section .rsvp-confirm-btn-wrap {
+    display: block;
+  }
+
+  .sintia-foot-flower {
+    width: 24%;
+  }
+}
+
+/* ================================================================
+   Sintia pass 3: desktop pane, Save The Date, Wedding Day,
+   RSVP alignment, contrast-safe interactions, closing footer.
+   ================================================================ */
+
+/* 1. Desktop pane mirrors the reference: bottom-anchored scenery + centred details. */
+.left-side.primary-pane {
+  width: 61%;
+  background: none;
+  padding: 0;
+}
+
+.left-side.primary-pane::before {
+  display: none;
+}
+
+.left-side .pane-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+  overflow: hidden;
+  background-color: var(--background-primary);
+  background-image: url("../images/sintia/bg-topcover-desktop-min.png");
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: 103% 103%;
+}
+
+.left-side .pane-inner .sintia-coconut-tree {
+  width: 34%;
+  z-index: 2;
+}
+
+.left-side .pane-inner .sintia-coconut-tree.left {
+  left: -17%;
+  bottom: 30%;
+  transform: scaleX(-1) rotate(-11deg);
+}
+
+.left-side .pane-inner .sintia-coconut-tree.right {
+  right: -17%;
+  top: 0;
+  bottom: auto;
+}
+
+.left-side .pane-inner .sintia-coconut-tree img {
+  animation-duration: 3s;
+}
+
+.left-side .pane-inner .sintia-flowers {
+  width: 21%;
+  z-index: 3;
+}
+
+.left-side .pane-inner .sintia-flowers.bottom-01.left { bottom: 0; left: -5%; transform: scaleX(1); }
+.left-side .pane-inner .sintia-flowers.bottom-01.right { bottom: 0; right: -5%; transform: scaleX(-1); }
+.left-side .pane-inner .sintia-flowers.bottom-02.left { bottom: -11%; left: 55px; transform: scaleX(-1); }
+.left-side .pane-inner .sintia-flowers.bottom-02.right { bottom: -11%; right: 55px; transform: scaleX(1); }
+
+.left-side .pane-details {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  margin-top: 15vh;
+  padding: 10px 24px;
+  display: block;
+  text-align: center;
+}
+
+.left-side .pane-title {
+  margin: 0 0 .45em;
+  color: var(--text-tertiary);
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(4rem, 6.4vw, 6.5rem);
+  font-weight: 400;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.left-side .pane-date {
+  margin: 0 0 1.1em;
+  color: var(--background-primary);
+  font-size: 1.28rem;
+  font-weight: 600;
+}
+
+.left-side .pane-guest p {
+  margin: 0;
+  color: var(--background-primary);
+  font-size: 1.1rem;
+}
+
+.left-side .pane-guest .wedding-guest-name {
+  margin-top: 6px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* 2. Save The Date: flourish, timer, then CTA — same rhythm as the reference. */
+.date-section.save-date-wrap {
+  padding: 46px 0 60px;
+}
+
+.date-section.save-date-wrap .save-date {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.date-section.save-date-wrap .save-date-head {
+  padding: 20px 0 0;
+}
+
+.save-date-icon-wrap {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.save-date-icon-wrap .save-date-icon {
+  display: block;
+  width: min(300px, 86%);
+  height: auto;
+  margin: 0 auto;
+}
+
+.save-date-icon-wrap.bottom {
+  margin: 6px 0 0;
+}
+
+.save-date-icon-wrap.bottom .save-date-icon {
+  transform: scaleY(-1);
+}
+
+.date-section.save-date-wrap .add-to-calendar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.date-section.save-date-wrap .to-calendar {
+  min-width: 0;
+  margin: 0;
+  padding: 11px 26px 13px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* 3. Wedding Day: overlay day header, cornered event panel, plain activity blocks. */
+.agenda-section.agenda-wrap {
+  padding: 14px 0 40px;
+}
+
+.agenda-section .agenda-header.agenda-head {
+  position: relative;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 26px 24px 10px;
+}
+
+.agenda-section .agenda-header .sintia-butterfly {
+  left: 26px;
+  top: -6px;
+  width: 34px;
+  transform: none;
+}
+
+.agenda-section .agenda-title {
+  margin-bottom: .25em;
+}
+
+.agenda-section .agenda-description {
+  max-width: 430px;
+}
+
+.agenda-section .agenda-body {
+  margin-top: 0;
+}
+
+.event-item {
+  position: relative;
+  margin: 42px 0 0;
+}
+
+.event-item .section-group {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-item .section-group.bottom {
+  margin-bottom: -30px;
+}
+
+.event-header.sintia-event-head {
+  height: 255px;
+  max-width: none;
+  margin: 0;
+  padding: 70px 20px 60px;
+  background-image: url("../images/sintia/rumah-gadang-overlay.png");
+  background-position: bottom;
+  background-repeat: no-repeat;
+  background-size: cover;
+  text-align: center;
+}
+
+.event-header .event-day {
+  margin: 0;
+  color: var(--gold);
+  font-family: "Alex Brush", cursive;
+  font-size: clamp(2.6rem, 11vw, 3.9rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.event-header .event-date {
+  margin: 0;
+  color: var(--paper);
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+}
+
+.sintia-section-separator.bottom {
+  margin-top: -30px;
+}
+
+.event-content {
+  position: relative;
+  padding: 20px 12px 20px;
+}
+
+.agenda-corner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.agenda-corner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.agenda-corner.top { top: 60px; }
+
+/* Override the more-specific Sintia template selector. */
+.agenda-body .agenda-corner.top { top: 70px; }
+.agenda-corner.bottom { bottom: 10px; }
+.agenda-corner.left { left: 22px; }
+.agenda-corner.right { right: 22px; }
+.agenda-corner.top.right { transform: scaleX(-1); }
+.agenda-corner.bottom.left { transform: scaleY(-1); }
+.agenda-corner.bottom.right { transform: scale(-1, -1); }
+
+.activity-wrap {
+  position: relative;
+  z-index: 2;
+  padding: 0 24px;
+  gap: 0;
+}
+
+.activity-wrap.same-location .activity-item,
+.activity-item,
+.activity-item:first-of-type {
+  max-width: 460px;
+  margin: 0 auto 34px;
+}
+
+/* The reference keeps activity blocks open on the textured background. */
+.activity-content {
+  min-height: 0;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  gap: 0;
+}
+
+.activity-header.activity-head {
+  padding: 0px;
+  gap: 4px;
+}
+
+.activity-content .activity-icon {
+  width: 75px;
+  height: 75px;
+  margin: 0 auto 10px;
+}
+
+.activity-content .activity-title {
+  margin-bottom: .2em;
+  font-size: clamp(2.3rem, 9vw, 3.1rem) !important;
+}
+
+.activity-content .activity-time {
+  display: inline-block;
+  padding: 0;
+  color: var(--paper);
+  font-family: "Playfair Display", serif;
+  font-size: 1.45rem;
+}
+
+.activity-content .event-details {
+  padding: 0 20px 30px;
+  gap: 4px;
+}
+
+.activity-content .event-hall {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.activity-content .event-link-wrap {
+  margin-top: 30px;
+}
+
+/* 4. RSVP attendance choices share one row with equal-height buttons. */
+.rsvp-section .rsvp-confirm-wrap {
+  align-items: stretch;
+}
+
+.rsvp-section .rsvp-confirm-wrap label {
+  display: flex;
+  width: 100%;
+  margin: 0;
+}
+
+.rsvp-section .rsvp-confirm-wrap label > .rsvp-confirm-btn {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  margin: 0;
+  padding: 12px 10px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.rsvp-section .rsvp-confirm-wrap .rsvp-confirm-btn > i {
+  flex: 0 0 auto;
+}
+
+/* 5. Contrast guard: never pair the gold tint with gold text on any state. */
+body.sintia .bridegroom-link {
+  border-bottom-color: rgba(244, 225, 195, .7);
+  color: var(--paper);
+}
+
+body.sintia .bridegroom-link:hover,
+body.sintia .bridegroom-link:focus-visible {
+  background-color: var(--gold);
+  border-bottom-color: var(--gold);
+  color: var(--ink);
+}
+
+body.sintia .bridegroom-link .icon-instagram {
+  /* Default link text is cream/paper. */
+  filter: brightness(0) saturate(100%) invert(95%) sepia(10%) saturate(350%) hue-rotate(350deg) brightness(105%) contrast(100%);
+  transition: none;
+}
+
+body.sintia .bridegroom-link:hover .icon-instagram,
+body.sintia .bridegroom-link:focus-visible .icon-instagram {
+  /* Hover link text is dark red/ink. */
+  filter: brightness(0) saturate(100%) invert(9%) sepia(63%) saturate(4444%) hue-rotate(9deg) brightness(94%) contrast(105%);
+}
+
+body.sintia .toggle-btn:hover,
+body.sintia .toggle-btn:focus-visible,
+body.sintia .rsvp-confirm-btn:focus,
+body.sintia .rsvp-confirm-btn:active,
+body.sintia .rsvp-confirm-btn:focus-visible {
+  background-color: var(--gold);
+  color: var(--ink);
+}
+
+body.sintia .rsvp-section .rsvp-confirm-btn:focus,
+body.sintia .rsvp-section .rsvp-confirm-btn:active,
+body.sintia .rsvp-section .rsvp-confirm-btn:focus-visible {
+  background-color: var(--wine);
+  color: var(--gold);
+}
+
+body.sintia .sticker-item.selected {
+  background: rgba(101, 11, 4, .12);
+}
+
+body.sintia .popup-footer .action-btn:hover,
+body.sintia .popup-footer .action-btn:focus-visible,
+body.sintia .btn-sticker:hover,
+body.sintia .btn-sticker:focus-visible {
+  background: var(--wine);
+  color: var(--gold);
+}
+
+body.sintia .wish-comment-action:hover,
+body.sintia .wish-comment-action:focus-visible {
+  color: var(--wine);
+  text-decoration: underline;
+}
+
+body.sintia .footer-inner:hover p,
+body.sintia .footer-inner:focus-visible p {
+  color: var(--paper);
+}
+
+/* 6. Closing panel: ornaments hug the edges, footer bar stacks above them. */
+.footnote-section.footnote-wrap {
+  padding-bottom: 120px;
+}
+
+.sintia-foot-flower {
+  width: 34%;
+  bottom: 44px;
+}
+
+.sintia-foot-flower.orn-1.left { left: -11%; bottom: 35px; transform: none; }
+.sintia-foot-flower.orn-1.right { right: -11%; bottom: 35px; transform: scaleX(-1); }
+.sintia-foot-flower.orn-2.left { left: 50px; bottom: -75px; transform: scaleX(-1) rotate(370deg); }
+.sintia-foot-flower.orn-2.right { right: 50px; bottom: -75px; transform: scaleX(1) rotate(-350deg); }
+
+.footer.sintia-footer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 8;
+  width: 100%;
+  margin: 0;
+  background: var(--ink);
+  border-top: 1px solid rgba(255, 222, 143, .35);
+}
+
+.footer.sintia-footer .footer-inner {
+  padding: 13px 0;
+  cursor: pointer;
+}
+
+.footer.sintia-footer .footer-inner p {
+  color: var(--gold);
+}
+
+.footer.sintia-footer .icon-up {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+@media (min-width: 961px) {
+  .left-side .pane-details {
+    margin-top: 14vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .event-header.sintia-event-head {
+    height: 200px;
+    padding: 58px 18px 54px;
+  }
+
+  .activity-wrap {
+    padding: 0 16px;
+  }
+
+  .agenda-corner {
+    width: 42px;
+    height: 42px;
+  }
+
+  .agenda-corner.left { left: 12px; }
+  .agenda-corner.right { right: 12px; }
+
+  .sintia-foot-flower {
+    width: 40%;
+  }
+}
+
+/* ================================================================
+   Sintia pass 4: ornament colour fix + reference scrollbars
+   ================================================================ */
+
+/* The base theme recoloured every ornament via hue-rotate(218deg), which
+   turned the Sintia flowers purple. Sintia art is already the right colour. */
+body.sintia .image-wrap img,
+body.sintia .sintia-flowers img,
+body.sintia .sintia-coconut-tree img,
+body.sintia .sintia-foot-flower img,
+body.sintia .sintia-butterfly img,
+body.sintia .sintia-rumah-gadang img,
+body.sintia .agenda-corner img,
+body.sintia .save-date-icon,
+body.sintia .sintia-section-separator img,
+body.sintia .sintia-batik-separator img {
+  filter: none;
+}
+
+/* Main scroller mirrors the reference: 10px track, cream thumb. */
+.right-side.secondary-pane {
+  scrollbar-width: thin;
+  scrollbar-color: var(--paper) transparent;
+}
+
+.right-side.secondary-pane::-webkit-scrollbar {
+  width: 10px;
+  height: 15px;
+}
+
+.right-side.secondary-pane::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 0;
+}
+
+.right-side.secondary-pane::-webkit-scrollbar-thumb,
+.right-side.secondary-pane::-webkit-scrollbar-thumb:hover {
+  background: var(--paper);
+  border-width: 2px;
+  border-radius: 0;
+}
+
+/* Keep the reference behaviour on narrow widths instead of hiding the bar. */
+@media screen and (max-width: 768px) {
+  .right-side.secondary-pane::-webkit-scrollbar {
+    width: 10px;
+  }
+}
+
+/* Love Story caption scroller: 6px, transparent track, dark red thumb. */
+.story-card .story-copy {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) transparent;
+}
+
+.story-card .story-copy::-webkit-scrollbar {
+  width: 6px;
+}
+
+.story-card .story-copy::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.story-card .story-copy::-webkit-scrollbar-thumb {
+  background-color: var(--ink);
+  border: none;
+  border-radius: 20px;
+}
+
+/* Remaining scroll areas follow the same language, picking the thumb
+   colour that stays readable against each panel background. */
+body.sintia .wish-list,
+body.sintia .wish-popup-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--paper) transparent;
+}
+
+body.sintia .wish-list::-webkit-scrollbar,
+body.sintia .wish-popup-body::-webkit-scrollbar,
+body.sintia .sticker-popup-body::-webkit-scrollbar,
+body.sintia .event-details::-webkit-scrollbar,
+body.sintia textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+body.sintia .wish-list::-webkit-scrollbar-track,
+body.sintia .wish-popup-body::-webkit-scrollbar-track,
+body.sintia .sticker-popup-body::-webkit-scrollbar-track,
+body.sintia textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body.sintia .wish-list::-webkit-scrollbar-thumb,
+body.sintia .wish-popup-body::-webkit-scrollbar-thumb {
+  background-color: var(--paper);
+  border: none;
+  border-radius: 20px;
+}
+
+body.sintia .sticker-popup-body,
+body.sintia textarea {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) transparent;
+}
+
+body.sintia .sticker-popup-body::-webkit-scrollbar-thumb,
+body.sintia textarea::-webkit-scrollbar-thumb {
+  background-color: var(--ink);
+  border: none;
+  border-radius: 20px;
+}
+
+/* ================================================================
+   Sintia pass 5: remove the duplicate page-level scrollbar.
+   html{overflow-y:scroll} (base) always drew a page scrollbar, while
+   the real scroller is .right-side. body.sintia{overflow:visible}
+   (template) reinforced it. Only .right-side should scroll.
+   ================================================================ */
+html {
+  overflow: hidden;
+}
+
+body.sintia,
+body.sintia.original {
+  height: 100%;
+  overflow: hidden;
+}
+
+.container.kat-page__side-to-side {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ================================================================
+   Sintia pass 6: Save The Date countdown as boxed 2x2 tiles
+   (matches the reference: cream tiles, dark-red numerals).
+   ================================================================ */
+.date-section.save-date-wrap .countdown {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  width: auto;
+  padding: 0;
+  margin: 6px auto 4px;
+}
+
+.date-section.save-date-wrap .countdown .count-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 120px;
+  min-width: 0;
+  margin: 10px;
+  padding: 0 2.5px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: none;
+  text-align: center;
+}
+
+.date-section.save-date-wrap .count-num {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Playfair Display", serif;
+  font-size: clamp(2.6rem, 11vw, 3.4rem) !important;
+  line-height: 1;
+}
+
+.date-section.save-date-wrap .count-text {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--ink);
+  font-family: "Playfair Display", serif;
+  font-size: .95rem;
+}
+
+.save-date-icon-wrap.bottom {
+  margin: 30px auto 20px;
+}
+
+/* ================================================================
+   Sintia pass 7: unified button style across all actions.
+   Default: gold bg, dark-red text/icon.
+   Hover/active: dark-red bg, gold text/icon.
+   ================================================================ */
+
+/* Reset all action-style buttons to the same base. */
+.to-calendar,
+.add-to-calendar,
+.event-link,
+.action-btn,
+.copy-action,
+.btn-sticker,
+.gift-section-action .gift-action,
+.rsvp-confirm-btn.confirm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .25s, color .25s, border-color .25s;
+  box-shadow: none;
+  min-width: 0;
+}
+
+/* Icons inside buttons: default state = dark-red. */
+.to-calendar i,
+.add-to-calendar i,
+.event-link i,
+.action-btn i,
+.copy-action i,
+.btn-sticker i,
+.gift-section-action .gift-action i,
+.rsvp-confirm-btn.confirm i,
+.icon-guest {
+  filter: brightness(0) saturate(100%) invert(6%) sepia(80%) saturate(5800%) hue-rotate(358deg) brightness(70%) contrast(115%);
+  /* SVG icons use multi-step filters; interpolating them creates a false
+     red/orange flash, so their state changes instantly with the button. */
+  transition: none !important;
+}
+
+/* Hover / active / focus-visible: flip to dark bg + gold text. */
+.to-calendar:hover,
+.to-calendar:active,
+.to-calendar:focus-visible,
+.add-to-calendar:hover,
+.add-to-calendar:active,
+.add-to-calendar:focus-visible,
+.event-link:hover,
+.event-link:active,
+.event-link:focus-visible,
+.action-btn:hover,
+.action-btn:active,
+.action-btn:focus-visible,
+.copy-action:hover,
+.copy-action:active,
+.copy-action:focus-visible,
+.btn-sticker:hover,
+.btn-sticker:active,
+.btn-sticker:focus-visible,
+.gift-section-action .gift-action:hover,
+.gift-section-action .gift-action:active,
+.gift-section-action .gift-action:focus-visible,
+.rsvp-confirm-btn.confirm:hover,
+.rsvp-confirm-btn.confirm:active,
+.rsvp-confirm-btn.confirm:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--gold);
+  opacity: 1;
+}
+
+/* Icons on hover/active: gold (using CSS filter to recolour SVG bg-images). */
+.to-calendar:hover i,
+.to-calendar:active i,
+.to-calendar:focus-visible i,
+.add-to-calendar:hover i,
+.add-to-calendar:active i,
+.add-to-calendar:focus-visible i,
+.event-link:hover i,
+.event-link:active i,
+.event-link:focus-visible i,
+.action-btn:hover i,
+.action-btn:active i,
+.action-btn:focus-visible i,
+.copy-action:hover i,
+.copy-action:active i,
+.copy-action:focus-visible i,
+.btn-sticker:hover i,
+.btn-sticker:active i,
+.btn-sticker:focus-visible i,
+.gift-section-action .gift-action:hover i,
+.gift-section-action .gift-action:active i,
+.gift-section-action .gift-action:focus-visible i,
+.rsvp-confirm-btn.confirm:hover i,
+.rsvp-confirm-btn.confirm:active i,
+.rsvp-confirm-btn.confirm:focus-visible i {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* Active tab for gift toggle stays inverted. */
+.gift-section-action .gift-action.gift-action-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--gold);
+}
+
+.gift-section-action .gift-action.gift-action-active i {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* ================================================================
+   Sintia pass 8: wish form layout cleanup + full-width submit.
+   ================================================================ */
+body.sintia .wish-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+body.sintia .form-wish {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: none;
+}
+
+body.sintia .form-wish .form-input-field,
+body.sintia .form-wish textarea.wish-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(101, 11, 4, .4);
+  border-radius: 12px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+body.sintia .form-wish .form-input-field:focus,
+body.sintia .form-wish textarea.wish-input:focus {
+  border-color: var(--ink);
+  outline: none;
+}
+
+body.sintia .form-wish .form-input-field::placeholder,
+body.sintia .form-wish textarea.wish-input::placeholder {
+  color: rgba(101, 11, 4, .55);
+}
+
+body.sintia .form-wish .selected-stickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body.sintia .form-wish .btn-sticker {
+  align-self: flex-start;
+}
+
+/* Submit button: full width */
+body.sintia .wish-form > .action-btn,
+body.sintia .wish-form .action-btn[type="submit"] {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ================================================================
+   Sintia pass 9: .wish-comment-action default gold, hover cream.
+   ================================================================ */
+body.sintia .wish-comment-action {
+  color: var(--gold);
+  cursor: pointer;
+  transition: color .25s;
+  margin-right: 10px;
+}
+
+body.sintia .wish-comment-action .icon-see-wish {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+  transition: none;
+}
+
+body.sintia .wish-comment-action:hover,
+body.sintia .wish-comment-action:focus-visible {
+  color: var(--paper);
+  text-decoration: none;
+}
+
+body.sintia .wish-comment-action:hover .icon-see-wish,
+body.sintia .wish-comment-action:focus-visible .icon-see-wish {
+  filter: brightness(0) saturate(100%) invert(95%) sepia(10%) saturate(350%) hue-rotate(350deg) brightness(105%) contrast(100%);
+}
+
+/* Section overflow restored. */
+
+
+/* =====================================================================
+   Sintia pass 10: scoped section-separator flow.
+   The reference keeps the ornament in normal flow, then moves only the
+   equivalent content group upward by 30px.  Top section padding is moved
+   into that group so the visual spacing remains intentional per section.
+   ===================================================================== */
+
+/* The separator starts at the actual section edge, never at global padding. */
+.quote-section.quote-wrap,
+.bridegroom-section.couple-wrap,
+.story-section.love-story,
+.date-section.save-date-wrap,
+.agenda-section.agenda-wrap,
+.photo-section.photo-wrap,
+.gift-section.wedding-gift-wrap,
+.wish-section.wedding-wish-wrap,
+.rsvp-section.rsvp-wrap,
+.note-section.notes-container {
+  padding-top: 0;
+}
+
+/* Dividers are centred ornaments: max 535px on wide screens and fluid below
+   that size.  Do not set transform here—AOS owns transform for zoom-out. */
+.right-side.secondary-pane > section > .sintia-section-separator {
+  box-sizing: border-box;
+  width: min(100%, 535px);
+  max-width: 535px;
+  height: 60px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.right-side.secondary-pane > section > .sintia-section-separator img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* The Wedding Day's internal divider follows the same centred geometry. */
+.sintia-section-separator.bottom {
+  width: min(100%, 535px);
+  max-width: 535px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sintia-section-separator.bottom img {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+.hero-section.cover > .sintia-batik-separator {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+}
+
+/* These wrappers are transparent Sintia content groups, so their 30px
+   overlap can safely place the ornament within the transition rhythm. */
+.quote-section > .sintia-section-separator + .quote-content,
+.bridegroom-section > .sintia-section-separator + .bridegroom-content,
+.story-section > .sintia-section-separator + .story-content,
+.date-section > .sintia-section-separator + .save-date,
+.agenda-section > .sintia-section-separator + .agenda-content,
+.photo-section > .sintia-section-separator + .photo-content,
+.gift-section > .sintia-section-separator + .gift-content,
+.wish-section > .sintia-section-separator + .wish-content {
+  position: relative;
+  z-index: 1;
+  margin-top: -30px;
+}
+
+.bridegroom-section > .sintia-section-separator + .bridegroom-content {
+  padding-top: 80px;
+}
+
+.story-section > .sintia-section-separator + .story-content {
+  padding-top: 38px;
+}
+
+.date-section > .sintia-section-separator + .save-date {
+  padding-top: 52px;
+}
+
+.agenda-section > .sintia-section-separator + .agenda-content {
+  padding-top: 44px;
+}
+
+.photo-section > .sintia-section-separator + .photo-content {
+  padding-top: 40px;
+}
+
+.gift-section > .sintia-section-separator + .gift-content {
+  padding-top: 70px;
+}
+
+.wish-section > .sintia-section-separator + .wish-content {
+  padding-top: 40px;
+}
+
+/* RSVP's paper card and the note's bordered content are surfaces, not
+   transparent groups.  Keep them in normal flow below the edge ornament. */
+.rsvp-section > .sintia-section-separator + .rsvp-content {
+  margin-top: 50px;
+}
+
+.note-section > .sintia-section-separator + .note-content {
+  margin-top: 50px;
+}
+
+/* The internal Wedding Day divider retains the reference section-group
+   composition; only its local group owns the negative margin. */
+.event-item .section-group.bottom {
+  margin-bottom: -30px;
+}
+
+.sintia-section-separator {
+  isolation: isolate;
+}
+
+/* custom.css adds a global tablet gap after every section.  Sintia's
+   separators are intentionally centred across the real section edge, so
+   remove that unrelated gap only inside the invitation panel. */
+@media (max-width: 768px) {
+  body.sintia .right-side.secondary-pane > section {
+    margin-bottom: 0;
+  }
+}
+
+
+/* Hero → quote is the one cross-section separator transition.  Let only
+   this quote section paint upward so the 60px ornament is centred on the
+   hero/quote boundary; every other section retains its local clipping. */
+.hero-section.cover {
+  z-index: 1;
+}
+
+.quote-section.quote-wrap {
+  z-index: 2;
+  overflow: visible;
+}
+
+.quote-section.quote-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* The separator's layout moves up by 30px, so preserve the quote's
+   original visual breathing room below it. */
+.quote-section > .sintia-section-separator + .quote-content {
+  padding-top: 70px;
+}
+
+
+/* Quote → bridegroom: mirror the completed Hero → Quote transition.
+   The bridegroom section paints above the quote so its ornament is centred
+   on their shared edge rather than clipped inside the dark section. */
+.bridegroom-section.couple-wrap {
+  z-index: 3;
+  overflow: visible;
+}
+
+.bridegroom-section.couple-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+.bridegroom-section > .sintia-section-separator + .bridegroom-content {
+  padding-top: 60px;
+}
+
+
+/* Final H2 scale: reduce Sintia's large Bona Nova headings while retaining
+   a clear visual hierarchy for the left desktop pane and data headings. */
+
+body.sintia h2.pane-title {
+  font-size: clamp(3rem, 4.8vw, 4.5rem) !important;
+}
+
+body.sintia h2.bridegroom-separator-text {
+  font-size: 2.2rem !important;
+}
+
+body.sintia h2.count-num {
+  font-size: clamp(1.7rem, 6.8vw, 2.35rem) !important;
+}
+
+body.sintia h2.event-day {
+  font-size: clamp(2rem, 7.6vw, 2.6rem) !important;
+}
+
+body.sintia h2.gift-card-title {
+  font-size: .95rem !important;
+}
+
+body.sintia h2.gift-send-title {
+  font-size: 1.35rem !important;
+}
+
+
+/* Wedding Day event hierarchy: venue, then time, then equal address lines. */
+.activity-content .event-hall {
+  margin-bottom: 6px;
+  color: var(--gold);
+  font-family: "Playfair Display", serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 15px;
+}
+
+.activity-content .activity-time {
+  margin: 0;
+  color: var(--paper);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin-bottom: 20px;
+}
+
+.activity-content .event-address,
+.activity-content .event-city {
+  margin: 0;
+  color: var(--paper);
+  font-family: "Playfair Display", serif;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+/* A small gold divider separates Akad Nikah from Resepsi in the existing gap. */
+.activity-wrap.same-location .activity-item + .activity-item::before {
+  content: "";
+  position: absolute;
+  top: -17px;
+  left: 50%;
+  width: min(116px, 40%);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--gold) 80%, transparent);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.activity-wrap.same-location .activity-item + .activity-item::after {
+  content: "";
+  position: absolute;
+  top: -21px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--wine);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--gold);
+  box-shadow: 0 0 0 3px var(--background-primary);
+  pointer-events: none;
+  z-index: 4;
+}
+
+
+/* Wedding Day → RSVP: centre the edge ornament on the section boundary,
+   using the same layered flow as the completed Hero → Quote transition. */
+.agenda-section.agenda-wrap {
+  z-index: 4;
+}
+
+.rsvp-section.rsvp-wrap {
+  z-index: 5;
+  overflow: visible;
+}
+
+.rsvp-section.rsvp-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* Preserve the RSVP paper card's existing distance below the divider. */
+.rsvp-section > .sintia-section-separator + .rsvp-content {
+  margin-top: 50px;
+}
+
+
+/* RSVP → Gallery: this remains in document flow, so the boundary follows
+   any RSVP form/message height while the 60px ornament stays centred on it. */
+.photo-section.photo-wrap {
+  z-index: 6;
+  overflow: visible;
+}
+
+.photo-section.photo-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* Compensate only Gallery's inner spacing; no fixed section height is used. */
+.photo-section > .sintia-section-separator + .photo-content {
+  padding-top: 50px;
+}
+
+
+/* Gallery → Wedding Gift: centred boundary ornament in normal document flow. */
+.gift-section.wedding-gift-wrap {
+  z-index: 7;
+  overflow: visible;
+}
+
+.gift-section.wedding-gift-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+.gift-section > .sintia-section-separator + .gift-content {
+  padding-top: 50px;
+}
+
+/* Wedding Gift contrast: preserve all existing cream and wine backgrounds,
+   while assigning text colors according to the surface it sits on. */
+.gift-section .gift-header .latin-title,
+.gift-section .gift-header p,
+.gift-section .gift-desc,
+.gift-section .gift-send-title {
+  color: var(--ink) !important;
+}
+
+.gift-section .gift-header p,
+.gift-section .gift-desc {
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.gift-section .gift-card-item .gift-card-title,
+.gift-section .gift-card-item .gift-card-name,
+.gift-section .gift-send-body .gift-send-name {
+  color: var(--gold) !important;
+}
+
+.gift-section .gift-card-item .gift-card-number,
+.gift-section .gift-send-body .gift-send-address {
+  color: var(--paper) !important;
+}
+
+.gift-section .gift-card-item .gift-card-number {
+  font-weight: 700;
+}
+
+
+/* Keep Gift toggle and its icon in the same 250ms action-button rhythm. */
+.gift-section-action .gift-action {
+  transition: background .25s ease, color .25s ease, border-color .25s ease !important;
+  transition-delay: 0s !important;
+}
+
+.gift-section-action .gift-action i {
+  transition: none !important;
+  transition-delay: 0s !important;
+}
+
+
+/* Wedding Gift → Best Wishes: keep the divider centred on a dynamic edge. */
+.wish-section.wedding-wish-wrap {
+  z-index: 8;
+  overflow: visible;
+}
+
+.wish-section.wedding-wish-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* Preserve Best Wishes' inner visual spacing after moving its divider up. */
+.wish-section > .sintia-section-separator + .wish-content {
+  padding-top: 70px;
+  padding-inline: 25px;
+  margin-bottom: 70px;
+}
+
+
+/* Best Wishes → Ucapan Akhir: centred divider that follows dynamic wishes. */
+.note-section.notes-container {
+  z-index: 9;
+  overflow: visible;
+}
+
+.note-section.notes-container > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* Preserve the note's internal placement after centring its divider. */
+.note-section > .sintia-section-separator + .note-content {
+  margin-top: 0px;
+  border: 0;
+}
+
+
+/* Hero footer text waits for the visitor's first invitation-panel scroll.
+   The logo and prewedding image remain available during preloading. */
+.hero-footer .deferred-hero-footer {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+}
+
+
+/* RSVP submit: plane icon always follows the button text color and timing. */
+.rsvp-section .rsvp-confirm-btn.confirm {
+  transition: background .25s ease, color .25s ease, border-color .25s ease !important;
+  transition-delay: 0s !important;
+}
+
+.rsvp-section .rsvp-confirm-btn.confirm i {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+  transition: none !important;
+  transition-delay: 0s !important;
+}
+
+.rsvp-section .rsvp-confirm-btn.confirm:hover i,
+.rsvp-section .rsvp-confirm-btn.confirm:focus-visible i {
+  filter: brightness(0) saturate(100%) invert(6%) sepia(80%) saturate(5800%) hue-rotate(358deg) brightness(70%) contrast(115%);
+}
+
+.rsvp-section .rsvp-confirm-btn.confirm:active i {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* RSVP attendance icons: larger and fully themed in every interaction state. */
+.rsvp-section .rsvp-confirm-btn .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn .icon-confirm-no-rsvp {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  filter: brightness(0) saturate(100%) invert(6%) sepia(80%) saturate(5800%) hue-rotate(358deg) brightness(70%) contrast(115%);
+  transition: none;
+}
+
+.rsvp-section .rsvp-confirm-btn:hover .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn:hover .icon-confirm-no-rsvp,
+.rsvp-section .rsvp-confirm-btn:focus-visible .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn:focus-visible .icon-confirm-no-rsvp,
+.rsvp-section .rsvp-confirm-btn:active .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn:active .icon-confirm-no-rsvp,
+.rsvp-section .rsvp-confirm-btn.going.active .icon-confirm-yes-rsvp,
+.rsvp-section .rsvp-confirm-btn.not-going.active .icon-confirm-no-rsvp {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* Audio control follows the same gold / wine interaction contract. */
+.audio-circle {
+  background-color: var(--gold);
+  border-color: var(--wine);
+  transition: background-color .25s ease, border-color .25s ease, opacity .2s ease-in-out;
+}
+
+.audio-circle .icon-audio,
+.audio-circle .icon-audio-off {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) saturate(100%) invert(6%) sepia(80%) saturate(5800%) hue-rotate(358deg) brightness(70%) contrast(115%);
+  transition: none;
+}
+
+.audio-circle:hover,
+.audio-circle:focus-visible,
+.audio-circle:active {
+  background-color: var(--wine);
+  border-color: var(--wine);
+  opacity: 1;
+}
+
+.audio-circle:hover .icon-audio,
+.audio-circle:hover .icon-audio-off,
+.audio-circle:focus-visible .icon-audio,
+.audio-circle:focus-visible .icon-audio-off,
+.audio-circle:active .icon-audio,
+.audio-circle:active .icon-audio-off {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+}
+
+/* The visible music icon rotates slowly while BacksoundManager marks the circle as playing. */
+.audio-circle.playing {
+  animation: none;
+  will-change: auto;
+}
+
+.audio-circle.playing .icon-audio {
+  animation-name: sintia-audio-spin;
+  animation-duration: 12s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-fill-mode: both;
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes sintia-audio-spin {
+  from { transform: rotate(0deg) translateZ(0); }
+  to { transform: rotate(360deg) translateZ(0); }
+}
+
+/* Welcome action: default wine, then gold on hover/press; its mail icon matches the text. */
+.welcome-section .welcome-open-action.action-btn {
+  background: var(--wine);
+  border-color: var(--wine);
+  color: var(--gold);
+  transition: background-color .25s ease, border-color .25s ease, color .25s ease;
+}
+
+.welcome-section .welcome-open-action.action-btn .icon-mail {
+  filter: brightness(0) saturate(100%) invert(88%) sepia(39%) saturate(469%) hue-rotate(352deg) brightness(106%) contrast(101%);
+  transition: none;
+}
+
+.welcome-section .welcome-open-action.action-btn:hover,
+.welcome-section .welcome-open-action.action-btn:focus-visible,
+.welcome-section .welcome-open-action.action-btn:active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--ink);
+}
+
+.welcome-section .welcome-open-action.action-btn:hover .icon-mail,
+.welcome-section .welcome-open-action.action-btn:focus-visible .icon-mail,
+.welcome-section .welcome-open-action.action-btn:active .icon-mail {
+  filter: brightness(0) saturate(100%) invert(6%) sepia(80%) saturate(5800%) hue-rotate(358deg) brightness(70%) contrast(115%);
+}
+
+
+/* Ucapan Akhir → Footnote: add the same centred, flow-based separator. */
+.footnote-section.footnote-wrap {
+  z-index: 10;
+  overflow: visible;
+  padding-top: 0;
+}
+
+.footnote-section.footnote-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+/* Flowers remain absolute; compensate spacing on the actual footer content. */
+.footnote-section.footnote-wrap > .footnote-content {
+  position: relative;
+  z-index: 2;
+  padding-top: 34px;
+}
+
+
+/* ================================================================
+   Footer heart trigger + cupid celebration overlay.
+   Artwork: Microsoft Fluent Emoji (MIT), loaded on first click only.
+   ================================================================ */
+.footnote-section.footnote-wrap .sintia-foot-love {
+  position: absolute;
+  bottom: 125px;
+  left: 50%;
+  z-index: 5;
+  color: var(--gold);
+  font-family: Georgia, serif;
+  font-size: clamp(4rem, 8vw, 5rem);
+  line-height: 1;
+  opacity: .28;
+  transform: translateX(-50%) scale(1);
+  transform-origin: center;
+  animation: sintia-foot-love-pulse 2.4s ease-in-out infinite;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+}
+
+.footnote-section.footnote-wrap .sintia-foot-love:focus-visible {
+  border-radius: 50%;
+  outline: 2px solid var(--gold);
+  outline-offset: 6px;
+}
+
+@keyframes sintia-foot-love-pulse {
+  0%, 100% { opacity: .22; transform: translateX(-50%) scale(1); }
+  15% { opacity: .36; transform: translateX(-50%) scale(1.12); }
+  30% { opacity: .26; transform: translateX(-50%) scale(1.03); }
+  45% { opacity: .38; transform: translateX(-50%) scale(1.15); }
+  60% { opacity: .24; transform: translateX(-50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footnote-section.footnote-wrap .sintia-foot-love { animation: none; }
+}
+
+.cupid-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000001;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 244, 214, .95), transparent 62%),
+    rgba(255, 255, 255, .97);
+}
+
+.cupid-overlay.is-playing {
+  visibility: visible;
+  animation: cupid-overlay-fade 4.2s ease forwards;
+}
+
+.cupid-stage {
+  position: relative;
+  width: min(92vw, 760px);
+  height: clamp(220px, 58vw, 380px);
+  max-height: 70svh;
+}
+
+/* Cupid: artwork plus a slim bow, flying in from the left. */
+.cupid-actor {
+  position: absolute;
+  top: 50%;
+  left: 2%;
+  width: 30%;
+  max-width: 210px;
+  opacity: 0;
+  transform: translate(-45vw, -50%);
+}
+
+.cupid-angel-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 12px 18px rgba(101, 11, 4, .18));
+}
+
+.cupid-bow {
+  position: absolute;
+  top: 42%;
+  right: -12%;
+  width: 34%;
+  height: auto;
+  overflow: visible;
+  transform-origin: 22% 50%;
+}
+
+.cupid-bow-limb {
+  fill: none;
+  stroke: #8a4a1f;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.cupid-bow-cord {
+  fill: none;
+  stroke: rgba(101, 11, 4, .55);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+/* Arrow flying towards the heart. */
+.cupid-dart {
+  position: absolute;
+  top: 47%;
+  left: 27%;
+  width: 22%;
+  max-width: 160px;
+  height: auto;
+  overflow: visible;
+  opacity: 0;
+  transform: translate(0, -50%);
+}
+
+.cupid-dart-shaft {
+  fill: none;
+  stroke: #8a4a1f;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.cupid-dart-head { fill: var(--wine); }
+.cupid-dart-fletch { fill: #d8452f; }
+
+/* Target heart: whole art swaps to the pierced art on impact. */
+.cupid-target {
+  position: absolute;
+  top: 50%;
+  right: 6%;
+  width: 27%;
+  max-width: 190px;
+  aspect-ratio: 1;
+  transform: translate(0, -50%);
+}
+
+.cupid-heart-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 12px 20px rgba(101, 11, 4, .2));
+}
+
+.cupid-heart-art.pierced { opacity: 0; }
+
+/* Small sparkles around the impact. */
+.cupid-sparkles span {
+  position: absolute;
+  top: 50%;
+  right: 17%;
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.cupid-sparkles span:nth-child(2) { width: 9px; height: 9px; background: #e8657a; }
+.cupid-sparkles span:nth-child(3) { width: 7px; height: 7px; }
+.cupid-sparkles span:nth-child(4) { width: 11px; height: 11px; background: #f2a3b3; }
+.cupid-sparkles span:nth-child(5) { width: 8px; height: 8px; }
+.cupid-sparkles span:nth-child(6) { width: 10px; height: 10px; background: #e8657a; }
+
+/* Choreography */
+.cupid-overlay.is-playing .cupid-actor {
+  animation: cupid-fly-in 1.35s cubic-bezier(.2, .78, .26, 1) .1s both,
+             cupid-hover 1.5s ease-in-out 1.45s 2 alternate;
+}
+
+.cupid-overlay.is-playing .cupid-bow {
+  animation: cupid-bow-pull 1s cubic-bezier(.3, .7, .3, 1) 1.4s both;
+}
+
+.cupid-overlay.is-playing .cupid-dart {
+  animation: cupid-dart-fly .75s cubic-bezier(.2, .82, .3, 1) 2.25s both;
+}
+
+.cupid-overlay.is-playing .cupid-heart-art.whole {
+  animation: cupid-heart-idle 1.1s ease-in-out .5s 2 alternate,
+             cupid-heart-vanish .01s linear 2.86s forwards;
+}
+
+.cupid-overlay.is-playing .cupid-heart-art.pierced {
+  animation: cupid-heart-struck 1.1s cubic-bezier(.2, .9, .3, 1) 2.86s both;
+}
+
+.cupid-overlay.is-playing .cupid-sparkles span {
+  animation: cupid-spark-out .95s ease-out 2.9s both;
+}
+
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(1) { --sx: -120px; --sy: -96px; }
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(2) { --sx: 54px; --sy: -110px; animation-delay: 2.96s; }
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(3) { --sx: 118px; --sy: -18px; animation-delay: 3.02s; }
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(4) { --sx: 74px; --sy: 96px; animation-delay: 2.94s; }
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(5) { --sx: -86px; --sy: 104px; animation-delay: 3.04s; }
+.cupid-overlay.is-playing .cupid-sparkles span:nth-child(6) { --sx: -140px; --sy: 16px; animation-delay: 3s; }
+
+@keyframes cupid-overlay-fade {
+  0% { opacity: 0; }
+  6%, 86% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes cupid-fly-in {
+  0% { opacity: 0; transform: translate(-45vw, -30%) rotate(-14deg) scale(.86); }
+  45% { opacity: 1; }
+  70% { transform: translate(4%, -58%) rotate(5deg) scale(1.02); }
+  100% { opacity: 1; transform: translate(0, -50%) rotate(0) scale(1); }
+}
+
+@keyframes cupid-hover {
+  from { transform: translate(0, -50%) rotate(0); }
+  to { transform: translate(0, -56%) rotate(-2.5deg); }
+}
+
+@keyframes cupid-bow-pull {
+  0%, 30% { transform: scaleX(1) rotate(0); }
+  70% { transform: scaleX(.82) rotate(-6deg); }
+  85% { transform: scaleX(.8) rotate(-7deg); }
+  100% { transform: scaleX(1.04) rotate(2deg); }
+}
+
+@keyframes cupid-dart-fly {
+  0% { opacity: 0; transform: translate(0, -50%) rotate(0); }
+  10% { opacity: 1; }
+  86% { opacity: 1; transform: translate(178%, -58%) rotate(-3deg); }
+  100% { opacity: 0; transform: translate(196%, -60%) rotate(-3deg); }
+}
+
+@keyframes cupid-heart-idle {
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
+}
+
+@keyframes cupid-heart-vanish {
+  to { opacity: 0; }
+}
+
+@keyframes cupid-heart-struck {
+  0% { opacity: 0; transform: scale(1.02) rotate(0); }
+  8% { opacity: 1; transform: scale(1.02) rotate(0); }
+  22% { transform: scale(1.24) rotate(-7deg); }
+  44% { transform: scale(.98) rotate(5deg); }
+  66% { transform: scale(1.12) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1.05) rotate(0); }
+}
+
+@keyframes cupid-spark-out {
+  0% { opacity: 0; transform: translate(0, -50%) scale(.3); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx, 0), calc(-50% + var(--sy, 0))) scale(.5); }
+}
+
+@media (max-width: 600px) {
+  .cupid-stage {
+    width: min(92vw, 520px);
+    height: clamp(220px, 74vw, 320px);
+  }
+
+  .cupid-actor { width: 36%; }
+  .cupid-target { width: 34%; }
+  .cupid-dart { width: 26%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cupid-overlay.is-playing,
+  .cupid-overlay.is-playing .cupid-actor,
+  .cupid-overlay.is-playing .cupid-bow,
+  .cupid-overlay.is-playing .cupid-dart,
+  .cupid-overlay.is-playing .cupid-heart-art.whole,
+  .cupid-overlay.is-playing .cupid-heart-art.pierced,
+  .cupid-overlay.is-playing .cupid-sparkles span {
+    animation-duration: .01s;
+    animation-delay: 0s;
+  }
+
+  .cupid-overlay.is-playing { opacity: 1; }
+  .cupid-overlay.is-playing .cupid-actor { opacity: 1; transform: translate(0, -50%); }
+  .cupid-overlay.is-playing .cupid-heart-art.whole { opacity: 0; }
+  .cupid-overlay.is-playing .cupid-heart-art.pierced { opacity: 1; }
+}
+
+
+/* Date and Wedding Day use the same flow-based, visible transition layer as
+   the other section boundaries so their dividers cannot be clipped above. */
+.date-section.save-date-wrap {
+  position: relative;
+  z-index: 4;
+  overflow: visible;
+}
+
+.agenda-section.agenda-wrap {
+  position: relative;
+  z-index: 5;
+  overflow: visible;
+}
+
+.date-section.save-date-wrap > .sintia-section-separator,
+.agenda-section.agenda-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+
+/* Hero → Quote: prevent the first divider's negative margin from collapsing
+   through Quote at tablet/mobile widths.  The flow root keeps the 30px overlap
+   local to the divider while both sections retain their normal document flow. */
+.hero-section.cover {
+  position: relative;
+  z-index: 1;
+}
+
+.quote-section.quote-wrap {
+  position: relative;
+  z-index: 2;
+  display: flow-root;
+  overflow: visible;
+}
+
+.quote-section.quote-wrap > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+
+/* Wedding Day headline: larger day and date with a stable responsive layout. */
+.event-header.sintia-event-head {
+  display: grid;
+  min-height: 255px;
+  height: auto;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 64px 20px 58px;
+}
+
+.event-header.sintia-event-head .event-day {
+  margin: 0;
+  color: var(--gold);
+  font-size: clamp(2.35rem, 5vw, 3.1rem) !important;
+  line-height: .98;
+  text-wrap: balance;
+}
+
+.event-header.sintia-event-head .event-date {
+  margin: 0;
+  color: var(--paper);
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: clamp(1px, .35vw, 3px);
+  text-align: center;
+  text-wrap: balance;
+}
+
+@media (max-width: 600px) {
+  .event-header.sintia-event-head {
+    min-height: 220px;
+    padding: 54px 16px 46px;
+    gap: 6px;
+  }
+
+  .event-header.sintia-event-head .event-day {
+    font-size: clamp(2.3rem, 9vw, 2.65rem) !important;
+  }
+
+  .event-header.sintia-event-head .event-date {
+    font-size: clamp(1.1rem, 5vw, 1.35rem);
+    letter-spacing: 1.5px;
+  }
+}
+
+
+/* Desktop left pane: keep the couple heading near the top while the guest
+   greeting sits safely above the lower Sintia flowers. */
+@media (min-width: 961px) {
+  .left-side .pane-details {
+    position: absolute;
+    inset: 0;
+    margin-top: 0;
+    padding: 10px 24px;
+  }
+
+  .left-side .pane-title {
+    margin-top: 15vh;
+  }
+
+  .left-side .pane-guest {
+    position: absolute;
+    bottom: clamp(82px, 12vh, 140px);
+    right: 0;
+    left: 0;
+    z-index: 4;
+    box-sizing: border-box;
+    width: min(calc(100% - 48px), 360px);
+    margin: 0 auto;
+    padding: 16px 20px;
+    border: 1px solid rgba(255, 222, 143, .56);
+    border-radius: 18px;
+    background: rgba(244, 225, 195, .92);
+    box-shadow: 0 14px 28px rgba(80, 24, 23, .2);
+    text-align: center;
+  }
+}
+
+
+/* Global script-heading change: replace every active Bona Nova treatment
+   with Alex Brush while retaining Playfair Display for body copy. */
+body.sintia.original {
+  --font-latin: "Alex Brush", cursive;
+  --heading-family: "Alex Brush", cursive;
+}
+
+body.sintia .latin-title,
+body.sintia section h2,
+body.sintia section h3,
+.left-side .couple-names h2,
+.left-side .pane-title,
+.welcome-section .welcome-header h1 {
+  font-family: "Alex Brush", cursive !important;
+}
+
+
+/* Keep the animated palms inside their clipped panels.  The previous 10deg
+   sway pushed the outer canopy beyond the panel edge; a smaller inward sway
+   preserves motion without letting the artwork hit the clipping boundary. */
+.sintia-coconut-tree.left img {
+  animation-name: sintia-coconut-sway-left;
+}
+
+.sintia-coconut-tree.right img {
+  animation-name: sintia-coconut-sway-right;
+}
+
+@keyframes sintia-coconut-sway-left {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(6deg); }
+}
+
+@keyframes sintia-coconut-sway-right {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-6deg); }
+}
+
+
+/* Desktop palms must stay inside pane-inner because that panel intentionally
+   clips its decorative artwork.  Keep a generous inner safety gutter for sway. */
+@media (min-width: 961px) {
+  .left-side .pane-inner .sintia-coconut-tree {
+    width: 28%;
+  }
+
+  .left-side .pane-inner .sintia-coconut-tree.left {
+    left: 12%;
+  }
+
+  .left-side .pane-inner .sintia-coconut-tree.right {
+    right: 12%;
+  }
+}
+
+
+/* Responsive welcome guest details: a readable rounded card over the cover art. */
+@media (max-width: 960px) {
+  .welcome-section .welcome-details {
+    box-sizing: border-box;
+    width: min(calc(100% - 32px), 390px);
+    margin: 18px auto 0;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(101, 11, 4, .34);
+    border-radius: 18px;
+    background: rgba(244, 225, 195, .9);
+    box-shadow: 0 14px 30px rgba(80, 24, 23, .16);
+  }
+
+  .welcome-section .welcome-details p {
+    color: var(--ink);
+  }
+
+  .welcome-section .welcome-details .welcome-guest-name {
+    color: var(--wine);
+  }
+}
+
+
+/* Countdown numerals remain readable rather than using the script heading font. */
+body.sintia .count-num,
+body.sintia .count-day {
+  font-family: "Playfair Display", serif !important;
+}
+
+
+/* Give the Akad → Resepsi divider balanced breathing room without changing
+   the spacing after the final event card. */
+.activity-wrap.same-location .activity-item:first-of-type {
+  margin-bottom: 32px;
+}
+
+.activity-wrap.same-location .activity-item + .activity-item::before {
+  top: -32px;
+}
+
+.activity-wrap.same-location .activity-item + .activity-item::after {
+  top: -36px;
+}
+
+
+/* Footer Cupid trigger: use the supplied SVG heart through a CSS image while
+   retaining the existing accessible button and click behaviour. */
+.footnote-section.footnote-wrap .sintia-foot-love {
+  width: clamp(4rem, 8vw, 5rem);
+  height: clamp(4rem, 8vw, 5rem);
+  font-size: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M0 0h16v16H0z' fill='none'/%3E%3Cpath fill='%23ffde8f' d='M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92C0 2.755 1.79 1 4 1'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
