@@ -11,22 +11,9 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-      import { getFirestore } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyCffYw2s4r3d4RB1Io0kYH41-8nu9qspm8",
-        authDomain: "wedding-web-alfira-fauzi.firebaseapp.com",
-        projectId: "wedding-web-alfira-fauzi",
-        storageBucket: "wedding-web-alfira-fauzi.firebasestorage.app",
-        messagingSenderId: "260951532899",
-        appId: "1:260951532899:web:76d14d2972ce8b7cc99f56"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);   // ✅ simpan global
-    </script>
+    <!-- Gerbang login + Firebase (config dari env VITE_*) -->
+    <script type="module" src="/src/admin-gate.js"></script>
+    <script type="module" src="/src/firebase.js"></script>
 
 </head>
 <body>
@@ -832,7 +819,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- SheetJS for Excel/CSV parsing -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-    <!-- Custom JS -->
-    <script type="module" src="assets/js/script.js"></script>
+    <!-- Custom JS (dibundel Vite) -->
+    <script type="module" src="/src/webadmin.js"></script>
 </body>
 </html>

@@ -1,4 +1,6 @@
-import {
+// Firestore API disediakan oleh src/firebase.js lewat window.firestore.
+// Modul ini dieksekusi setelah firebase.js karena urutan module di HTML.
+const {
     collection,
     addDoc,
     serverTimestamp,
@@ -10,7 +12,7 @@ import {
     updateDoc,
     getDoc,
     setDoc
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+} = window.firestore;
 
 $(document).ready(function () {
 
@@ -113,7 +115,8 @@ $(document).ready(function () {
     // ✅ ADMIN ADD GUEST
     // ==============================
 
-    const ADMIN_KEY = "F4uziGant3n9";
+    // Diisi dari VITE_ADMIN_KEY lewat src/firebase.js
+    const ADMIN_KEY = window.ADMIN_KEY;
 
     let allGuests = [];      // Semua data dari Firestore
     let filteredGuests = []; // Data setelah filter search

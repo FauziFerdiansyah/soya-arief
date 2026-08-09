@@ -1,0 +1,12 @@
+node_modules/
+dist/
+
+# Env lokal - jangan pernah di-commit
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// PENTING: ganti ADMIN_KEY di bawah dengan nilai yang sama seperti
+// VITE_ADMIN_KEY, lalu deploy lewat Firebase Console atau Firebase CLI.
+//
+// Batasan yang perlu disadari: karena situs ini static (GitHub Pages)
+// tanpa Firebase Auth, ADMIN_KEY ikut ter-bundle ke JavaScript dan bisa
+// dibaca pengunjung. Aturan ini menahan penulisan acak, tapi bukan
+// pengamanan kuat. Untuk itu perlu Firebase Auth.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.resource.data.adminKey == 'pIsg57BDcRoztQJqKSsdbEqlLIrHdv3M';
+    }
+
+    // Data tamu: dibaca undangan, ditulis hanya oleh admin.
+    match /guest/{guestId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        // Tamu boleh update field RSVP & tracking miliknya sendiri.
+        || request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly([
+               'rsvpStatus', 'rsvpCount', 'rsvpAt', 'updatedAt',
+               'openedAt', 'openCount', 'lastDevice', 'sendCount'
+             ]);
+      allow delete: if isAdmin();
+    }
+
+    // RSVP: tamu boleh kirim, tidak boleh ubah/hapus.
+    match /rsvp/{rsvpId} {
+      allow read: if true;
+      allow create: if request.resource.data.guestId is string;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Ucapan: tamu boleh kirim, admin boleh moderasi.
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 100;
+      allow update, delete: if isAdmin();
+    }
+
+    // Template pesan undangan: hanya admin.
+    match /invitationTemplate/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Tutup sisanya.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
