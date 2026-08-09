@@ -499,7 +499,8 @@ section p {
 }
 .logo-wrap {
   width: 100%;
-  height: 120px;
+  height: 110px;
+  padding: 10px;
   position: relative;
 }
 
@@ -2460,7 +2461,7 @@ font-weight: var(--font-weight-bold);
 
 .welcome-guest-name {
   font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold) !important;
   margin-top: 5px;
 }
 

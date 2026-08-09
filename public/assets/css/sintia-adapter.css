@@ -3144,19 +3144,28 @@ body.sintia section h3,
 }
 
 
-/* Desktop palms must stay inside pane-inner because that panel intentionally
-   clips its decorative artwork.  Keep a generous inner safety gutter for sway. */
+/* Desktop palms hug the far corners of pane-inner, mirroring the mobile
+   cover.  The previous 12% gutter pulled them toward the middle of the panel.
+   Because pane-inner clips with overflow:hidden, the sway is pivoted at the
+   trunk base (transform-origin) so the canopy rotates inward instead of
+   pushing past the panel edge.  Tweak --sintia-palm-inset to a negative value
+   for a more cropped look. */
 @media (min-width: 961px) {
   .left-side .pane-inner .sintia-coconut-tree {
-    width: 28%;
+    --sintia-palm-inset: -16%;
+    width: 30%;
   }
 
   .left-side .pane-inner .sintia-coconut-tree.left {
-    left: 12%;
+    left: var(--sintia-palm-inset);
   }
 
   .left-side .pane-inner .sintia-coconut-tree.right {
-    right: 12%;
+    right: var(--sintia-palm-inset);
+  }
+
+  .left-side .pane-inner .sintia-coconut-tree img {
+    transform-origin: bottom center;
   }
 }
 

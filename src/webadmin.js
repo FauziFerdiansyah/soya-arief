@@ -20,14 +20,19 @@ $(document).ready(function () {
     // ==============================
     // URL DOMAIN CONFIG
     // ==============================
-    // ✅ Auto-detect current domain atau gunakan default
-    let url_domain = window.location.origin + "/";
-    
-    // Fallback ke production domain jika localhost
-    if (url_domain.includes("localhost") || url_domain.includes("127.0.0.1")) {
-        url_domain = "https://alfirafauzi.site/";
-    }
-    
+    // Basis link undangan yang dicopy/dikirim dari panel admin.
+    // Prioritas:
+    //   1. VITE_PUBLIC_URL  -> diset di .env.local & GitHub Variables
+    //   2. origin + BASE_URL -> base path build saat ini (mis. /soya-arief/)
+    //
+    // Memakai BASE_URL penting karena situs tidak berada di root domain,
+    // jadi window.location.origin saja akan menghasilkan link yang salah.
+    const url_domain = (() => {
+        const configured = (import.meta.env.VITE_PUBLIC_URL ?? "").trim();
+        const base = configured || window.location.origin + import.meta.env.BASE_URL;
+        return base.endsWith("/") ? base : base + "/";
+    })();
+
     console.log("🌐 URL Domain:", url_domain);
 
     // ==============================
