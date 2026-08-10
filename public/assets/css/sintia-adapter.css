@@ -3287,3 +3287,20 @@ body.sintia .count-day {
     margin-bottom: -40px;
   }
 }
+
+/* ============================================================
+   FONT KARTU HADIAH (gift card)
+   ------------------------------------------------------------
+   Aturan global di atas memaksa `body.sintia section h2` dan
+   `section h3` memakai "Alex Brush" dengan !important, sehingga
+   gift-card-title (h2) dan gift-card-number (h3) ikut terkena
+   walau sudah didefinisikan Playfair Display sebelumnya.
+   Blok ini mengembalikan ketiganya ke Playfair Display. Ditulis
+   paling akhir dan memakai !important agar menang atas aturan
+   tersebut.
+   ============================================================ */
+body.sintia .gift-card-title,
+body.sintia .gift-card-number,
+body.sintia .gift-card-name {
+  font-family: "Playfair Display", serif !important;
+}

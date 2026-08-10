@@ -18,23 +18,29 @@
     <meta name="description" content="Sabtu, 5 September 2026 | Wedding Invitation">
     <meta name="robots" content="noindex, nofollow">
 
-    <!-- Open Graph (Facebook, WhatsApp, etc.) -->
+    <!-- Open Graph (Facebook, WhatsApp, etc.)
+         PENTING: og:image WAJIB URL absolut. Path relatif tidak bisa
+         diresolusi oleh crawler WhatsApp/Facebook sehingga preview
+         gambarnya kosong. %VITE_PUBLIC_URL% diganti Vite saat build. -->
+    <meta property="og:site_name" content="The Wedding of Arief &amp; Soya">
     <meta property="og:title" content="The Wedding of Arief & Soya">
     <meta property="og:description" content="Sabtu, 5 September 2026 | Wedding Invitation">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="id_ID">
-        <meta property="og:image" content="assets/images/prewed/square.jpg">
-    <meta property="og:image:secure_url" content="assets/images/prewed/square.jpg">
+    <meta property="og:url" content="%VITE_PUBLIC_URL%">
+    <meta property="og:image" content="%VITE_PUBLIC_URL%assets/images/prewed/square.jpg">
+    <meta property="og:image:secure_url" content="%VITE_PUBLIC_URL%assets/images/prewed/square.jpg">
     <meta property="og:image:type" content="image/jpeg">
     <meta property="og:image:width" content="300">
     <meta property="og:image:height" content="300">
     <meta property="og:image:alt" content="Arief & Soya">
 
-    <!-- Twitter Cards -->
-    <meta name="twitter:card" content="summary_large_image">
+    <!-- Twitter Cards. Gambarnya persegi 300x300, jadi tipe "summary"
+         lebih tepat daripada "summary_large_image". -->
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="The Wedding of Arief & Soya">
     <meta name="twitter:description" content="Sabtu, 5 September 2026 | Wedding Invitation">
-    <meta name="twitter:image" content="assets/images/prewed/square.jpg">
+    <meta name="twitter:image" content="%VITE_PUBLIC_URL%assets/images/prewed/square.jpg">
     <meta name="twitter:image:alt" content="Arief & Soya">
     
     <!-- Preconnect untuk external resources -->
@@ -423,9 +429,9 @@
                                     Putri ketiga dari Bapak Budhi Kristianto & Ibu Cut Dewi Astuti Hasan
                                 </p>
                                 <div class="bridegroom-link-instagram" data-aos="fade-in" data-aos-duration="800" data-aos-delay="200">
-                                    <a href="https://www.instagram.com/soyaamnda/" target="_blank" class="bridegroom-link">
+                                    <a href="https://www.instagram.com/soyaamndaa/" target="_blank" class="bridegroom-link">
                                         <i class="icon-instagram"></i>
-                                        @soyaamnda
+                                        @soyaamndaa
                                     </a>
                                 </div>
                             </div>
@@ -773,9 +779,9 @@
                                     <div class="gift-card-body">
                                         <div class="gift-card-item">
                                             <div class="info-card">
-                                                <h2 class="gift-card-title">SHOPEEPAY</h2>
+                                                <h2 class="gift-card-title">BANK BCA</h2>
                                                 <h3 class="gift-card-number" data-remote="rekening-1">08996530109</h3>
-                                                <h4 class="gift-card-name">soyaamanda122</h4>
+                                                <h4 class="gift-card-name">5500546176</h4>
                                             </div>
                                             <div class="action-info-card">
                                                 <button class="copy-action" data-copy="rekening-1">
