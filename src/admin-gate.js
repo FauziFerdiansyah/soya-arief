@@ -343,7 +343,7 @@ function buildOverlay() {
       <div class="agate__divider"></div>
       <p class="agate__footer">
         Sesi berlaku di semua tab &middot; berakhir otomatis setelah 8 jam
-        <span class="agate__brand">Soya &amp; Arief</span>
+        <span class="agate__brand">Arief &amp; Soya</span>
       </p>
     </div>
   `;

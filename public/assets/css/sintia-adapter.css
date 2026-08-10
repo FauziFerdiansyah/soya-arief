@@ -1,4 +1,4 @@
-/* Sintia template adapter for the existing Soya & Arief markup. */
+/* Sintia template adapter for the existing Arief & Soya markup. */
 body.sintia.original {
   --background-primary: #650b04;
   --background-primary-rgb: 101, 11, 4;
@@ -793,7 +793,7 @@ body.sintia a {
 }
 
 .note-section.notes-container {
-  padding: 50px 24px;
+  padding: 0px;
   background-color: var(--background-primary);
   background-image: url("../images/sintia/texture-body-min.png");
   background-size: 100%;
