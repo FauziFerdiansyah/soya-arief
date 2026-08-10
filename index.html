@@ -72,59 +72,8 @@
     <link rel="stylesheet" href="assets/css/sintia-template.css">
     <link rel="stylesheet" href="assets/css/sintia-adapter.css">
 
-    <!-- Firebase -->
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-    import { 
-        getFirestore,
-        collection,
-        addDoc,
-        doc,
-        getDoc,
-        setDoc,
-        updateDoc,
-        serverTimestamp,
-        query,
-        where,
-        orderBy,
-        limit,
-        getDocs
-    } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyCffYw2s4r3d4RB1Io0kYH41-8nu9qspm8",
-        authDomain: "wedding-web-alfira-fauzi.firebaseapp.com",
-        projectId: "wedding-web-alfira-fauzi",
-        storageBucket: "wedding-web-alfira-fauzi.firebasestorage.app",
-        messagingSenderId: "260951532899",
-        appId: "1:260951532899:web:76d14d2972ce8b7cc99f56"
-    };
-
-    // Init ✅
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // lempar ke global
-    window.db = db;
-    window.firebaseApp = app;
-
-    window.firestore = {
-        collection,
-        addDoc,
-        doc,
-        getDoc,
-        setDoc,
-        updateDoc,
-        serverTimestamp,
-        query,
-        where,
-        orderBy,
-        limit,
-        getDocs
-    };
-
-    console.log("✅ Firebase initialized (clean)");
-</script>
+    <!-- Firebase (config dari env VITE_*, dibundel oleh Vite) -->
+    <script type="module" src="/src/firebase.js"></script>
     
     <!-- Resource hints untuk JavaScript -->
     <link rel="modulepreload" href="assets/js/main.js">
@@ -300,7 +249,7 @@
                 <div class="hero-content">
                     <div class="hero-header">
                         <div class="logo-wrap" data-aos="fade-down" data-aos-duration="700" data-aos-delay="150">
-                            <img src="assets/images/af.png"
+                            <img src="assets/images/sa.png"
                                 alt="AF" class="logo">
                         </div>
                     </div>
@@ -516,7 +465,7 @@
                             </div>
                         </div>
                         <div class="add-to-calendar-wrap add-to-calendar-date" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="800">
-                            <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Soya+%26+Arief&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Soya+dan+Arief." target="_blank" rel="nofollow" id="addToCalendar">Tambahkan ke Kalender</a>
+                            <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Soya+%26+Arief&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Soya+dan+Arief." data-apple-calendar="assets/calendar/soya-arief-wedding.ics" target="_blank" rel="nofollow noopener" id="addToCalendar">Tambahkan ke Kalender</a>
                         </div>
                         <div class="save-date-icon-wrap bottom" aria-hidden="true" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">
                             <img class="save-date-icon" src="assets/images/sintia/save-date-flourish.svg" alt="">
@@ -1162,7 +1111,7 @@
                     </div>
                     <div class="footnote-body">
                         <div class="logo-wrap" data-aos="fade-in" data-aos-duration="700" data-aos-delay="100">
-                            <img src="assets/images/af.png"
+                            <img src="assets/images/sa.png"
                                 alt="AF" class="logo">
                         </div>
                         <p class="top-text" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">

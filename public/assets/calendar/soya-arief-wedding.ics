@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Soya & Arief//Wedding Invitation//ID
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:soya-arief-wedding-20260905@soya-arief-wedding
+DTSTAMP:20260809T000000Z
+DTSTART;TZID=Asia/Jakarta:20260905T080000
+DTEND;TZID=Asia/Jakarta:20260905T140000
+SUMMARY:The Wedding of Soya & Arief
+DESCRIPTION:Kami mengundang Anda untuk hadir di hari bahagia Soya dan Arief.
+LOCATION:Aula Kampus Widuri\, Jl. Palmerah Barat No. 353\, RT. 3/RW. 5\, Grogol Utara\, Kebayoran Lama\, Jakarta Selatan\, DKI Jakarta 11480
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR

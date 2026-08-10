@@ -1,0 +1,22 @@
+{
+  "name": "soya-arief-wedding",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "hash:password": "node scripts/hash-password.mjs",
+    "env:sync": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-github-env.ps1",
+    "rules:deploy": "firebase deploy --only firestore:rules",
+    "rules:login": "firebase login"
+  },
+  "dependencies": {
+    "firebase": "12.17.1"
+  },
+  "devDependencies": {
+    "firebase-tools": "15.25.1",
+    "vite": "8.2.1"
+  }
+}

@@ -144,7 +144,7 @@ img[data-lazy] {
 </div>
 
 <!-- Logo (tetap instant load) -->
-<img src="assets/images/af.png" class="logo">
+<img src="assets/images/sa.png" class="logo">
 ```
 
 ## 📝 Notes

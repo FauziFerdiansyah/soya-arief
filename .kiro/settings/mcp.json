@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "C:\\Users\\Fauzi\\go\\bin\\github-mcp-server.exe",
+      "args": ["stdio"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

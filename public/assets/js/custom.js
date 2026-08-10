@@ -860,6 +860,27 @@ const PerformanceOptimizer = {
 };
 
 /**
+ * CALENDAR LINK MANAGER
+ * Memilih kalender sesuai perangkat: Apple Calendar di iPhone/iPad dan Google Calendar di Android/desktop.
+ */
+const CalendarLinkManager = {
+  init() {
+    const calendarLink = document.getElementById('addToCalendar');
+    if (!calendarLink) return;
+
+    const isAppleMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    if (isAppleMobile) {
+      calendarLink.href = calendarLink.dataset.appleCalendar;
+      calendarLink.removeAttribute('target');
+      calendarLink.removeAttribute('rel');
+      calendarLink.setAttribute('aria-label', 'Tambahkan acara ke Kalender Apple');
+    }
+  }
+};
+
+/**
  * MAIN CUSTOM INITIALIZATION
  * Initialize semua custom functionality
  */
@@ -876,6 +897,7 @@ const CustomInitializer = {
       
       // Initialize core features
       SmoothScrollManager.init();
+      CalendarLinkManager.init();
       // RSVPFormManager.init();
       CountdownManager.init();
       
@@ -3093,3 +3115,4 @@ const CupidHeartAnimation = {
 };
 
 CupidHeartAnimation.init();
+

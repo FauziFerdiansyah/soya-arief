@@ -1,4 +1,6 @@
-import {
+// Firestore API disediakan oleh src/firebase.js lewat window.firestore.
+// Modul ini dieksekusi setelah firebase.js karena urutan module di HTML.
+const {
     collection,
     addDoc,
     serverTimestamp,
@@ -10,7 +12,7 @@ import {
     updateDoc,
     getDoc,
     setDoc
-} from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+} = window.firestore;
 
 $(document).ready(function () {
 
@@ -18,15 +20,197 @@ $(document).ready(function () {
     // ==============================
     // URL DOMAIN CONFIG
     // ==============================
-    // ✅ Auto-detect current domain atau gunakan default
-    let url_domain = window.location.origin + "/";
-    
-    // Fallback ke production domain jika localhost
-    if (url_domain.includes("localhost") || url_domain.includes("127.0.0.1")) {
-        url_domain = "https://alfirafauzi.site/";
-    }
-    
+    // Basis link undangan yang dicopy/dikirim dari panel admin.
+    // Prioritas:
+    //   1. VITE_PUBLIC_URL  -> diset di .env.local & GitHub Variables
+    //   2. origin + BASE_URL -> base path build saat ini (mis. /soya-arief/)
+    //
+    // Memakai BASE_URL penting karena situs tidak berada di root domain,
+    // jadi window.location.origin saja akan menghasilkan link yang salah.
+    const url_domain = (() => {
+        const configured = (import.meta.env.VITE_PUBLIC_URL ?? "").trim();
+        const base = configured || window.location.origin + import.meta.env.BASE_URL;
+        return base.endsWith("/") ? base : base + "/";
+    })();
+
     console.log("🌐 URL Domain:", url_domain);
+
+    // ==============================
+    // RINGKASAN FILTER CEPAT
+    // ==============================
+    // Menampilkan filter aktif di tombol dropdown supaya isinya tetap
+    // terlihat walau menu tertutup. Hanya urusan tampilan; logika filter
+    // tetap ditangani handler change pada masing-masing checkbox.
+    const QUICK_FILTER_IDS = [
+        "filterVipTable",
+        "filterVipSouvenir",
+        "filterOpened",
+        "filterRsvp",
+        "filterBelumDikirim",
+    ];
+
+    function updateQuickFilterSummary() {
+        const checked = QUICK_FILTER_IDS
+            .map((id) => document.getElementById(id))
+            .filter((el) => el && el.checked);
+
+        const $label = $("#filterQuickLabel");
+        const $count = $("#filterQuickCount");
+
+        if (checked.length === 0) {
+            $label.text("Semua tamu");
+            $count.attr("hidden", "hidden");
+            return;
+        }
+
+        const firstLabel = $(`label[for="${checked[0].id}"]`).text().trim();
+
+        $label.text(checked.length === 1 ? firstLabel : `${checked.length} filter aktif`);
+        $count.text(checked.length).removeAttr("hidden");
+    }
+
+    QUICK_FILTER_IDS.forEach((id) => {
+        $(document).on("change", `#${id}`, updateQuickFilterSummary);
+    });
+
+    // Reset filter juga harus menyegarkan ringkasan.
+    $(document).on("click", "#resetFilters", function () {
+        window.setTimeout(updateQuickFilterSummary, 0);
+    });
+
+    updateQuickFilterSummary();
+
+    // ==============================
+    // MENU AKSI BARIS (custom, bukan dropdown Bootstrap)
+    // ==============================
+    // Saat dibuka, menu dipindah ke <body> dan diposisikan fixed terhadap
+    // tombolnya. Dengan begitu menu tidak pernah terpotong oleh
+    // .table-responsive yang punya overflow, dan tabel tidak perlu discroll.
+    const ROW_MENU_GAP = 6;
+    const ROW_MENU_EDGE = 8;
+    let openRowMenu = null;
+
+    function closeRowMenu() {
+        if (!openRowMenu) return;
+
+        const { menu, toggle, home } = openRowMenu;
+
+        menu.classList.remove("is-open");
+        menu.hidden = true;
+        menu.removeAttribute("style");
+        if (home) home.appendChild(menu); // kembalikan ke barisnya
+        toggle.setAttribute("aria-expanded", "false");
+
+        openRowMenu = null;
+    }
+
+    function openRowMenuFor(toggle) {
+        const home = toggle.closest(".row-actions__wrap");
+        const menu = home ? home.querySelector(".row-actions__menu") : null;
+        if (!menu) return;
+
+        closeRowMenu();
+
+        // Ukur dulu dalam keadaan tak terlihat supaya tidak berkedip.
+        document.body.appendChild(menu);
+        menu.hidden = false;
+        menu.style.position = "fixed";
+        menu.style.visibility = "hidden";
+        menu.classList.add("is-open");
+
+        const rect = toggle.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth;
+        const menuHeight = menu.offsetHeight;
+
+        // Rata kanan tombol, lalu jaga supaya tidak keluar viewport.
+        let left = rect.right - menuWidth;
+        left = Math.min(left, window.innerWidth - menuWidth - ROW_MENU_EDGE);
+        left = Math.max(ROW_MENU_EDGE, left);
+
+        // Buka ke bawah; kalau mentok, balik ke atas tombol.
+        let top = rect.bottom + ROW_MENU_GAP;
+        if (top + menuHeight > window.innerHeight - ROW_MENU_EDGE) {
+            top = rect.top - menuHeight - ROW_MENU_GAP;
+        }
+        top = Math.max(ROW_MENU_EDGE, top);
+
+        menu.style.left = `${left}px`;
+        menu.style.top = `${top}px`;
+        menu.style.visibility = "";
+
+        toggle.setAttribute("aria-expanded", "true");
+        openRowMenu = { menu, toggle, home };
+    }
+
+    $(document).on("click", ".row-actions__toggle", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (openRowMenu && openRowMenu.toggle === this) {
+            closeRowMenu();
+            return;
+        }
+
+        openRowMenuFor(this);
+    });
+
+    // Tutup setelah item dipilih. Handler aksi tetap jalan karena node
+    // tombolnya tidak dihapus, hanya dipindah kembali ke barisnya.
+    $(document).on("click", ".row-actions__menu .dropdown-item", function () {
+        closeRowMenu();
+    });
+
+    $(document).on("click", function (e) {
+        if (!openRowMenu) return;
+        if (e.target.closest(".row-actions__menu")) return;
+        if (e.target.closest(".row-actions__toggle")) return;
+        closeRowMenu();
+    });
+
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape") closeRowMenu();
+    });
+
+    window.addEventListener("scroll", closeRowMenu, true);
+    window.addEventListener("resize", closeRowMenu);
+
+    // ==============================
+    // DETAIL SEBAGAI POPUP DI MODE KARTU
+    // ==============================
+    // Di bawah 768px tabel berubah jadi kartu, sehingga baris detail yang
+    // memanjang tidak lagi cocok. Handler ini menyalin isi .detail-content
+    // ke dalam modal. Di layar lebar, perilaku expand inline dibiarkan apa
+    // adanya (handler bawaan yang jalan).
+    const CARD_MODE_MAX_WIDTH = 768;
+
+    function isCardMode() {
+        return window.matchMedia(`(max-width: ${CARD_MODE_MAX_WIDTH}px)`).matches;
+    }
+
+    $(document).on(
+        "click",
+        ".toggleDetail, .toggleRsvpDetail, .toggleCommentDetail",
+        function (e) {
+            if (!isCardMode()) return; // desktop: biarkan expand inline
+
+            const $row = $(this).closest("tr");
+            const $content = $row.next("tr.detail-row").find(".detail-content").first();
+            if (!$content.length) return;
+
+            // Cegah handler expand bawaan supaya tidak dobel.
+            e.preventDefault();
+            e.stopImmediatePropagation();
+
+            const title = $row.find("td.card-cell--title, td.guest-card__name").first().text().trim();
+
+            $("#rowDetailModalTitle").text(title || "Detail");
+            $("#rowDetailModalBody").empty().append($content.clone());
+
+            bootstrap.Modal.getOrCreateInstance(
+                document.getElementById("rowDetailModal")
+            ).show();
+        }
+    );
 
     // ==============================
     // MENU TOGGLE
@@ -113,7 +297,8 @@ $(document).ready(function () {
     // ✅ ADMIN ADD GUEST
     // ==============================
 
-    const ADMIN_KEY = "F4uziGant3n9";
+    // Diisi dari VITE_ADMIN_KEY lewat src/firebase.js
+    const ADMIN_KEY = window.ADMIN_KEY;
 
     let allGuests = [];      // Semua data dari Firestore
     let filteredGuests = []; // Data setelah filter search
@@ -465,74 +650,103 @@ $(document).ready(function () {
             // Main row
             tbody.append(`
                 <tr class="guest-row" data-id="${doc.id}">
-                    <td class="text-center">
+                    <td class="text-center guest-card__toggle">
                         <button class="btn btn-sm btn-outline-secondary toggleDetail" data-id="${doc.id}" title="Lihat Detail">
                             <i class="ri-arrow-down-s-line"></i>
+                            <span class="btn-label">Detail</span>
                         </button>
                     </td>
-                    <td>
+                    <td data-label="Nama Tamu" class="guest-card__name">
                         ${d.name || "-"}
                         ${d.isTableVip ? '<i class="ri-vip-fill text-primary ms-1" data-bs-toggle="tooltip" title="VIP Table"></i>' : ''}
                         ${d.isSouvenirVip ? '<i class="ri-vip-diamond-fill text-info ms-1" data-bs-toggle="tooltip" title="VIP Souvenir"></i>' : ''}
                     </td>
-                    <td>${d.maxGuests || 0} Tamu</td>
-                    <td>${d.phone || "-"}</td>
-                    <td>${d.source || "-"}</td>
-                    <td>
-                        ${d.opened 
-                            ? '<span class="badge bg-success"><i class="ri-check-line"></i> Sudah</span>' 
-                            : '<span class="badge bg-secondary"><i class="ri-close-line"></i> Belum</span>'}
-                    </td>
-                    <td>
-                        ${d.sendCount && d.sendCount > 0
-                            ? '<span class="badge bg-success"><i class="ri-check-double-line"></i> Terkirim</span>' 
-                            : '<span class="badge bg-secondary"><i class="ri-close-line"></i> Belum</span>'}
-                    </td>
-                    <td class="text-center">
-                        <div class="btn-group" role="group">
-                            ${d.phone ? `
-                                <button class="btn btn-sm btn-success sendWhatsAppDirect" 
-                                        data-id="${doc.id}"
-                                        data-name="${d.name || ''}"
-                                        data-phone="${d.phone || ''}"
-                                        title="Kirim WhatsApp">
-                                    <i class="ri-whatsapp-line"></i>
-                                </button>
-                            ` : ''}
-                            ${d.instagram ? `
-                                <button class="btn btn-sm btn-danger sendInstagramDM" 
-                                        data-id="${doc.id}"
-                                        data-name="${d.name || ''}"
-                                        data-instagram="${d.instagram || ''}"
-                                        title="Buka Instagram">
-                                    <i class="ri-instagram-line"></i>
-                                </button>
-                            ` : ''}
+                    <td data-label="Jumlah">${d.maxGuests || 0} Tamu</td>
+                    <td data-label="No HP">${d.phone || "-"}</td>
+                    <td data-label="Dari">${d.source || "-"}</td>
+                    <td data-label="Status">
+                        <div class="status-cell">
+                            <span class="status-chip status-chip--seen${d.opened ? " is-on" : ""}">
+                                <i class="${d.opened ? "ri-check-line" : "ri-eye-off-line"}"></i>
+                                Dilihat
+                            </span>
+                            <span class="status-chip status-chip--sent${d.sendCount && d.sendCount > 0 ? " is-on" : ""}">
+                                <i class="${d.sendCount && d.sendCount > 0 ? "ri-check-double-line" : "ri-mail-line"}"></i>
+                                Terkirim
+                            </span>
                         </div>
-                        <button class="btn btn-sm btn-warning copyMessage" 
-                                data-id="${doc.id}"
-                                data-name="${d.name || ''}"
-                                title="Copy Pesan">
-                            <i class="ri-file-copy-2-line"></i>
-                        </button>
-                        <button class="btn btn-sm btn-primary copyLink" data-id="${doc.id}" title="Copy Link">
-                            <i class="ri-link"></i>
-                        </button>
-                        <button class="btn btn-sm btn-info editGuest" 
-                                data-id="${doc.id}"
-                                data-name="${d.name || ''}"
-                                data-maxguests="${d.maxGuests || 1}"
-                                data-phone="${d.phone || ''}"
-                                data-instagram="${d.instagram || ''}"
-                                data-source="${d.source || ''}"
-                                data-sourcename="${d.sourceName || ''}"
-                                data-istablevip="${d.isTableVip || false}"
-                                data-issouvenivip="${d.isSouvenirVip || false}">
-                            <i class="ri-edit-line"></i>
-                        </button>
-                        <button class="btn btn-sm btn-danger deleteGuest" data-id="${doc.id}">
-                            <i class="ri-delete-bin-line"></i>
-                        </button>
+                    </td>
+                    <td class="text-center guest-card__wa" data-label="WhatsApp">
+                        ${d.phone ? `
+                            <button class="btn btn-sm btn-success sendWhatsAppDirect" 
+                                    data-id="${doc.id}"
+                                    data-name="${d.name || ''}"
+                                    data-phone="${d.phone || ''}"
+                                    title="Kirim WhatsApp">
+                                <i class="ri-whatsapp-line"></i>
+                                <span class="btn-label">Kirim</span>
+                            </button>
+                        ` : '<span class="text-muted">-</span>'}
+                    </td>
+                    <td class="text-center guest-card__actions">
+                        <div class="row-actions">
+                            <div class="row-actions__wrap">
+                                <button class="btn btn-sm btn-outline-secondary row-actions__toggle"
+                                        type="button"
+                                        aria-expanded="false"
+                                        aria-haspopup="true"
+                                        aria-label="Aksi lain untuk ${d.name || 'tamu ini'}"
+                                        title="Aksi lain">
+                                    <i class="ri-more-2-fill"></i>
+                                </button>
+
+                                <ul class="row-actions__menu" hidden>
+                                    ${d.instagram ? `
+                                        <li>
+                                            <button class="dropdown-item sendInstagramDM" type="button"
+                                                    data-id="${doc.id}"
+                                                    data-name="${d.name || ''}"
+                                                    data-instagram="${d.instagram || ''}">
+                                                <i class="ri-instagram-line"></i> Buka Instagram
+                                            </button>
+                                        </li>
+                                    ` : ''}
+                                    <li>
+                                        <button class="dropdown-item copyMessage" type="button"
+                                                data-id="${doc.id}"
+                                                data-name="${d.name || ''}">
+                                            <i class="ri-file-copy-2-line"></i> Copy Pesan
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item copyLink" type="button" data-id="${doc.id}">
+                                            <i class="ri-link"></i> Copy Link
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item editGuest" type="button"
+                                                data-id="${doc.id}"
+                                                data-name="${d.name || ''}"
+                                                data-maxguests="${d.maxGuests || 1}"
+                                                data-phone="${d.phone || ''}"
+                                                data-instagram="${d.instagram || ''}"
+                                                data-source="${d.source || ''}"
+                                                data-sourcename="${d.sourceName || ''}"
+                                                data-istablevip="${d.isTableVip || false}"
+                                                data-issouvenivip="${d.isSouvenirVip || false}">
+                                            <i class="ri-edit-line"></i> Edit Tamu
+                                        </button>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <button class="dropdown-item dropdown-item--danger deleteGuest" type="button" data-id="${doc.id}">
+                                            <i class="ri-delete-bin-line"></i> Hapus Tamu
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                        </div>
                     </td>
                 </tr>
             `);
@@ -1929,27 +2143,28 @@ Alfira & Fauzi`;
             
             tbody.append(`
                 <tr class="rsvp-row" data-id="${doc.id}">
-                    <td class="text-center">
+                    <td class="text-center card-cell--detail">
                         <button class="btn btn-sm btn-outline-secondary toggleRsvpDetail" data-id="${doc.id}" title="Lihat Detail">
                             <i class="ri-arrow-down-s-line"></i>
+                            <span class="btn-label">Detail</span>
                         </button>
                     </td>
-                    <td>
+                    <td data-label="Nama Tamu" class="card-cell--title">
                         ${d.name || "-"}
                         ${d.isTableVip ? '<i class="ri-vip-fill text-primary ms-1" data-bs-toggle="tooltip" title="VIP Table"></i>' : ''}
                         ${d.isSouvenirVip ? '<i class="ri-vip-diamond-fill text-info ms-1" data-bs-toggle="tooltip" title="VIP Souvenir"></i>' : ''}
                     </td>
-                    <td>
+                    <td data-label="Status RSVP">
                         ${d.rsvpStatus === "yes" 
                             ? '<span class="badge bg-success"><i class="ri-check-line"></i> Hadir</span>' 
                             : d.rsvpStatus === "no"
                             ? '<span class="badge bg-danger"><i class="ri-close-line"></i> Tidak Hadir</span>'
                             : '<span class="badge bg-secondary">Belum Konfirmasi</span>'}
                     </td>
-                    <td>${d.rsvpCount || 0} orang</td>
-                    <td>${d.maxGuests || 0} orang</td>
-                    <td>${d.phone || "-"}</td>
-                    <td>${d.source || "-"}</td>
+                    <td data-label="Jumlah Hadir">${d.rsvpCount || 0} orang</td>
+                    <td data-label="Max Tamu">${d.maxGuests || 0} orang</td>
+                    <td data-label="No HP">${d.phone || "-"}</td>
+                    <td data-label="Dari">${d.source || "-"}</td>
                 </tr>
             `);
 
@@ -2276,19 +2491,20 @@ Alfira & Fauzi`;
             
             tbody.append(`
                 <tr class="comment-row" data-id="${doc.id}">
-                    <td class="text-center">
+                    <td class="text-center card-cell--detail">
                         <button class="btn btn-sm btn-outline-secondary toggleCommentDetail" data-id="${doc.id}" title="Lihat Detail">
                             <i class="ri-arrow-down-s-line"></i>
+                            <span class="btn-label">Detail</span>
                         </button>
                     </td>
-                    <td>${d.name || "-"}</td>
-                    <td>${commentPreview}</td>
-                    <td>
+                    <td data-label="Nama" class="card-cell--title">${d.name || "-"}</td>
+                    <td data-label="Komentar">${commentPreview}</td>
+                    <td data-label="Sticker">
                         ${d.sticker 
                             ? `<img src="../assets/images/sticker/${d.sticker}" alt="sticker" style="width: 30px; height: 30px;">` 
                             : '-'}
                     </td>
-                    <td>${formatDate(d.createdAt)}</td>
+                    <td data-label="Tanggal">${formatDate(d.createdAt)}</td>
                 </tr>
             `);
 
