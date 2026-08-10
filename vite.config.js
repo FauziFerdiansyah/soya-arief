@@ -4,8 +4,9 @@ import { resolve } from 'node:path';
 const rootDir = import.meta.dirname;
 
 // Base path GitHub Pages.
-// - Tanpa custom domain  : '/soya-arief/'  (default sekarang)
-// - Setelah pakai domain : set VITE_BASE='/' di GitHub Variables
+// Situs dilayani di root custom domain soyaarief.site, jadi default '/'.
+// Kalau suatu saat kembali ke URL project pages
+// (fauziferdiansyah.github.io/soya-arief/), set VITE_BASE='/soya-arief/'.
 /**
  * Tanpa trailing slash, dev server jatuh ke index.html root sehingga
  * /webadmin menampilkan halaman undangan. Plugin ini mengarahkannya
@@ -35,7 +36,7 @@ function redirectDirectoryUrls(base) {
 }
 
 export default defineConfig(({ mode }) => {
-  const base = process.env.VITE_BASE ?? '/soya-arief/';
+  const base = process.env.VITE_BASE ?? '/';
 
   return {
     base,
