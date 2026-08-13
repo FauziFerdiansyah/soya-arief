@@ -2267,6 +2267,7 @@ font-weight: var(--font-weight-bold);
 
 .note-description {
     text-align: center;
+    margin-bottom: 40px;
 }
 
 /* ===== FOOTNOTE SECTION ===== */
