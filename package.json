@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "hash:password": "node scripts/hash-password.mjs",
     "env:sync": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-github-env.ps1",
     "rules:deploy": "firebase deploy --only firestore:rules",
     "rules:login": "firebase login"

@@ -1723,89 +1723,93 @@ $("#startToExplore").on("click", function (e) {
    */
 
   let _guestLoaded = false;
+  window.validGuest = false;
+  window.guestIdentityReady = Promise.resolve(false);
 
-  async function updateGuestTracking(guestId) {
-    if (!guestId || !window.db || !window.firestore) return;
-
+  async function linkGuestAccess(guestId) {
     try {
-      const ref = window.firestore.doc(window.db, "guest", guestId);
-      const snap = await window.firestore.getDoc(ref);
-      if (!snap.exists()) return;
+      await window.authReady;
+      let user = window.auth.currentUser;
 
-      const data = snap.data();
-      const now = window.firestore.serverTimestamp();
-      const device = detectDeviceType();
-
-      const updateData = {
-        lastOpenedAt: now,
-        openCount: (data.openCount || 0) + 1,
-        deviceType: device,
-        updatedAt: now,
-      };
-
-      if (!data.opened) {
-        updateData.opened = true;
-        updateData.openedAt = now;
+      // Never replace an active password-authenticated admin session in another tab.
+      if (user && !user.isAnonymous) {
+        throw new Error('Sesi Firebase aktif bukan sesi anonim');
+      }
+      if (!user) {
+        user = (await window.firebaseAuth.signInAnonymously(window.auth)).user;
       }
 
-      await window.firestore.updateDoc(ref, updateData);
+      const accessRef = window.firestore.doc(window.db, 'guest', guestId, 'access', user.uid);
+      const accessSnap = await window.firestore.getDoc(accessRef);
+      if (!accessSnap.exists()) {
+        await window.firestore.setDoc(accessRef, {
+          uid: user.uid,
+          guestId,
+          deviceType: detectDeviceType(),
+          createdAt: window.firestore.serverTimestamp(),
+        });
+      }
 
-      console.log("✅ guest tracking updated", updateData);
+      window.validGuest = true;
+      window.currentGuestUid = user.uid;
+      document.documentElement.dataset.validGuest = 'true';
+      return true;
     } catch (err) {
-      console.error("❌ tracking update failed:", err);
+      window.validGuest = false;
+      console.warn('Login anonim/link guest tidak tersedia:', err);
+      window.showSnackbar?.('Identitas tamu belum aktif. Komentar tetap dapat dibaca.');
+      return false;
+    }
+  }
+
+  async function updateGuestTracking(guestId) {
+    if (!window.validGuest) return;
+
+    try {
+      const ref = window.firestore.doc(window.db, 'guest', guestId);
+      const snap = await window.firestore.getDoc(ref);
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const now = window.firestore.serverTimestamp();
+      const updateData = {
+        opened: true,
+        lastOpenedAt: now,
+        openCount: (data.openCount || 0) + 1,
+        deviceType: detectDeviceType(),
+        updatedAt: now,
+      };
+      if (!data.openedAt) updateData.openedAt = now;
+      await window.firestore.updateDoc(ref, updateData);
+    } catch (err) {
+      console.warn('Guest tracking tidak dapat diperbarui:', err);
     }
   }
 
   async function loadGuestInfo() {
-    console.log("🔥 loadGuestInfo() DIPANGGIL");
-
-    if (_guestLoaded) {
-      console.log("⛔ loadGuestInfo() ABAI — sudah pernah jalan");
-      return;
-    }
+    if (_guestLoaded || !window.db || !window.firestore) return;
     _guestLoaded = true;
 
     const guestId = getGuestIdFromURL();
-    console.log("🔍 guestId dari URL:", guestId);
+    if (!guestId) return;
 
-    if (!guestId) {
-      console.warn("❌ Tidak ada g= di URL");
-      return;
+    try {
+      const ref = window.firestore.doc(window.db, 'guest', guestId);
+      const snap = await window.firestore.getDoc(ref);
+      if (!snap.exists()) return;
+
+      const guest = snap.data();
+      window.currentGuest = guest;
+      window.currentGuestId = guestId;
+      $('#name, #nama').val(guest.name || '').prop('readonly', true);
+      $('.guest-name').text(guest.name || '');
+
+      window.guestIdentityReady = linkGuestAccess(guestId);
+      if (await window.guestIdentityReady) {
+        await updateGuestTracking(guestId);
+      }
+    } catch (err) {
+      console.error('Gagal memuat data tamu:', err);
     }
-
-    if (!window.db || !window.firestore) {
-      console.warn("⏳ Firebase belum siap → retry...");
-      setTimeout(loadGuestInfo, 300);
-      return;
-    }
-
-    console.log("✅ Firebase siap, ambil data...");
-
-    const ref = window.firestore.doc(window.db, "guest", guestId);
-    const snap = await window.firestore.getDoc(ref);
-
-    console.log("📥 FIREBASE SNAP:", snap.exists(), snap.data());
-
-    if (!snap.exists()) {
-      console.warn("❌ Guest tidak ditemukan di Firestore!");
-      return;
-    }
-
-    const guest = snap.data();
-    window.currentGuest = guest;
-    window.currentGuestId = guestId;
-
-    console.log("✅ Guest ditemukan:", guest);
-
-    // ✅ SEHARUSNYA MUNCUL DI INPUT
-    $("#name").val(guest.name).prop("readonly", false);
-    $(".guest-name").text(guest.name);
-    console.log("✏️ Isi input name:", $("#name").val());
-
-    $(".guest-name").text(guest.name);
-
-    // Tracking
-    updateGuestTracking(guestId);
   }
 
 
@@ -1816,7 +1820,11 @@ $("#startToExplore").on("click", function (e) {
    */
 
   async function submitRSVP() {
-    if (!window.currentGuestId || !window.db || !window.firestore) return;
+    if (!window.currentGuestId || !window.db || !window.firestore) return false;
+    if (!(await window.guestIdentityReady) || !window.validGuest) {
+      window.showSnackbar('Identitas tamu belum aktif. Silakan coba lagi.');
+      return false;
+    }
 
     const guestId = window.currentGuestId;
     const name = window.currentGuest?.name || "";
@@ -1834,6 +1842,7 @@ $("#startToExplore").on("click", function (e) {
         window.firestore.collection(window.db, "rsvp"),
         {
           guestId,
+          ownerUid: window.auth.currentUser.uid,
           name,
           status,
           count,
@@ -1893,41 +1902,23 @@ $(".action-rsvp").on("click", function () {
 ================================ */
 
 async function preloadRSVP() {
-  const guestId = window.currentGuestId;
-  if (!guestId) return;
+  const data = window.currentGuest;
+  if (!data?.rsvpStatus || data.rsvpStatus === 'pending') return;
 
-  const q = window.firestore.query(
-    window.firestore.collection(window.db, "rsvp"),
-    window.firestore.where("guestId", "==", guestId),
-    window.firestore.orderBy("createdAt", "desc"),
-    window.firestore.limit(1)
-  );
-
-  const snap = await window.firestore.getDocs(q);
-  if (snap.empty) return;
-
-  const data = snap.docs[0].data();
-
-  if (data.status === "yes") {
-    $("input[value='yes']").prop("checked", true);
-    $(".rsvp-confirm-btn.going").addClass("active");
-    $("#people").val(data.count);
-    $(".rsvp-amount-wrap").addClass("open");
+  if (data.rsvpStatus === 'yes') {
+    $("input[value='yes']").prop('checked', true);
+    $('.rsvp-confirm-btn.going').addClass('active');
+    $('#people').val(data.rsvpCount || 1);
+    $('.rsvp-amount-wrap').addClass('open');
   } else {
-    $("input[value='no']").prop("checked", true);
-    $(".rsvp-confirm-btn.not-going").addClass("active");
-    $(".rsvp-amount-wrap").removeClass("open");
+    $("input[value='no']").prop('checked', true);
+    $('.rsvp-confirm-btn.not-going').addClass('active');
+    $('.rsvp-amount-wrap').removeClass('open');
   }
 
-  renderRSVPDescription(
-    window.currentGuest?.rsvpStatus || data.status,
-    window.currentGuest?.rsvpCount || data.count
-  );
-
-  $(".rsvp-description").show();
-  $(".rsvp-form").hide();
-
-  console.log("✅ RSVP data loaded:", data);
+  renderRSVPDescription(data.rsvpStatus, data.rsvpCount || 0);
+  $('.rsvp-description').show();
+  $('.rsvp-form').hide();
 }
 
 /* ================================
@@ -1991,7 +1982,7 @@ function renderRSVPDescription(status, count) {
 
     const guest = window.currentGuest;
 
-    $("#name").val(guest.name || "").prop("readonly", false);
+    $("#name, #nama").val(guest.name || "").prop("readonly", true);
 
     const max = guest.maxGuests || 1;
     $("#people").attr("max", max);
@@ -2069,12 +2060,6 @@ const StickerPopupManager = {
   selectedSticker: null,
 
   stickerList: [
-    'assets/images/sticker/stc-1.png',
-    'assets/images/sticker/stc-2.png',
-    'assets/images/sticker/stc-3.png',
-    'assets/images/sticker/stc-4.png',
-    'assets/images/sticker/stc-5.png',
-
     'assets/images/sticker/stc-a-1.gif',
     'assets/images/sticker/stc-a-2.gif',
     'assets/images/sticker/stc-a-3.gif',
@@ -2214,50 +2199,75 @@ document.addEventListener("DOMContentLoaded", () => StickerPopupManager.init());
    ====================================================== */
 
   const WishManager = {
+    async loadCommentSettings() {
+      let allowed = false;
+      try {
+        const snap = await window.firestore.getDoc(
+          window.firestore.doc(window.db, 'settings', 'comments')
+        );
+        allowed = snap.exists() && snap.data().allowPublicComments === true;
+      } catch (err) {
+        console.warn('Pengaturan komentar memakai default OFF:', err);
+      }
+      window.allowPublicComments = allowed;
+      const canComment = allowed || window.validGuest;
+      const form = document.getElementById('wish-form');
+      form?.querySelectorAll('textarea, button[type="submit"], .btn-sticker')
+        .forEach((control) => { control.disabled = !canComment; });
+      if (!canComment && form) {
+        form.dataset.commentNotice = 'Komentar hanya untuk tamu dengan link undangan valid.';
+      } else if (form) {
+        delete form.dataset.commentNotice;
+      }
+      return allowed;
+    },
+
     async submitWish() {
-      if (!window.db || !window.firestore) {
-        console.warn("⏳ Firebase belum siap");
+      if (!window.db || !window.firestore) return;
+
+      const name = $('#nama').val().trim();
+      const comment = $('#pesan').val().trim();
+      const stickerSrc = $('#selectedStickers .selected-sticker-item img').attr('src') || '';
+      const stickerFile = stickerSrc.split('/').pop() || '';
+      const stickerAllowed = !stickerFile || /^stc-a-([1-9]|1[0-8])\.gif$/.test(stickerFile);
+
+      if (!window.allowPublicComments && !window.validGuest) {
+        window.showSnackbar('Komentar hanya untuk tamu dengan link undangan valid');
         return;
       }
-
-      const name = $("#nama").val().trim();
-      const comment = $("#pesan").val().trim();
-
-      const stickerDOM = $("#selectedStickers .selected-sticker-item img");
-      const sticker = stickerDOM.length ? stickerDOM.attr("src") : ""; 
-      // Kita simpan nama file aja
-      const stickerFile = sticker ? sticker.split("/").pop() : "";
-
       if (!name || !comment) {
-        window.showSnackbar("Nama & Ucapan wajib diisi");
+        window.showSnackbar('Nama & Ucapan wajib diisi');
+        return;
+      }
+      if (name.length > 100 || comment.length > 2000 || !stickerAllowed) {
+        window.showSnackbar('Ucapan atau sticker tidak valid');
         return;
       }
 
-      const now = window.firestore.serverTimestamp();
+      if (window.currentGuestId) await window.guestIdentityReady;
+      const user = window.auth?.currentUser;
 
       try {
         await window.firestore.addDoc(
-          window.firestore.collection(window.db, "comments"),
+          window.firestore.collection(window.db, 'comments'),
           {
+            guestId: window.validGuest ? window.currentGuestId : '',
+            authorUid: user?.uid || '',
             name,
             comment,
             sticker: stickerFile,
-            createdAt: now,
-            guestId: window.currentGuestId || "",
+            createdAt: window.firestore.serverTimestamp(),
           }
         );
 
-        window.showSnackbar("Ucapan berhasil dikirim!");
-
-        $("#wish-form")[0].reset();
-        $("#selectedStickers").html("");
-
-        // Reload list
-        this.loadWishes();
-
+        window.showSnackbar('Ucapan berhasil dikirim!');
+        $('#wish-form')[0].reset();
+        if (window.currentGuest) $('#nama').val(window.currentGuest.name || '').prop('readonly', true);
+        $('#selectedStickers').empty();
+        await this.loadWishes();
       } catch (err) {
-        console.error("❌ Gagal kirim ucapan:", err);
-        window.showSnackbar("Gagal mengirim ucapan");
+        console.error('Gagal kirim ucapan:', err);
+        window.showSnackbar('Komentar belum diizinkan atau gagal dikirim');
       }
     },
 
@@ -2266,112 +2276,226 @@ document.addEventListener("DOMContentLoaded", () => StickerPopupManager.init());
       ============================ */
     async loadWishes() {
       if (!window.db || !window.firestore) return;
+      try {
+        const q = window.firestore.query(
+          window.firestore.collection(window.db, 'comments'),
+          window.firestore.orderBy('createdAt', 'desc')
+        );
+        const snap = await window.firestore.getDocs(q);
+        const list = await Promise.all(snap.docs.map(async (commentDoc) => {
+          const item = {
+            id: commentDoc.id,
+            ...commentDoc.data(),
+            reactions: [],
+            replyReactions: [],
+          };
+          try {
+            const [commentReactions, replyReactions] = await Promise.all([
+              window.firestore.getDocs(
+                window.firestore.collection(window.db, 'comments', commentDoc.id, 'reactions')
+              ),
+              window.firestore.getDocs(
+                window.firestore.collection(window.db, 'comments', commentDoc.id, 'replyReactions')
+              ),
+            ]);
+            item.reactions = commentReactions.docs.map((reactionDoc) => reactionDoc.data());
+            item.replyReactions = replyReactions.docs.map((reactionDoc) => reactionDoc.data());
+          } catch (err) {
+            console.warn('Reaksi tidak dapat dimuat:', err);
+          }
+          return item;
+        }));
+        this.render(list);
+      } catch (err) {
+        console.error('Komentar tidak dapat dimuat:', err);
+      }
+    },
 
-      const q = window.firestore.query(
-        window.firestore.collection(window.db, "comments"),
-        window.firestore.orderBy("createdAt", "desc")
+    async toggleReaction(commentId, type, target = 'comment') {
+      if (!(await window.guestIdentityReady) || !window.validGuest) {
+        window.showSnackbar('Reaksi hanya untuk tamu dengan link undangan valid');
+        return;
+      }
+      const uid = window.auth.currentUser.uid;
+      const reactionCollection = target === 'reply' ? 'replyReactions' : 'reactions';
+      const reactionRef = window.firestore.doc(
+        window.db, 'comments', commentId, reactionCollection, `${uid}_${type}`
       );
-
-      const snap = await window.firestore.getDocs(q);
-      this.render(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        const existing = await window.firestore.getDoc(reactionRef);
+        if (existing.exists()) {
+          await window.firestore.deleteDoc(reactionRef);
+        } else {
+          await window.firestore.setDoc(reactionRef, {
+            uid,
+            guestId: window.currentGuestId,
+            type,
+            createdAt: window.firestore.serverTimestamp(),
+          });
+        }
+        await this.loadWishes();
+      } catch (err) {
+        console.error('Gagal mengubah reaksi:', err);
+        window.showSnackbar('Reaksi gagal diperbarui');
+      }
     },
 
     /* ============================
       RENDER WISHES TO UI
       ============================ */
     render(list) {
-      const container = document.querySelector(".wish-list");
-      container.innerHTML = "";
+      const container = document.querySelector('.wish-list');
+      if (!container) return;
+      container.replaceChildren();
+      this.allWishes = list;
 
       if (!list.length) {
-        container.innerHTML = `<p class="empty-wish">Belum ada ucapan.</p>`;
+        const empty = document.createElement('p');
+        empty.className = 'empty-wish';
+        empty.textContent = 'Belum ada ucapan.';
+        container.appendChild(empty);
         return;
       }
 
-      container.innerHTML = `<div class="wish-comment-counter-header"><h2 class="wish-comment-count">(${list.length}) Ucapan & Doa</h2><div class="wish-comment-action"><i class="icon-see-wish"></i>Lihat semua</div></div>`;
+      const header = document.createElement('div');
+      header.className = 'wish-comment-counter-header';
+      const count = document.createElement('h2');
+      count.className = 'wish-comment-count';
+      count.textContent = `(${list.length}) Ucapan & Doa`;
+      const viewAll = document.createElement('button');
+      viewAll.type = 'button';
+      viewAll.className = 'wish-comment-action';
+      viewAll.textContent = 'Lihat semua';
+      viewAll.addEventListener('click', () => this.showWishPopup());
+      header.append(count, viewAll);
+      container.appendChild(header);
+      list.forEach((item) => container.appendChild(this.createWishElement(item)));
+    },
 
-      list.forEach(item => {
-        const stickerHTML = item.sticker
-          ? `<div class="wish-sticker"><img src="assets/images/sticker/${item.sticker}"></div>`
-          : "";
+    validSticker(sticker) {
+      return typeof sticker === 'string'
+        && (/^stc-a-([1-9]|1[0-8])\.gif$/.test(sticker) || /^stc-[1-5]\.png$/.test(sticker));
+    },
 
-        container.innerHTML += `
-          <div class="wish-item">
-            <div class="wish-comment-header">
-              <div class="wish-comment-name">
-              <i class="icon-guest"></i>
-              ${item.name}</div>
-            </div>
+    createWishElement(item) {
+      const element = document.createElement('article');
+      element.className = 'wish-item';
+      element.dataset.commentId = String(item.id || '');
 
-            <div class="wish-comment-text">${item.comment}</div>
+      const header = document.createElement('div');
+      header.className = 'wish-comment-header';
+      const name = document.createElement('div');
+      name.className = 'wish-comment-name';
+      const icon = document.createElement('i');
+      icon.className = 'icon-guest';
+      name.append(icon, document.createTextNode(String(item.name || 'Tamu')));
+      header.appendChild(name);
 
-            ${stickerHTML}
-            ${this.formatTime(item.createdAt)}
-          </div>
-        `;
-      });
+      const text = document.createElement('div');
+      text.className = 'wish-comment-text';
+      text.textContent = String(item.comment || '');
+      element.append(header, text);
 
-      // Store list untuk popup
-      this.allWishes = list;
-      
-      // Setup event listener untuk "Lihat semua"
-      const viewAllButton = container.querySelector(".wish-comment-action");
-      if (viewAllButton) {
-        viewAllButton.addEventListener("click", () => this.showWishPopup());
+      if (this.validSticker(item.sticker)) {
+        const sticker = document.createElement('div');
+        sticker.className = 'wish-sticker';
+        const image = document.createElement('img');
+        image.src = `assets/images/sticker/${item.sticker}`;
+        image.alt = 'Sticker komentar';
+        sticker.appendChild(image);
+        element.appendChild(sticker);
       }
+
+      if (item.replyText || this.validSticker(item.replySticker)) {
+        const reply = document.createElement('div');
+        reply.className = 'wish-admin-reply';
+
+        const replyHead = document.createElement('div');
+        replyHead.className = 'wish-admin-reply__head';
+
+        const avatar = document.createElement('span');
+        avatar.className = 'wish-admin-reply__avatar';
+        avatar.setAttribute('aria-hidden', 'true');
+        const avatarIcon = document.createElement('i');
+        avatarIcon.className = 'wish-admin-reply__avatar-icon';
+        avatar.appendChild(avatarIcon);
+
+        const identity = document.createElement('div');
+        identity.className = 'wish-admin-reply__identity';
+        const label = document.createElement('strong');
+        label.textContent = 'Arief & Soya';
+        
+        identity.append(label);
+        replyHead.append(avatar, identity);
+        reply.appendChild(replyHead);
+
+        if (item.replyText) {
+          const replyText = document.createElement('p');
+          replyText.textContent = String(item.replyText);
+          reply.appendChild(replyText);
+        }
+        if (this.validSticker(item.replySticker)) {
+          const image = document.createElement('img');
+          image.src = `assets/images/sticker/${item.replySticker}`;
+          image.alt = 'Sticker balasan admin';
+          reply.appendChild(image);
+        }
+        reply.appendChild(this.createReactionBar(item, 'reply'));
+        element.appendChild(reply);
+      }
+
+      element.appendChild(this.createReactionBar(item));
+      const time = this.createTimeElement(item.createdAt);
+      if (time) element.appendChild(time);
+      return element;
+    },
+
+    createReactionBar(item, target = 'comment') {
+      const types = [
+        ['heart', '❤️'], ['like', '👍'], ['celebrate', '🎉'],
+        ['pray', '🙏'], ['smile', '😄'],
+      ];
+      const bar = document.createElement('div');
+      bar.className = `wish-reactions wish-reactions--${target}`;
+      bar.setAttribute(
+        'aria-label',
+        target === 'reply' ? 'Reaksi untuk balasan admin' : 'Reaksi untuk komentar'
+      );
+      const uid = window.auth?.currentUser?.uid;
+      const reactionList = target === 'reply' ? item.replyReactions : item.reactions;
+      types.forEach(([type, emoji]) => {
+        const matching = (reactionList || []).filter((reaction) => reaction.type === type);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'wish-reaction';
+        button.classList.toggle('is-active', matching.some((reaction) => reaction.uid === uid));
+        button.setAttribute('aria-label', `Reaksi ${type}`);
+        button.setAttribute('aria-pressed', String(matching.some((reaction) => reaction.uid === uid)));
+        button.textContent = `${emoji}${matching.length ? ` ${matching.length}` : ''}`;
+        button.addEventListener('click', () => this.toggleReaction(item.id, type, target));
+        bar.appendChild(button);
+      });
+      return bar;
     },
 
     showWishPopup() {
-      const popup = document.getElementById("wishPopup");
-      const popupList = document.getElementById("wishPopupList");
-      
-      if (!popup || !popupList) {
-        console.warn("⚠️ Wish popup elements not found");
-        return;
+      const popup = document.getElementById('wishPopup');
+      const popupList = document.getElementById('wishPopupList');
+      if (!popup || !popupList) return;
+      popupList.replaceChildren();
+
+      if (!this.allWishes?.length) {
+        const empty = document.createElement('div');
+        empty.className = 'wish-popup-empty';
+        empty.textContent = 'Belum ada ucapan.';
+        popupList.appendChild(empty);
+      } else {
+        this.allWishes.forEach((item) => popupList.appendChild(this.createWishElement(item)));
       }
 
-      // Clear previous content
-      popupList.innerHTML = "";
-
-      // Check if there are wishes
-      if (!this.allWishes || this.allWishes.length === 0) {
-        popupList.innerHTML = `<div class="wish-popup-empty">Belum ada ucapan.</div>`;
-        popup.classList.add("open");
-        popup.removeAttribute("inert");
-        document.activeElement?.blur();
-        // Lock scrolling when popup opens
-        lockBodyScroll();
-        return;
-      }
-
-      // Render all wishes in popup
-      this.allWishes.forEach(item => {
-        const stickerHTML = item.sticker
-          ? `<div class="wish-sticker"><img src="assets/images/sticker/${item.sticker}"></div>`
-          : "";
-
-        const wishElement = document.createElement("div");
-        wishElement.className = "wish-item";
-        wishElement.innerHTML = `
-          <div class="wish-comment-header">
-            <div class="wish-comment-name">
-              <i class="icon-guest"></i>
-              ${item.name}
-            </div>
-          </div>
-          <div class="wish-comment-text">${item.comment}</div>
-          ${stickerHTML}
-          ${this.formatTime(item.createdAt)}
-        `;
-        
-        popupList.appendChild(wishElement);
-      });
-
-      // Show popup
-      popup.classList.add("open");
-      popup.removeAttribute("inert");
+      popup.classList.add('open');
+      popup.removeAttribute('inert');
       document.activeElement?.blur();
-      // Lock scrolling when popup opens
       lockBodyScroll();
     },
 
@@ -2385,48 +2509,25 @@ document.addEventListener("DOMContentLoaded", () => StickerPopupManager.init());
       }
     },
 
-    formatTime(ts) {
-      if (!ts) return "";
-      const date = ts.toDate();
-      const now = new Date();
-      const diffMs = now - date;
-      const diffSecs = Math.floor(diffMs / 1000);
-      const diffMins = Math.floor(diffSecs / 60);
-      const diffHours = Math.floor(diffMins / 60);
-      const diffDays = Math.floor(diffHours / 24);
-      const diffWeeks = Math.floor(diffDays / 7);
-      const diffMonths = Math.floor(diffDays / 30);
-      const diffYears = Math.floor(diffDays / 365);
+    createTimeElement(ts) {
+      if (!ts) return null;
+      const date = typeof ts.toDate === 'function' ? ts.toDate() : new Date(ts);
+      if (Number.isNaN(date.getTime())) return null;
+      const seconds = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+      let label = 'baru saja';
+      if (seconds >= 31536000) label = `${Math.floor(seconds / 31536000)} tahun yang lalu`;
+      else if (seconds >= 2592000) label = `${Math.floor(seconds / 2592000)} bulan yang lalu`;
+      else if (seconds >= 604800) label = `${Math.floor(seconds / 604800)} minggu yang lalu`;
+      else if (seconds >= 86400) label = `${Math.floor(seconds / 86400)} hari yang lalu`;
+      else if (seconds >= 3600) label = `${Math.floor(seconds / 3600)} jam yang lalu`;
+      else if (seconds >= 60) label = `${Math.floor(seconds / 60)} menit yang lalu`;
 
-      let relativeTime = "";
-
-      if (diffSecs < 60) {
-        relativeTime = diffSecs === 0 ? "baru saja" : `${diffSecs} detik yang lalu`;
-      } else if (diffMins < 60) {
-        relativeTime = diffMins === 1 ? "1 menit yang lalu" : `${diffMins} menit yang lalu`;
-      } else if (diffHours < 24) {
-        relativeTime = diffHours === 1 ? "1 jam yang lalu" : `${diffHours} jam yang lalu`;
-      } else if (diffDays < 7) {
-        relativeTime = diffDays === 1 ? "1 hari yang lalu" : `${diffDays} hari yang lalu`;
-      } else if (diffWeeks < 4) {
-        relativeTime = diffWeeks === 1 ? "1 minggu yang lalu" : `${diffWeeks} minggu yang lalu`;
-      } else if (diffMonths < 12) {
-        relativeTime = diffMonths === 1 ? "1 bulan yang lalu" : `${diffMonths} bulan yang lalu`;
-      } else {
-        relativeTime = diffYears === 1 ? "1 tahun yang lalu" : `${diffYears} tahun yang lalu`;
-      }
-
-      const fullDate = date.toLocaleString("id-ID", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
-
-      return `<span class="wish-comment-time" title="${fullDate}">${relativeTime}</span>`;
+      const time = document.createElement('time');
+      time.className = 'wish-comment-time';
+      time.dateTime = date.toISOString();
+      time.title = date.toLocaleString('id-ID');
+      time.textContent = label;
+      return time;
     }
   };
   
@@ -2489,23 +2590,24 @@ document.addEventListener("DOMContentLoaded", () => StickerPopupManager.init());
     }
   });
 
-  document.addEventListener("mainInitComplete", () => {
-    setTimeout(() => WishManager.loadWishes(), 500);
-    loadGuestInfo().then(() => {
+  document.addEventListener("mainInitComplete", async () => {
+    if (!window.db || !window.firestore) {
+      await new Promise((resolve) => window.addEventListener('firebase:ready', resolve, { once: true }));
+    }
 
-      applyDynamicRSVPUI();
+    await loadGuestInfo();
+    await WishManager.loadCommentSettings();
+    await WishManager.loadWishes();
+    applyDynamicRSVPUI();
 
-      if (window.currentGuest?.rsvpStatus && window.currentGuest.rsvpStatus !== "pending") {
-        $(".rsvp-description").show();
-        $(".rsvp-form").hide();
-      } else {
-        $(".rsvp-description").hide();
-        $(".rsvp-form").show();
-      }
-
-      preloadRSVP();
-
-    });
+    if (window.currentGuest?.rsvpStatus && window.currentGuest.rsvpStatus !== 'pending') {
+      $('.rsvp-description').show();
+      $('.rsvp-form').hide();
+    } else {
+      $('.rsvp-description').hide();
+      $('.rsvp-form').show();
+    }
+    await preloadRSVP();
   });
 
   /**

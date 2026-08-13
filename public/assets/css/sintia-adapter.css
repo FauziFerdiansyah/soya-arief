@@ -2565,6 +2565,7 @@ body.sintia h2.gift-card-title {
 
 body.sintia h2.gift-send-title {
   font-size: 1.35rem !important;
+  font-weight: 600;
 }
 
 
@@ -3301,7 +3302,9 @@ body.sintia .count-day {
    ============================================================ */
 body.sintia .gift-card-title,
 body.sintia .gift-card-number,
-body.sintia .gift-card-name {
+body.sintia .gift-card-name,
+body.sintia .gift-send-name,
+body.sintia .gift-section .gift-send-title {
   font-family: "Afacad Flux", sans-serif !important;
 }
 

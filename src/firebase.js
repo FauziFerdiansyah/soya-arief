@@ -1,11 +1,4 @@
-/**
- * Inisialisasi Firebase untuk seluruh halaman.
- *
- * Konfigurasi dibaca dari env VITE_* saat build. Bentuk global
- * (window.db / window.firestore) dipertahankan supaya kode lama di
- * public/assets/js/custom.js dan public/webadmin/assets/js/script.js
- * tidak perlu diubah strukturnya.
- */
+/** Firebase bootstrap shared by the public invitation and webadmin. */
 import { initializeApp } from 'firebase/app';
 import {
   getFirestore,
@@ -17,12 +10,22 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   serverTimestamp,
   query,
   where,
   orderBy,
   limit,
 } from 'firebase/firestore';
+import {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  signInAnonymously,
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,43 +40,66 @@ const missing = Object.entries(firebaseConfig)
   .filter(([, value]) => !value)
   .map(([key]) => key);
 
-if (missing.length > 0) {
-  console.error(
-    'Konfigurasi Firebase belum lengkap:',
-    missing.join(', '),
-    '- cek file .env.local atau GitHub Variables.'
-  );
+if (missing.length) {
+  console.error('Konfigurasi Firebase belum lengkap:', missing.join(', '));
 }
 
-const app = initializeApp(firebaseConfig);
+const isAdminPage = /\/webadmin(?:\/|$)/.test(window.location.pathname);
+// Gunakan app bernama terpisah untuk halaman publik. Dengan begitu sesi
+// anonymous tamu tidak dapat mengganti sesi admin pada origin yang sama.
+const app = isAdminPage
+  ? initializeApp(firebaseConfig)
+  : initializeApp(firebaseConfig, 'public-invitation');
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 const firestoreApi = {
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp,
-  query,
-  where,
-  orderBy,
-  limit,
+  collection, addDoc, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc,
+  deleteField, serverTimestamp, query, where, orderBy, limit,
 };
+
+const firebaseAuthApi = {
+  getAuth,
+  setPersistence,
+  browserLocalPersistence,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  signInAnonymously,
+};
+
+// Persistence is configured before consumers inspect the initial user.
+const authReady = setPersistence(auth, browserLocalPersistence)
+  .catch((error) => {
+    console.warn('Firebase Auth persistence tidak tersedia:', error);
+  })
+  .then(() => new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        unsubscribe();
+        resolve(user);
+      },
+      (error) => {
+        console.error('Firebase Auth gagal diinisialisasi:', error);
+        resolve(null);
+      }
+    );
+  }));
 
 window.firebaseApp = app;
 window.db = db;
 window.firestore = firestoreApi;
+window.auth = auth;
+window.firebaseAuth = firebaseAuthApi;
+window.authReady = authReady;
 
-// Token tulis admin, dibaca oleh script.js di webadmin.
-window.ADMIN_KEY = import.meta.env.VITE_ADMIN_KEY ?? '';
+authReady.then((user) => {
+  window.dispatchEvent(new CustomEvent('firebase:ready', {
+    detail: { app, db, auth, user },
+  }));
+});
 
-// Menandai Firebase siap, dipakai kode yang menunggu inisialisasi.
-window.dispatchEvent(new CustomEvent('firebase:ready', { detail: { app, db } }));
+console.log('✅ Firebase initialized (Firestore + Auth)');
 
-console.log('✅ Firebase initialized (Vite + npm)');
-
-export { app, db, firestoreApi };
+export { app, db, auth, firestoreApi, firebaseAuthApi, authReady };

@@ -2495,3 +2495,228 @@ p {
 
 /* Catatan: label "Tampilkan" & sufiks "per halaman" sudah disembunyikan
    untuk semua layar <= 767.98px pada blok di atas. */
+
+
+/* Comment access setting and moderation actions. */
+.comment-setting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.125rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.comment-setting p { margin-top: 0.2rem; color: var(--black3); font-size: 13px; }
+.comment-setting .form-switch { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.comment-setting .form-check-input { width: 2.4rem; height: 1.25rem; margin: 0; cursor: pointer; }
+.comment-setting .form-check-label { min-width: 2rem; font-weight: 700; color: var(--primary-color); }
+.comment-preserve { white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-card__actions { white-space: nowrap; }
+.comment-card__actions .btn + .btn { margin-left: 0.25rem; }
+@media (max-width: 768px) {
+  .comment-setting { align-items: flex-start; padding: 0.875rem; }
+  #page-content-wrapper .table-cards > tbody > tr.comment-row { padding-bottom: 3.25rem; }
+  #page-content-wrapper .table-cards > tbody > tr > td.comment-card__actions {
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    display: flex;
+    width: auto;
+    padding: 0;
+  }
+  #page-content-wrapper .table-cards > tbody > tr > td.comment-card__actions::before { display: none; }
+}
+@media (max-width: 430px) {
+  .comment-setting { flex-direction: column; }
+  .comment-setting .form-switch { align-self: flex-end; }
+}
+
+/* Reply composer, moderation icons, and polished logout action. */
+.comment-setting { transition: border-color .2s ease, box-shadow .2s ease, opacity .2s ease; }
+.comment-setting[data-state="saving"] { opacity: .72; border-color: var(--primary-color-light); }
+.comment-setting[data-state="error"] { border-color: #f1aeb5; box-shadow: 0 0 0 3px rgba(220, 53, 69, .08); }
+.comment-setting[data-state="saving"] .form-check-input { cursor: wait; }
+
+.comment-action-btn {
+  width: 2.15rem;
+  height: 2.15rem;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: .65rem;
+  font-size: 1.05rem;
+  line-height: 1;
+  transition: transform .15s ease, color .15s ease, background-color .15s ease, border-color .15s ease;
+}
+.comment-action-btn:hover { transform: translateY(-1px); }
+.comment-action-btn--reply { color: #056ee9; background: #eef6ff; border-color: #cfe5ff; }
+.comment-action-btn--reply:hover { color: #fff; background: #056ee9; border-color: #056ee9; }
+.comment-action-btn--delete { color: #c92a3a; background: #fff2f3; border-color: #ffd2d7; }
+.comment-action-btn--delete:hover { color: #fff; background: #dc3545; border-color: #dc3545; }
+.comment-action-btn:focus-visible,
+.admin-logout-btn:focus-visible,
+.admin-reply-sticker:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.admin-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 2.15rem;
+  padding-inline: .75rem;
+  border-radius: .65rem;
+  font-weight: 600;
+}
+.admin-logout-btn i { font-size: 1.05rem; }
+.ri-spin { animation: admin-icon-spin .8s linear infinite; }
+@keyframes admin-icon-spin { to { transform: rotate(360deg); } }
+
+.admin-reply-popup.swal2-popup {
+  width: min(94vw, 41rem);
+  padding: 1.5rem;
+  border: 1px solid var(--border-soft, #e8edf5);
+  border-radius: 1rem;
+  box-shadow: 0 1.25rem 3.5rem rgba(7, 20, 55, .18);
+}
+.admin-reply-popup .swal2-title {
+  padding: 0;
+  color: var(--black, #071437);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.admin-reply-popup .admin-reply-html { margin: 1rem 0 0; padding: 0; }
+.admin-reply-form { text-align: left; }
+.admin-reply-context {
+  margin-bottom: 1rem;
+  padding: .8rem .9rem;
+  border-left: 3px solid var(--primary-color, #007bff);
+  border-radius: .65rem;
+  background: var(--surface-muted, #f7f8fb);
+}
+.admin-reply-context__label {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  margin-bottom: .25rem;
+  color: var(--primary-color, #007bff);
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+.admin-reply-context strong { display: block; color: var(--black, #071437); font-size: .9rem; }
+.admin-reply-context p {
+  display: -webkit-box;
+  margin: .2rem 0 0;
+  overflow: hidden;
+  color: var(--black3, #84878f);
+  font-size: .82rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.admin-reply-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: .4rem;
+  color: var(--link-color, #252f4a);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.admin-reply-label small { color: var(--black3, #84878f); font-size: .72rem; font-weight: 500; }
+.admin-reply-textarea {
+  min-height: 7rem;
+  resize: vertical;
+  border-color: var(--border-strong, #dce3ed);
+  border-radius: .7rem;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.admin-reply-textarea:focus {
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .12);
+}
+.admin-reply-stickers { margin: 1rem 0 0; padding: 0; border: 0; }
+.admin-reply-stickers legend {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  width: 100%;
+  margin-bottom: .55rem;
+  color: var(--link-color, #252f4a);
+  font-size: .85rem;
+  font-weight: 600;
+}
+.admin-reply-stickers legend small { color: var(--black3, #84878f); font-size: .72rem; font-weight: 400; }
+.admin-reply-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: .5rem;
+  max-height: min(38vh, 19rem);
+  padding: .2rem .25rem .35rem .2rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.admin-reply-sticker {
+  position: relative;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: .3rem;
+  overflow: hidden;
+  border: 1px solid var(--border-soft, #e8edf5);
+  border-radius: .7rem;
+  background: #fff;
+  color: var(--black3, #84878f);
+  cursor: pointer;
+  transition: transform .15s ease, border-color .15s ease, background-color .15s ease, box-shadow .15s ease;
+}
+.admin-reply-sticker:hover { transform: translateY(-1px); border-color: var(--primary-color-light, #b3dcff); background: #f7fbff; }
+.admin-reply-sticker.is-selected {
+  border-color: var(--primary-color, #007bff);
+  background: #eef6ff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, .15);
+}
+.admin-reply-sticker img { width: 100%; height: 100%; max-width: 3.5rem; max-height: 3.5rem; object-fit: contain; }
+.admin-reply-sticker span {
+  position: absolute;
+  right: .25rem;
+  bottom: .18rem;
+  color: var(--black3, #84878f);
+  font-size: .62rem;
+  font-weight: 700;
+}
+.admin-reply-sticker--none { gap: .15rem; font-size: 1.25rem; }
+.admin-reply-sticker--none span { position: static; font-size: .65rem; }
+.admin-reply-popup .swal2-actions { gap: .55rem; margin-top: 1.15rem; }
+.admin-reply-confirm,
+.admin-reply-cancel {
+  min-height: 2.5rem;
+  padding: .55rem 1rem;
+  border-radius: .65rem;
+  font-size: .86rem;
+  font-weight: 600;
+}
+.admin-reply-confirm { border: 1px solid var(--primary-color, #007bff); background: var(--primary-color, #007bff); color: #fff; }
+.admin-reply-confirm:hover { background: var(--primary-color-active, #056ee9); }
+.admin-reply-cancel { border: 1px solid var(--border-strong, #dce3ed); background: #fff; color: var(--link-color, #252f4a); }
+.admin-reply-cancel:hover { background: var(--surface-muted, #f7f8fb); }
+
+@media (max-width: 576px) {
+  .admin-reply-popup.swal2-popup { width: calc(100vw - 1rem); padding: 1.1rem .9rem; }
+  .admin-reply-popup .swal2-title { font-size: 1.05rem; }
+  .admin-reply-sticker-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; max-height: 35vh; }
+  .admin-reply-sticker { border-radius: .6rem; }
+  .admin-reply-popup .swal2-actions { width: 100%; margin-inline: 0; }
+  .admin-reply-confirm, .admin-reply-cancel { flex: 1; margin: 0; }
+}

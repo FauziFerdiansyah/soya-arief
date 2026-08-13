@@ -1,5 +1,9 @@
-// Firestore API disediakan oleh src/firebase.js lewat window.firestore.
-// Modul ini dieksekusi setelah firebase.js karena urutan module di HTML.
+import './admin-gate.js';
+
+// Never initialize the panel or read Firestore before the Firebase-authenticated
+// admin gate resolves. Login can happen later without reloading this module.
+await window.adminReady;
+
 const {
     collection,
     addDoc,
@@ -297,9 +301,6 @@ $(document).ready(function () {
     // ✅ ADMIN ADD GUEST
     // ==============================
 
-    // Diisi dari VITE_ADMIN_KEY lewat src/firebase.js
-    const ADMIN_KEY = window.ADMIN_KEY;
-
     let allGuests = [];      // Semua data dari Firestore
     let filteredGuests = []; // Data setelah filter search
     let currentPage = 1;
@@ -468,10 +469,7 @@ $(document).ready(function () {
             rsvpCount: 0,
 
             createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
-
-            // ✅ HARUS ADA supaya lolos rules
-            adminKey: ADMIN_KEY
+            updatedAt: serverTimestamp()
         };
 
         try {
@@ -740,7 +738,7 @@ $(document).ready(function () {
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <button class="dropdown-item dropdown-item--danger deleteGuest" type="button" data-id="${doc.id}">
-                                            <i class="ri-delete-bin-line"></i> Hapus Tamu
+                                            <i class="ri-delete-bin-6-line"></i> Hapus Tamu
                                         </button>
                                     </li>
                                 </ul>
@@ -1375,8 +1373,7 @@ $(document).ready(function () {
                     rsvpStatus: "",
                     rsvpCount: 0,
                     createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp(),
-                    adminKey: ADMIN_KEY
+                    updatedAt: serverTimestamp()
                 };
 
                 // Save to Firestore
@@ -1565,8 +1562,7 @@ $(document).ready(function () {
             isTableVip: $('input[name="editGuestTableVip"]').is(':checked'),
             isSouvenirVip: $('input[name="editGuestSouvenirVip"]').is(':checked'),
             
-            updatedAt: serverTimestamp(),
-            adminKey: ADMIN_KEY
+            updatedAt: serverTimestamp()
         };
 
         if (!payload.name || !payload.maxGuests) {
@@ -1677,7 +1673,6 @@ Alfira & Fauzi`;
             const docRef = doc(window.db, "chatInvitation", TEMPLATE_DOC_ID);
             await setDoc(docRef, {
                 template: template,
-                adminKey: ADMIN_KEY,  // ✅ Tambahkan adminKey untuk lolos rules
                 updatedAt: serverTimestamp()
             });
 
@@ -1852,8 +1847,7 @@ Alfira & Fauzi`;
             await updateDoc(docRef, {
                 lastSent: serverTimestamp(),
                 sendCount: currentSendCount + 1,
-                updatedAt: serverTimestamp(),
-                adminKey: ADMIN_KEY
+                updatedAt: serverTimestamp()
             });
 
             console.log('✅ Send tracking updated:', { guestId, sendCount: currentSendCount + 1 });
@@ -2441,11 +2435,110 @@ Alfira & Fauzi`;
     let sortCommentColumn = "createdAt";
     let sortCommentDirection = "desc";
 
+    const ADMIN_STICKERS = Array.from({ length: 18 }, (_, index) => `stc-a-${index + 1}.gif`);
+    const isAllowedSticker = (value) => value === ''
+        || ADMIN_STICKERS.includes(value)
+        || /^stc-[1-5]\.png$/.test(String(value));
+    const escapeHtml = (value) => String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+    function renderCommentSetting(enabled, state = 'ready') {
+        const toggle = document.getElementById('allowPublicComments');
+        if (!toggle) return;
+
+        toggle.checked = enabled;
+        toggle.dataset.savedValue = String(enabled);
+        toggle.closest('.comment-setting')?.setAttribute('data-state', state);
+
+        const status = state === 'saving' ? 'MENYIMPAN…' : enabled ? 'ON' : 'OFF';
+        $('#allowPublicCommentsStatus').text(status);
+        $('#commentPublicDescription').text(
+            state === 'saving'
+                ? 'Menyimpan pengaturan komentar ke Firestore…'
+                : enabled
+                    ? 'ON — tamu dan pengunjung non-guest dapat mengirim komentar.'
+                    : 'OFF — hanya tamu dengan link undangan valid yang dapat mengirim komentar.'
+        );
+    }
+
+    async function loadCommentSetting() {
+        let enabled = false;
+        try {
+            const snap = await getDoc(doc(window.db, 'settings', 'comments'));
+            enabled = snap.exists() && snap.data().allowPublicComments === true;
+        } catch (err) {
+            console.warn('Pengaturan komentar memakai default OFF:', err);
+        }
+        renderCommentSetting(enabled);
+        return enabled;
+    }
+
+    $('#allowPublicComments').on('change', async function () {
+        const enabled = this.checked;
+        const previousEnabled = this.dataset.savedValue === 'true';
+        this.disabled = true;
+        renderCommentSetting(enabled, 'saving');
+
+        try {
+            const adminUser = window.auth?.currentUser;
+            if (!adminUser) {
+                const authError = new Error('Sesi admin tidak ditemukan');
+                authError.code = 'unauthenticated';
+                throw authError;
+            }
+
+            // Segarkan token agar Firestore menerima klaim email terbaru.
+            await adminUser.getIdToken(true);
+            await setDoc(doc(window.db, 'settings', 'comments'), {
+                allowPublicComments: enabled,
+                updatedAt: serverTimestamp(),
+            });
+
+            renderCommentSetting(enabled);
+            Swal.fire({
+                icon: 'success',
+                title: 'Pengaturan tersimpan',
+                text: enabled
+                    ? 'Komentar publik sekarang aktif.'
+                    : 'Komentar kini hanya untuk tamu dengan link valid.',
+                timer: 1700,
+                showConfirmButton: false,
+            });
+        } catch (err) {
+            console.error('Gagal menyimpan pengaturan komentar:', err);
+            renderCommentSetting(previousEnabled, 'error');
+
+            const code = String(err?.code || '');
+            let message = 'Pengaturan komentar tidak dapat disimpan. Coba lagi.';
+            if (code.includes('permission-denied')) {
+                message = 'Akses ditolak Firestore. Pastikan Anda login sebagai admin@soyaarief.site dan rules terbaru sudah dideploy.';
+            } else if (code.includes('unauthenticated')) {
+                message = 'Sesi admin sudah tidak aktif. Silakan logout lalu login kembali.';
+            } else if (code.includes('unavailable') || code.includes('network')) {
+                message = 'Koneksi ke Firebase sedang bermasalah. Periksa internet lalu coba lagi.';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal menyimpan',
+                text: message,
+                confirmButtonText: 'Mengerti',
+            });
+        } finally {
+            this.disabled = false;
+        }
+    });
+
     async function loadCommentList() {
         const tbody = $("#commentTableBody");
         tbody.html(`<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>`);
 
         try {
+            await loadCommentSetting();
             const q = query(collection(window.db, "comments"), orderBy("createdAt", "desc"));
             const snap = await getDocs(q);
 
@@ -2476,78 +2569,56 @@ Alfira & Fauzi`;
     function renderCommentTable(list) {
         const tbody = $("#commentTableBody");
         tbody.empty();
-
-        // Update total data count
         $("#totalDataComment").text(filteredComments.length);
 
         if (!list.length) {
-            tbody.html(`<tr><td colspan="5" class="text-center text-muted">Tidak ada komentar.</td></tr>`);
+            tbody.html(`<tr><td colspan="6" class="text-center text-muted">Tidak ada komentar.</td></tr>`);
             return;
         }
 
-        list.forEach(doc => {
-            const d = doc.data;
-            const commentPreview = d.comment ? (d.comment.length > 100 ? d.comment.substring(0, 100) + "..." : d.comment) : "-";
-            
+        list.forEach(commentDoc => {
+            const d = commentDoc.data;
+            const safeId = escapeHtml(commentDoc.id);
+            const safeName = escapeHtml(d.name || '-');
+            const rawComment = String(d.comment || '');
+            const safeComment = escapeHtml(rawComment || '-');
+            const safePreview = escapeHtml(rawComment.length > 100 ? `${rawComment.slice(0, 100)}...` : rawComment || '-');
+            const sticker = isAllowedSticker(d.sticker) && d.sticker ? d.sticker : '';
+            const replySticker = isAllowedSticker(d.replySticker) && d.replySticker ? d.replySticker : '';
+
             tbody.append(`
-                <tr class="comment-row" data-id="${doc.id}">
+                <tr class="comment-row" data-id="${safeId}">
                     <td class="text-center card-cell--detail">
-                        <button class="btn btn-sm btn-outline-secondary toggleCommentDetail" data-id="${doc.id}" title="Lihat Detail">
-                            <i class="ri-arrow-down-s-line"></i>
-                            <span class="btn-label">Detail</span>
+                        <button class="btn btn-sm btn-outline-secondary toggleCommentDetail" data-id="${safeId}" title="Lihat Detail">
+                            <i class="ri-arrow-down-s-line"></i><span class="btn-label">Detail</span>
                         </button>
                     </td>
-                    <td data-label="Nama" class="card-cell--title">${d.name || "-"}</td>
-                    <td data-label="Komentar">${commentPreview}</td>
-                    <td data-label="Sticker">
-                        ${d.sticker 
-                            ? `<img src="../assets/images/sticker/${d.sticker}" alt="sticker" style="width: 30px; height: 30px;">` 
-                            : '-'}
+                    <td data-label="Nama" class="card-cell--title">${safeName}</td>
+                    <td data-label="Komentar">${safePreview}${d.replyText || replySticker ? '<span class="badge text-bg-info ms-2">Dibalas</span>' : ''}</td>
+                    <td data-label="Sticker">${sticker ? `<img src="../assets/images/sticker/${sticker}" alt="sticker" width="30" height="30">` : '-'}</td>
+                    <td data-label="Tanggal">${escapeHtml(formatDate(d.createdAt))}</td>
+                    <td data-label="Aksi" class="comment-card__actions text-center">
+                        <button type="button" class="btn btn-sm comment-action-btn comment-action-btn--reply replyComment" data-id="${safeId}" title="Balas komentar" aria-label="Balas komentar">
+                            <i class="ri-chat-1-line" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm comment-action-btn comment-action-btn--delete deleteComment" data-id="${safeId}" title="Hapus komentar" aria-label="Hapus komentar">
+                            <i class="ri-delete-bin-6-line" aria-hidden="true"></i>
+                        </button>
                     </td>
-                    <td data-label="Tanggal">${formatDate(d.createdAt)}</td>
                 </tr>
-            `);
-
-            // Detail row
-            tbody.append(`
-                <tr class="detail-row" id="comment-detail-${doc.id}" style="display: none;">
-                    <td colspan="5" class="p-0">
+                <tr class="detail-row" id="comment-detail-${safeId}" style="display: none;">
+                    <td colspan="6" class="p-0">
                         <div class="detail-content bg-light p-3">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h6 class="mb-3"><i class="ri-information-line"></i> Detail Comment</h6>
-                                    <table class="table table-sm table-borderless">
-                                        <tr>
-                                            <td width="30%"><strong>ID Comment:</strong></td>
-                                            <td><code>${doc.id}</code></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Guest ID:</strong></td>
-                                            <td><code>${d.guestId || "-"}</code></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Nama:</strong></td>
-                                            <td>${d.name || "-"}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Komentar:</strong></td>
-                                            <td style="white-space: pre-wrap;">${d.comment || "-"}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Sticker:</strong></td>
-                                            <td>
-                                                ${d.sticker 
-                                                    ? `<img src="../assets/images/sticker/${d.sticker}" alt="sticker" style="width: 60px; height: 60px;"><br><small>${d.sticker}</small>` 
-                                                    : '-'}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Tanggal:</strong></td>
-                                            <td>${formatDate(d.createdAt)}</td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
+                            <h6 class="mb-3"><i class="ri-information-line"></i> Detail Comment</h6>
+                            <table class="table table-sm table-borderless">
+                                <tr><td width="30%"><strong>ID Comment:</strong></td><td><code>${safeId}</code></td></tr>
+                                <tr><td><strong>Guest ID:</strong></td><td><code>${escapeHtml(d.guestId || '-')}</code></td></tr>
+                                <tr><td><strong>Nama:</strong></td><td>${safeName}</td></tr>
+                                <tr><td><strong>Komentar:</strong></td><td class="comment-preserve">${safeComment}</td></tr>
+                                <tr><td><strong>Sticker:</strong></td><td>${sticker ? `<img src="../assets/images/sticker/${sticker}" alt="sticker" width="60" height="60">` : '-'}</td></tr>
+                                <tr><td><strong>Balasan Admin:</strong></td><td class="comment-preserve">${escapeHtml(d.replyText || '-')}${replySticker ? `<br><img src="../assets/images/sticker/${replySticker}" alt="sticker balasan" width="60" height="60">` : ''}</td></tr>
+                                <tr><td><strong>Tanggal:</strong></td><td>${escapeHtml(formatDate(d.createdAt))}</td></tr>
+                            </table>
                         </div>
                     </td>
                 </tr>
@@ -2689,6 +2760,161 @@ Alfira & Fauzi`;
         currentCommentPage = 1;
         renderCommentTable(getPagedCommentData());
         renderCommentPagination();
+    });
+
+    $(document).on('click', '.replyComment', async function() {
+        const id = String($(this).data('id'));
+        const current = allComments.find((item) => item.id === id)?.data || {};
+        const selectedSticker = ADMIN_STICKERS.includes(current.replySticker) ? current.replySticker : '';
+        const commentPreview = String(current.comment || '').slice(0, 180);
+        const stickerTiles = ADMIN_STICKERS.map((sticker, index) => `
+            <button
+                type="button"
+                class="admin-reply-sticker${selectedSticker === sticker ? ' is-selected' : ''}"
+                data-sticker="${sticker}"
+                aria-label="Pilih sticker ${index + 1}"
+                aria-pressed="${selectedSticker === sticker}"
+            >
+                <img src="../assets/images/sticker/${sticker}" alt="Sticker ${index + 1}" loading="lazy" decoding="async">
+                <span>${index + 1}</span>
+            </button>
+        `).join('');
+
+        const result = await Swal.fire({
+            title: current.replyText || selectedSticker ? 'Edit Balasan' : 'Balas Komentar',
+            html: `
+                <div class="admin-reply-form">
+                    <div class="admin-reply-context">
+                        <span class="admin-reply-context__label"><i class="ri-chat-quote-line" aria-hidden="true"></i> Membalas komentar</span>
+                        <strong>${escapeHtml(current.name || 'Tamu')}</strong>
+                        <p>${escapeHtml(commentPreview || 'Tanpa isi komentar')}</p>
+                    </div>
+
+                    <label class="admin-reply-label" for="adminReplyText">
+                        <span>Balasan admin</span>
+                        <small id="adminReplyCount">0/2000</small>
+                    </label>
+                    <textarea id="adminReplyText" class="form-control admin-reply-textarea" maxlength="2000" rows="5" placeholder="Tulis balasan untuk tamu…"></textarea>
+
+                    <fieldset class="admin-reply-stickers">
+                        <legend><i class="ri-emotion-happy-line" aria-hidden="true"></i> Pilih sticker <small>(opsional)</small></legend>
+                        <input id="adminReplySticker" type="hidden" value="${selectedSticker}">
+                        <div class="admin-reply-sticker-grid" role="group" aria-label="Pilihan sticker balasan">
+                            <button
+                                type="button"
+                                class="admin-reply-sticker admin-reply-sticker--none${selectedSticker ? '' : ' is-selected'}"
+                                data-sticker=""
+                                aria-label="Tanpa sticker"
+                                aria-pressed="${!selectedSticker}"
+                            >
+                                <i class="ri-forbid-2-line" aria-hidden="true"></i>
+                                <span>Tanpa</span>
+                            </button>
+                            ${stickerTiles}
+                        </div>
+                    </fieldset>
+                </div>
+            `,
+            customClass: {
+                popup: 'admin-reply-popup',
+                htmlContainer: 'admin-reply-html',
+                confirmButton: 'admin-reply-confirm',
+                cancelButton: 'admin-reply-cancel',
+            },
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: '<i class="ri-send-plane-2-line" aria-hidden="true"></i> Simpan balasan',
+            cancelButtonText: 'Batal',
+            focusConfirm: false,
+            didOpen: () => {
+                const root = Swal.getHtmlContainer();
+                const textarea = root.querySelector('#adminReplyText');
+                const stickerInput = root.querySelector('#adminReplySticker');
+                const counter = root.querySelector('#adminReplyCount');
+                textarea.value = String(current.replyText || '');
+
+                const updateCounter = () => {
+                    counter.textContent = `${textarea.value.length}/2000`;
+                };
+                const selectSticker = (button) => {
+                    stickerInput.value = button.dataset.sticker || '';
+                    root.querySelectorAll('.admin-reply-sticker').forEach((tile) => {
+                        const active = tile === button;
+                        tile.classList.toggle('is-selected', active);
+                        tile.setAttribute('aria-pressed', String(active));
+                    });
+                };
+
+                updateCounter();
+                textarea.addEventListener('input', updateCounter);
+                root.querySelector('.admin-reply-sticker-grid').addEventListener('click', (event) => {
+                    const button = event.target.closest('.admin-reply-sticker');
+                    if (button) selectSticker(button);
+                });
+                textarea.focus();
+            },
+            preConfirm: () => {
+                const root = Swal.getHtmlContainer();
+                const replyText = root.querySelector('#adminReplyText').value.trim();
+                const replySticker = root.querySelector('#adminReplySticker').value;
+                if (!replyText && !replySticker) {
+                    Swal.showValidationMessage('Isi teks balasan atau pilih minimal satu sticker.');
+                    return false;
+                }
+                return { replyText, replySticker };
+            },
+        });
+        if (!result.isConfirmed) return;
+
+        try {
+            await updateDoc(doc(window.db, 'comments', id), {
+                replyText: result.value.replyText,
+                replySticker: result.value.replySticker,
+                replyUpdatedAt: serverTimestamp(),
+            });
+            await loadCommentList();
+            Swal.fire({
+                icon: 'success',
+                title: 'Balasan tersimpan',
+                text: 'Balasan admin berhasil diperbarui.',
+                timer: 1600,
+                showConfirmButton: false,
+            });
+        } catch (err) {
+            console.error('Gagal menyimpan balasan:', err);
+            Swal.fire('Gagal', 'Balasan tidak dapat disimpan.', 'error');
+        }
+    });
+
+    $(document).on('click', '.deleteComment', async function() {
+        const id = String($(this).data('id'));
+        const result = await Swal.fire({
+            title: 'Hapus komentar?',
+            text: 'Komentar, balasan, dan reaksinya akan dihapus.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#dc3545',
+        });
+        if (!result.isConfirmed) return;
+
+        try {
+            const [commentReactions, replyReactions] = await Promise.all([
+                getDocs(collection(window.db, 'comments', id, 'reactions')),
+                getDocs(collection(window.db, 'comments', id, 'replyReactions')),
+            ]);
+            await Promise.all([
+                ...commentReactions.docs.map((reaction) => deleteDoc(reaction.ref)),
+                ...replyReactions.docs.map((reaction) => deleteDoc(reaction.ref)),
+            ]);
+            await deleteDoc(doc(window.db, 'comments', id));
+            await loadCommentList();
+            Swal.fire('Dihapus', 'Komentar berhasil dihapus.', 'success');
+        } catch (err) {
+            console.error('Gagal menghapus komentar:', err);
+            Swal.fire('Gagal', 'Komentar tidak dapat dihapus.', 'error');
+        }
     });
 
     $(document).on("click", ".toggleCommentDetail", function() {

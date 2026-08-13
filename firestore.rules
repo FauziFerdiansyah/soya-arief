@@ -1,56 +1,238 @@
 rules_version = '2';
 
-// PENTING: ganti ADMIN_KEY di bawah dengan nilai yang sama seperti
-// VITE_ADMIN_KEY, lalu deploy lewat Firebase Console atau Firebase CLI.
-//
-// Batasan yang perlu disadari: karena situs ini static (GitHub Pages)
-// tanpa Firebase Auth, ADMIN_KEY ikut ter-bundle ke JavaScript dan bisa
-// dibaca pengunjung. Aturan ini menahan penulisan acak, tapi bukan
-// pengamanan kuat. Untuk itu perlu Firebase Auth.
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function isAdmin() {
-      return request.resource.data.adminKey == 'pIsg57BDcRoztQJqKSsdbEqlLIrHdv3M';
+      return request.auth != null
+        && request.auth.token.email == 'admin@soyaarief.site';
     }
 
-    // Data tamu: dibaca undangan, ditulis hanya oleh admin.
+    function isLinkedGuest(guestId) {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous'
+        && guestId is string
+        && guestId.size() > 0
+        && exists(/databases/$(database)/documents/guest/$(guestId))
+        && exists(/databases/$(database)/documents/guest/$(guestId)/access/$(request.auth.uid));
+    }
+
+    function publicCommentsEnabled() {
+      return exists(/databases/$(database)/documents/settings/comments)
+        && get(/databases/$(database)/documents/settings/comments).data.allowPublicComments == true;
+    }
+
+    function validSticker(value) {
+      return value is string
+        && (value == '' || value.matches('^stc-a-([1-9]|1[0-8])\\.gif$'));
+    }
+
+    function validGuestData(data) {
+      return data.keys().hasOnly([
+          'name', 'phone', 'instagram', 'maxGuests', 'source', 'sourceName',
+          'isTableVip', 'isSouvenirVip', 'opened', 'openCount',
+          'rsvpStatus', 'rsvpCount', 'createdAt', 'updatedAt', 'openedAt',
+          'lastOpenedAt', 'deviceType', 'lastDevice', 'lastSent', 'sendCount',
+          'adminKey'
+        ])
+        && data.keys().hasAll([
+          'name', 'maxGuests', 'opened', 'openCount', 'rsvpStatus',
+          'rsvpCount', 'createdAt', 'updatedAt'
+        ])
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+        && data.maxGuests is int && data.maxGuests >= 1 && data.maxGuests <= 10
+        && data.opened is bool && data.openCount is int && data.openCount >= 0
+        && data.rsvpStatus is string && data.rsvpStatus.size() <= 20
+        && data.rsvpCount is int && data.rsvpCount >= 0 && data.rsvpCount <= 10
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 30))
+        && (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 50))
+        && (!('source' in data) || (data.source is string && data.source.size() <= 100))
+        && (!('sourceName' in data) || (data.sourceName is string && data.sourceName.size() <= 200));
+    }
+
+
     match /guest/{guestId} {
-      allow read: if true;
-      allow create, update: if isAdmin()
-        // Tamu boleh update field RSVP & tracking miliknya sendiri.
-        || request.resource.data.diff(resource.data).affectedKeys()
-             .hasOnly([
-               'rsvpStatus', 'rsvpCount', 'rsvpAt', 'updatedAt',
-               'openedAt', 'openCount', 'lastDevice', 'sendCount'
-             ]);
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        && validGuestData(request.resource.data)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow update: if (isAdmin() && validGuestData(request.resource.data))
+        || (isLinkedGuest(guestId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'opened', 'openedAt', 'lastOpenedAt', 'openCount', 'deviceType',
+            'rsvpStatus', 'rsvpCount', 'updatedAt'
+          ])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny([
+              'opened', 'openedAt', 'lastOpenedAt', 'openCount', 'deviceType'
+            ]) || (
+              request.resource.data.opened == true
+              && request.resource.data.openCount is int
+              && request.resource.data.openCount >= resource.data.openCount
+              && request.resource.data.deviceType in ['mobile', 'tablet', 'desktop']
+            ))
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny([
+              'rsvpStatus', 'rsvpCount'
+            ]) || (
+              request.resource.data.rsvpStatus in ['yes', 'no']
+              && request.resource.data.rsvpCount is int
+              && request.resource.data.rsvpCount >= 0
+              && request.resource.data.rsvpCount <= request.resource.data.maxGuests
+            ))
+          && request.resource.data.updatedAt == request.time
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['openedAt'])
+            || request.resource.data.openedAt == request.time)
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['lastOpenedAt'])
+            || request.resource.data.lastOpenedAt == request.time));
       allow delete: if isAdmin();
+
+      match /access/{uid} {
+        allow get: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+        allow list: if isAdmin();
+        allow create: if request.auth != null
+          && request.auth.token.firebase.sign_in_provider == 'anonymous'
+          && request.auth.uid == uid
+          && exists(/databases/$(database)/documents/guest/$(guestId))
+          && request.resource.data.keys().hasOnly(['uid', 'guestId', 'deviceType', 'createdAt'])
+          && request.resource.data.keys().hasAll(['uid', 'guestId', 'deviceType', 'createdAt'])
+          && request.resource.data.uid == uid
+          && request.resource.data.guestId == guestId
+          && request.resource.data.deviceType in ['mobile', 'tablet', 'desktop']
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+        allow delete: if isAdmin();
+      }
     }
 
-    // RSVP: tamu boleh kirim, tidak boleh ubah/hapus.
     match /rsvp/{rsvpId} {
-      allow read: if true;
-      allow create: if request.resource.data.guestId is string;
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
-    }
-
-    // Ucapan: tamu boleh kirim, admin boleh moderasi.
-    match /comments/{commentId} {
-      allow read: if true;
-      allow create: if request.resource.data.name is string
-                    && request.resource.data.name.size() > 0
-                    && request.resource.data.name.size() <= 100;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly([
+          'guestId', 'ownerUid', 'name', 'status', 'count', 'deviceType', 'createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'guestId', 'ownerUid', 'name', 'status', 'count', 'deviceType', 'createdAt'
+        ])
+        && request.resource.data.ownerUid == request.auth.uid
+        && isLinkedGuest(request.resource.data.guestId)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.status in ['yes', 'no']
+        && request.resource.data.count is int
+        && request.resource.data.count >= 0
+        && request.resource.data.count <= 10
+        && request.resource.data.deviceType in ['mobile', 'tablet', 'desktop']
+        && request.resource.data.createdAt == request.time;
+      allow get, list: if isAdmin()
+        || (request.auth != null
+          && resource.data.ownerUid == request.auth.uid
+          && isLinkedGuest(resource.data.guestId));
       allow update, delete: if isAdmin();
     }
 
-    // Template pesan undangan: hanya admin.
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly([
+          'guestId', 'authorUid', 'name', 'comment', 'sticker', 'createdAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'guestId', 'authorUid', 'name', 'comment', 'sticker', 'createdAt'
+        ])
+        && request.resource.data.guestId is string
+        && request.resource.data.guestId.size() <= 128
+        && request.resource.data.authorUid is string
+        && request.resource.data.authorUid.size() <= 128
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() > 0
+        && request.resource.data.comment.size() <= 2000
+        && validSticker(request.resource.data.sticker)
+        && request.resource.data.createdAt == request.time
+        && (publicCommentsEnabled()
+          || (request.auth != null
+            && request.resource.data.authorUid == request.auth.uid
+            && isLinkedGuest(request.resource.data.guestId)));
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'replyText', 'replySticker', 'replyUpdatedAt'
+        ])
+        && request.resource.data.replyText is string
+        && request.resource.data.replyText.size() <= 2000
+        && validSticker(request.resource.data.replySticker)
+        && request.resource.data.replyUpdatedAt == request.time;
+      allow delete: if isAdmin();
+
+      match /reactions/{reactionId} {
+        allow read: if true;
+        allow create: if request.auth != null
+          && exists(/databases/$(database)/documents/comments/$(commentId))
+          && request.resource.data.keys().hasOnly(['uid', 'guestId', 'type', 'createdAt'])
+          && request.resource.data.keys().hasAll(['uid', 'guestId', 'type', 'createdAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.type in ['heart', 'like', 'celebrate', 'pray', 'smile']
+          && reactionId == request.auth.uid + '_' + request.resource.data.type
+          && isLinkedGuest(request.resource.data.guestId)
+          && request.resource.data.createdAt == request.time;
+        allow delete: if isAdmin()
+          || (request.auth != null
+            && resource.data.uid == request.auth.uid
+            && reactionId == request.auth.uid + '_' + resource.data.type);
+        allow update: if false;
+      }
+
+      match /replyReactions/{reactionId} {
+        allow read: if true;
+        allow create: if request.auth != null
+          && exists(/databases/$(database)/documents/comments/$(commentId))
+          && get(/databases/$(database)/documents/comments/$(commentId)).data.keys()
+               .hasAny(['replyText', 'replySticker'])
+          && request.resource.data.keys().hasOnly(['uid', 'guestId', 'type', 'createdAt'])
+          && request.resource.data.keys().hasAll(['uid', 'guestId', 'type', 'createdAt'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.type in ['heart', 'like', 'celebrate', 'pray', 'smile']
+          && reactionId == request.auth.uid + '_' + request.resource.data.type
+          && isLinkedGuest(request.resource.data.guestId)
+          && request.resource.data.createdAt == request.time;
+        allow delete: if isAdmin()
+          || (request.auth != null
+            && resource.data.uid == request.auth.uid
+            && reactionId == request.auth.uid + '_' + resource.data.type);
+        allow update: if false;
+      }
+    }
+
+    match /settings/comments {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['allowPublicComments', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['allowPublicComments', 'updatedAt'])
+        && request.resource.data.allowPublicComments is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+
+    match /chatInvitation/{docId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['template', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['template', 'updatedAt'])
+        && request.resource.data.template is string
+        && request.resource.data.template.size() <= 10000
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // Kept for compatibility with older deployments that used this name.
     match /invitationTemplate/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // Tutup sisanya.
     match /{document=**} {
       allow read, write: if false;
     }

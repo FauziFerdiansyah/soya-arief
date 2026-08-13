@@ -1,4 +1,4 @@
-# Sinkronkan .env.local ke GitHub Actions Variables & Secrets.
+# Sinkronkan nilai publik .env.local ke GitHub Actions Variables.
 # Nilai tidak pernah dicetak ke output.
 param(
     [string]$Repo = 'FauziFerdiansyah/soya-arief',
@@ -29,13 +29,13 @@ $asVariables = @(
     'VITE_FIREBASE_MESSAGING_SENDER_ID',
     'VITE_FIREBASE_APP_ID',
     'VITE_BASE',
-    'VITE_PUBLIC_URL'
+    'VITE_PUBLIC_URL',
+    'VITE_ADMIN_USERNAME',
+    'VITE_ADMIN_EMAIL'
 )
 
-$asSecrets = @(
-    'VITE_ADMIN_KEY',
-    'VITE_ADMIN_PASSWORD_HASH'
-)
+# Seluruh VITE_* di atas adalah nilai publik yang ikut masuk ke bundle.
+$asSecrets = @()
 
 function Set-GhEntry {
     param([string]$Kind, [string]$Name, [string]$Value, [string]$Repo)

@@ -1,32 +1,16 @@
-/**
- * Gerbang login untuk /webadmin/.
- *
- * Password tidak disimpan di kode, hanya SHA-256 hash-nya
- * (VITE_ADMIN_PASSWORD_HASH). Input user di-hash lalu dibandingkan.
- *
- * Sesi disimpan di localStorage sehingga berlaku untuk semua tab, dan
- * disinkronkan lewat event `storage`: login atau logout di satu tab
- * langsung berlaku di tab lain.
- *
- * Tampilan memakai variabel CSS dan komponen Bootstrap yang sama dengan
- * panel admin (assets/css/style.css), jadi kalau palet admin diubah,
- * halaman login ikut menyesuaikan.
- *
- * BATASAN PENTING: pemeriksaan ini berjalan di browser, jadi sifatnya
- * hanya penghalang UI. Perlindungan data yang sebenarnya ada di
- * firestore.rules.
- */
-const SESSION_KEY = 'webadmin:session';
-const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 jam
-const EXPECTED_HASH = (import.meta.env.VITE_ADMIN_PASSWORD_HASH ?? '').toLowerCase();
+/** Firebase Auth login gate for /webadmin/. */
+import './firebase.js';
 
-async function sha256Hex(text) {
-  const bytes = new TextEncoder().encode(text);
-  const digest = await crypto.subtle.digest('SHA-256', bytes);
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-}
+const SESSION_KEY = 'webadmin:session';
+const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000;
+const ADMIN_USERNAME = (import.meta.env.VITE_ADMIN_USERNAME ?? 'admin').trim();
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? 'admin@soyaarief.site').trim().toLowerCase();
+
+let resolveAdminReady;
+window.adminReady = new Promise((resolve) => {
+  resolveAdminReady = resolve;
+});
+window.adminAuthenticated = false;
 
 /** Baca sesi yang masih berlaku, atau null kalau tidak ada / kedaluwarsa. */
 function readSession() {
@@ -48,17 +32,35 @@ function readSession() {
   }
 }
 
-function writeSession() {
+function writeSession(email) {
+  const now = Date.now();
   localStorage.setItem(
     SESSION_KEY,
-    JSON.stringify({ loggedInAt: Date.now(), expiresAt: Date.now() + SESSION_MAX_AGE_MS })
+    JSON.stringify({ email, loggedInAt: now, expiresAt: now + SESSION_MAX_AGE_MS })
   );
 }
 
-/** Keluar dari sesi admin. Tab lain ikut terkunci lewat event `storage`. */
-export function logoutAdmin() {
+function isExpectedAdmin(user) {
+  return Boolean(user?.email && user.email.toLowerCase() === ADMIN_EMAIL);
+}
+
+function unlock(overlay) {
+  window.adminAuthenticated = true;
+  document.body.classList.remove('admin-gate-locked');
+  overlay?.remove();
+  resolveAdminReady(true);
+  window.dispatchEvent(new CustomEvent('admin:unlocked'));
+}
+
+/** Keluar dari sesi admin dan Firebase Auth. */
+export async function logoutAdmin() {
   localStorage.removeItem(SESSION_KEY);
-  window.location.reload();
+  window.adminAuthenticated = false;
+  try {
+    await window.firebaseAuth.signOut(window.auth);
+  } finally {
+    window.location.reload();
+  }
 }
 
 function injectStyles() {
@@ -161,8 +163,9 @@ function injectStyles() {
     }
 
     /* Input memakai .form-control dari style.css, hanya beri ruang tombol mata */
-    .agate__field { position: relative; }
+    .agate__field { position: relative; margin-bottom: 1rem; }
     .agate__field .form-control { padding-right: 3rem; }
+    .agate__field--plain .form-control { padding-right: 0.75rem; }
     .agate__toggle {
       position: absolute;
       top: 50%;
@@ -301,8 +304,21 @@ function buildOverlay() {
       <p class="agate__subtitle">Masuk untuk mengelola data undangan</p>
 
       <form id="admin-gate-form" novalidate>
-        <label class="agate__label" for="admin-gate-password">Password</label>
+        <label class="agate__label" for="admin-gate-username">Username</label>
+        <div class="agate__field agate__field--plain">
+          <input
+            class="form-control"
+            id="admin-gate-username"
+            name="username"
+            type="text"
+            value="${ADMIN_USERNAME}"
+            placeholder="Masukkan username"
+            autocomplete="username"
+            required
+          />
+        </div>
 
+        <label class="agate__label" for="admin-gate-password">Password</label>
         <div class="agate__field">
           <input
             class="form-control"
@@ -389,6 +405,7 @@ function lock() {
 
   const card = overlay.querySelector('#admin-gate-card');
   const form = overlay.querySelector('#admin-gate-form');
+  const usernameInput = overlay.querySelector('#admin-gate-username');
   const input = overlay.querySelector('#admin-gate-password');
   const toggle = overlay.querySelector('#admin-gate-toggle');
   const error = overlay.querySelector('#admin-gate-error');
@@ -398,15 +415,14 @@ function lock() {
 
   wireToggle(input, toggle);
   wireCapsLockHint(input, caps);
-  input.focus();
+  usernameInput.focus();
 
   const showError = (message) => {
     errorText.textContent = message;
     error.hidden = false;
     input.setAttribute('aria-invalid', 'true');
-
     card.classList.remove('is-shaking');
-    void card.offsetWidth; // paksa reflow supaya animasi bisa diulang
+    void card.offsetWidth;
     card.classList.add('is-shaking');
   };
 
@@ -416,6 +432,7 @@ function lock() {
     input.removeAttribute('aria-invalid');
   };
 
+  usernameInput.addEventListener('input', clearError);
   input.addEventListener('input', clearError);
   card.addEventListener('animationend', () => card.classList.remove('is-shaking'));
 
@@ -423,14 +440,8 @@ function lock() {
     event.preventDefault();
     clearError();
 
-    if (!EXPECTED_HASH) {
-      showError('Password belum dikonfigurasi. Hubungi pengelola situs.');
-      return;
-    }
-
-    if (!input.value) {
-      showError('Password belum diisi.');
-      input.focus();
+    if (usernameInput.value.trim() !== ADMIN_USERNAME || !input.value) {
+      showError('Username atau password salah.');
       return;
     }
 
@@ -438,22 +449,26 @@ function lock() {
     submit.innerHTML = '<span class="agate__spinner" aria-hidden="true"></span>Memeriksa...';
 
     try {
-      const hash = await sha256Hex(input.value);
+      const credential = await window.firebaseAuth.signInWithEmailAndPassword(
+        window.auth,
+        ADMIN_EMAIL,
+        input.value
+      );
 
-      if (hash === EXPECTED_HASH) {
-        writeSession();
-        document.body.classList.remove('admin-gate-locked');
-        overlay.remove();
-        window.dispatchEvent(new CustomEvent('admin:unlocked'));
-        return;
+      if (!isExpectedAdmin(credential.user)) {
+        await window.firebaseAuth.signOut(window.auth);
+        throw new Error('Akun tidak diizinkan');
       }
 
-      showError('Password salah. Coba lagi.');
+      input.value = '';
+      writeSession(credential.user.email.toLowerCase());
+      scheduleExpiry();
+      unlock(overlay);
+    } catch (err) {
+      console.error('Login admin ditolak:', err);
+      showError('Username atau password salah.');
       input.value = '';
       input.focus();
-    } catch (err) {
-      console.error('Gagal memeriksa password:', err);
-      showError('Terjadi kesalahan saat memeriksa password.');
     } finally {
       submit.disabled = false;
       submit.innerHTML = '<i class="ri-login-circle-line" aria-hidden="true"></i> Masuk';
@@ -463,9 +478,11 @@ function lock() {
 
 function wireLogoutButtons() {
   document.querySelectorAll('[data-admin-logout]').forEach((el) => {
-    el.addEventListener('click', (event) => {
+    el.addEventListener('click', async (event) => {
       event.preventDefault();
-      logoutAdmin();
+      el.disabled = true;
+      el.innerHTML = '<i class="ri-loader-4-line ri-spin" aria-hidden="true"></i><span>Keluar…</span>';
+      await logoutAdmin();
     });
   });
 }
@@ -498,31 +515,33 @@ function scheduleExpiry() {
   if (!session) return;
 
   window.setTimeout(() => {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.reload();
+    logoutAdmin();
   }, session.expiresAt - Date.now());
 }
 
-function start() {
-  if (!EXPECTED_HASH) {
-    console.error(
-      'VITE_ADMIN_PASSWORD_HASH belum diset. Login diblokir. ' +
-        'Buat hash dengan: npm run hash:password "password-anda"'
-    );
-  }
-
+async function start() {
   wireLogoutButtons();
   wireCrossTabSync();
 
-  if (readSession()) {
+  const user = await window.authReady;
+  const session = readSession();
+  const validSession = session?.email === ADMIN_EMAIL;
+
+  if (isExpectedAdmin(user) && validSession) {
     scheduleExpiry();
-  } else {
-    lock();
+    unlock();
+    return;
   }
+
+  localStorage.removeItem(SESSION_KEY);
+  if (user) {
+    await window.firebaseAuth.signOut(window.auth).catch(() => {});
+  }
+  lock();
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', start);
+  document.addEventListener('DOMContentLoaded', start, { once: true });
 } else {
   start();
 }
