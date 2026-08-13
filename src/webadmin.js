@@ -1,4 +1,13 @@
 import './admin-gate.js';
+import {
+    CONTENT_SECTIONS,
+    CONTENT_FIELDS,
+    CONTENT_COLLECTION,
+    CONTENT_DOC_ID,
+    CONTENT_MAX_LENGTH,
+    sanitizeContent,
+    isSafeUrl,
+} from './site-content.js';
 
 // Never initialize the panel or read Firestore before the Firebase-authenticated
 // admin gate resolves. Login can happen later without reloading this module.
@@ -244,7 +253,7 @@ $(document).ready(function () {
         $(this).addClass("active");
         
         // Hide all sections
-        $("#guestsSection, #rsvpSection, #commentsSection").hide();
+        $("#guestsSection, #rsvpSection, #commentsSection, #contentSection").hide();
         
         // Show selected section
         if (menu === "guests") {
@@ -256,6 +265,9 @@ $(document).ready(function () {
         } else if (menu === "comments") {
             $("#commentsSection").show();
             loadCommentList();
+        } else if (menu === "content") {
+            $("#contentSection").show();
+            loadSiteContentEditor();
         }
         
         console.log(`📍 Navigated to: ${menu}`);
@@ -309,6 +321,72 @@ $(document).ready(function () {
     // ✅ Sort state
     let sortColumn = "createdAt"; // Default sort by created date
     let sortDirection = "desc";   // desc = newest first
+
+    // Label lagu yang dipakai di detail tamu. Nilai tersimpan di Firestore
+    // hanya 'default' atau 'minang'.
+    const MUSIC_LABELS = {
+        default: "Mahalini - Bermuara",
+        minang: "Urang Minang",
+    };
+
+    // ==============================
+    // ✅ SESI ADMIN UNTUK OPERASI TULIS
+    // ==============================
+    // window.auth.currentUser bisa sesaat kosong ketika SDK sedang memulihkan
+    // sesi atau menyegarkan token. Menunggu event auth lebih dapat diandalkan
+    // daripada membaca currentUser satu kali.
+    function waitForAdminUser(timeoutMs = 5000) {
+        const current = window.auth?.currentUser;
+        if (current) return Promise.resolve(current);
+
+        return new Promise((resolve) => {
+            let settled = false;
+
+            const finish = (user) => {
+                if (settled) return;
+                settled = true;
+                unsubscribe?.();
+                resolve(user);
+            };
+
+            const unsubscribe = window.firebaseAuth.onAuthStateChanged(
+                window.auth,
+                (user) => { if (user) finish(user); },
+                () => finish(null)
+            );
+
+            window.setTimeout(() => finish(window.auth?.currentUser ?? null), timeoutMs);
+        });
+    }
+
+    async function requireAdminUser() {
+        const user = await waitForAdminUser();
+        if (user) return user;
+
+        const error = new Error('Sesi admin tidak ditemukan');
+        error.code = 'unauthenticated';
+        throw error;
+    }
+
+    /**
+     * Jalankan operasi tulis admin dengan token yang baru disegarkan. Kalau
+     * Firestore tetap menolak karena token kedaluwarsa, dicoba sekali lagi
+     * setelah token dipaksa diperbarui.
+     */
+    async function runAdminWrite(write) {
+        const user = await requireAdminUser();
+
+        try {
+            await user.getIdToken(true);
+            return await write();
+        } catch (err) {
+            if (!String(err?.code || '').includes('unauthenticated')) throw err;
+
+            const retryUser = await requireAdminUser();
+            await retryUser.getIdToken(true);
+            return await write();
+        }
+    }
 
     // ==============================
     // ✅ NORMALIZE PHONE NUMBER
@@ -438,6 +516,10 @@ $(document).ready(function () {
         const isTableVip     = $('[name="guestTableVip"]').is(':checked');
         const isSouvenirVip  = $('[name="guestSouvenirVip"]').is(':checked');
 
+        // ✅ Opsi khusus per tamu: section Turut Mengundang & pilihan lagu
+        const showInviters   = $('[name="guestShowInviters"]').is(':checked');
+        const musicTrack     = $('[name="guestMusicTrack"]').val() === "minang" ? "minang" : "default";
+
         // ✅ Validasi
         if (!guestName)  return alert("Nama tamu wajib diisi");
         if (!maxGuests || maxGuests < 1) return alert("Jumlah minimal 1");
@@ -462,6 +544,10 @@ $(document).ready(function () {
             // ✅ 2 field VIP terpisah (boolean)
             isTableVip: isTableVip,
             isSouvenirVip: isSouvenirVip,
+
+            // ✅ Opsi tampilan & audio khusus tamu ini
+            showInviters: showInviters,
+            musicTrack: musicTrack,
 
             opened: false,
             openCount: 0,
@@ -493,6 +579,10 @@ $(document).ready(function () {
             // ✅ Reset 2 VIP checkboxes
             $('[name="guestTableVip"]').prop("checked", false);
             $('[name="guestSouvenirVip"]').prop("checked", false);
+
+            // ✅ Reset opsi Turut Mengundang & lagu
+            $('[name="guestShowInviters"]').prop("checked", false);
+            $('[name="guestMusicTrack"]').val("default");
 
         } catch (err) {
             console.error(err);
@@ -731,7 +821,9 @@ $(document).ready(function () {
                                                 data-source="${d.source || ''}"
                                                 data-sourcename="${d.sourceName || ''}"
                                                 data-istablevip="${d.isTableVip || false}"
-                                                data-issouvenivip="${d.isSouvenirVip || false}">
+                                                data-issouvenivip="${d.isSouvenirVip || false}"
+                                                data-showinviters="${d.showInviters || false}"
+                                                data-musictrack="${d.musicTrack || 'default'}">
                                             <i class="ri-edit-line"></i> Edit Tamu
                                         </button>
                                     </li>
@@ -797,6 +889,20 @@ $(document).ready(function () {
                                                         ? '<span class="badge bg-warning text-dark"><i class="ri-gift-line"></i> VIP Souvenir</span>' 
                                                         : '<span class="badge bg-secondary"><i class="ri-gift-line"></i> Regular Souvenir</span>'}
                                                 </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Turut Mengundang:</strong></td>
+                                            <td>
+                                                ${d.showInviters
+                                                    ? '<span class="badge bg-success"><i class="ri-eye-line"></i> Aktif</span>'
+                                                    : '<span class="badge bg-secondary"><i class="ri-eye-off-line"></i> Tidak Aktif</span>'}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Lagu Undangan:</strong></td>
+                                            <td>
+                                                <span class="badge bg-info"><i class="ri-music-2-line"></i> ${MUSIC_LABELS[d.musicTrack] || MUSIC_LABELS.default}</span>
                                             </td>
                                         </tr>
                                     </table>
@@ -1538,6 +1644,11 @@ $(document).ready(function () {
         $('input[name="editGuestTableVip"]').prop("checked", isTableVip === true || isTableVip === "true");
         $('input[name="editGuestSouvenirVip"]').prop("checked", isSouvenirVip === true || isSouvenirVip === "true");
 
+        // ✅ Set opsi Turut Mengundang & lagu
+        const showInviters = $btn.data("showinviters");
+        $('input[name="editGuestShowInviters"]').prop("checked", showInviters === true || showInviters === "true");
+        $('select[name="editGuestMusicTrack"]').val($btn.data("musictrack") === "minang" ? "minang" : "default");
+
         console.log('📝 Edit guest data:', { id, name, maxGuests, phone, instagram, source, sourceName, isTableVip, isSouvenirVip });
 
         const modal = new bootstrap.Modal(document.getElementById("editGuestModal"));
@@ -1561,7 +1672,11 @@ $(document).ready(function () {
             // ✅ 2 field VIP terpisah (boolean)
             isTableVip: $('input[name="editGuestTableVip"]').is(':checked'),
             isSouvenirVip: $('input[name="editGuestSouvenirVip"]').is(':checked'),
-            
+
+            // ✅ Opsi tampilan & audio khusus tamu ini
+            showInviters: $('input[name="editGuestShowInviters"]').is(':checked'),
+            musicTrack: $('select[name="editGuestMusicTrack"]').val() === "minang" ? "minang" : "default",
+
             updatedAt: serverTimestamp()
         };
 
@@ -2484,19 +2599,10 @@ Alfira & Fauzi`;
         renderCommentSetting(enabled, 'saving');
 
         try {
-            const adminUser = window.auth?.currentUser;
-            if (!adminUser) {
-                const authError = new Error('Sesi admin tidak ditemukan');
-                authError.code = 'unauthenticated';
-                throw authError;
-            }
-
-            // Segarkan token agar Firestore menerima klaim email terbaru.
-            await adminUser.getIdToken(true);
-            await setDoc(doc(window.db, 'settings', 'comments'), {
+            await runAdminWrite(() => setDoc(doc(window.db, 'settings', 'comments'), {
                 allowPublicComments: enabled,
                 updatedAt: serverTimestamp(),
-            });
+            }));
 
             renderCommentSetting(enabled);
             Swal.fire({
@@ -2517,7 +2623,7 @@ Alfira & Fauzi`;
             if (code.includes('permission-denied')) {
                 message = 'Akses ditolak Firestore. Pastikan Anda login sebagai admin@soyaarief.site dan rules terbaru sudah dideploy.';
             } else if (code.includes('unauthenticated')) {
-                message = 'Sesi admin sudah tidak aktif. Silakan logout lalu login kembali.';
+                message = 'Token sesi admin kedaluwarsa dan percobaan ulang gagal. Muat ulang halaman lalu coba lagi.';
             } else if (code.includes('unavailable') || code.includes('network')) {
                 message = 'Koneksi ke Firebase sedang bermasalah. Periksa internet lalu coba lagi.';
             }
@@ -2932,6 +3038,548 @@ Alfira & Fauzi`;
     });
 
 
+    // ==============================
+    // EDITOR KONTEN WEBSITE (per section)
+    // ==============================
+    // Menyimpan seluruh teks undangan ke settings/siteContent. Halaman publik
+    // membaca dokumen itu dan menerapkannya ke elemen ber-atribut data-content.
+    // Field kosong berarti "pakai teks bawaan index.html".
+    const CONTENT_FIELD_BY_KEY = new Map(CONTENT_FIELDS.map((field) => [field.key, field]));
+    let savedSiteContent = {};
+    let siteContentLoaded = false;
+    let siteContentLoading = false;
 
+    function setContentStatus(message, state = 'ready') {
+        $('#contentEditorStatus').text(message);
+        document.getElementById('contentEditorToolbar')?.setAttribute('data-state', state);
+    }
+
+    /** Satu baris nama pada editor daftar: handle geser, input, dan tombol. */
+    function buildListRow(text = '') {
+        const row = document.createElement('div');
+        row.className = 'content-list-row';
+        row.draggable = true;
+
+        const handle = document.createElement('span');
+        handle.className = 'content-list-row__handle';
+        handle.title = 'Tarik untuk memindahkan';
+        handle.innerHTML = '<i class="ri-draggable" aria-hidden="true"></i>';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'form-control content-list-row__input';
+        input.maxLength = 200;
+        input.placeholder = 'Contoh: - Hj. Wawan';
+        input.value = text;
+
+        const tools = document.createElement('div');
+        tools.className = 'content-list-row__tools';
+        tools.innerHTML = `
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-list-move="up" title="Naikkan" aria-label="Naikkan nama">
+                <i class="ri-arrow-up-s-line" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-list-move="down" title="Turunkan" aria-label="Turunkan nama">
+                <i class="ri-arrow-down-s-line" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-list-remove title="Hapus" aria-label="Hapus nama">
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+        `;
+
+        row.append(handle, input, tools);
+        return row;
+    }
+
+    /** Salin urutan baris ke textarea tersembunyi yang dibaca saat menyimpan. */
+    function syncListEditor(editor) {
+        if (!editor) return;
+
+        const store = editor.querySelector('.content-list-editor__value');
+        const rows = [...editor.querySelectorAll('.content-list-row__input')];
+        const names = rows.map((input) => input.value.trim()).filter(Boolean);
+
+        if (store) store.value = names.join('\n');
+        const counter = editor.querySelector('.content-list-editor__count');
+        if (counter) counter.textContent = `${names.length} nama`;
+
+        const empty = editor.querySelector('.content-list-editor__empty');
+        if (empty) empty.hidden = rows.length > 0;
+    }
+
+    function buildListEditor(field) {
+        const editor = document.createElement('div');
+        editor.className = 'content-list-editor';
+
+        const store = document.createElement('textarea');
+        store.className = 'content-list-editor__value';
+        store.dataset.contentKey = field.key;
+        store.hidden = true;
+        store.value = savedSiteContent[field.key] ?? '';
+        editor.appendChild(store);
+
+        const rows = document.createElement('div');
+        rows.className = 'content-list-editor__rows';
+        String(store.value)
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .forEach((line) => rows.appendChild(buildListRow(line)));
+        editor.appendChild(rows);
+
+        const empty = document.createElement('p');
+        empty.className = 'content-list-editor__empty';
+        empty.textContent = 'Belum ada nama. Tambahkan minimal satu nama supaya section ini tampil.';
+        editor.appendChild(empty);
+
+        const footer = document.createElement('div');
+        footer.className = 'content-list-editor__footer';
+        footer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-outline-primary" data-list-add>
+                <i class="ri-add-line" aria-hidden="true"></i> Tambah Nama
+            </button>
+            <span class="content-list-editor__count">0 nama</span>
+        `;
+        editor.appendChild(footer);
+
+        syncListEditor(editor);
+        return editor;
+    }
+
+    function buildContentField(field) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'content-field';
+        if (field.type === 'textarea') wrapper.classList.add('content-field--wide');
+
+        const inputId = `content-input-${field.key}`;
+
+        const label = document.createElement('label');
+        label.className = 'content-field__label';
+        label.setAttribute('for', inputId);
+        label.textContent = field.label;
+        wrapper.appendChild(label);
+
+        let control;
+
+        if (field.editor === 'sortable-list') {
+            control = buildListEditor(field);
+            label.removeAttribute('for');
+        } else if (field.type === 'select') {
+            control = document.createElement('select');
+            control.className = 'form-select content-field__input';
+            (field.options || []).forEach((option) => {
+                const item = document.createElement('option');
+                item.value = option.value;
+                item.textContent = option.label;
+                control.appendChild(item);
+            });
+            control.id = inputId;
+            control.dataset.contentKey = field.key;
+            control.value = savedSiteContent[field.key] ?? field.fallback ?? '';
+        } else {
+            control = field.type === 'textarea'
+                ? document.createElement('textarea')
+                : document.createElement('input');
+
+            if (field.type === 'textarea') {
+                control.rows = field.rows || 3;
+            } else {
+                control.type = field.type === 'url' ? 'url' : 'text';
+            }
+
+            control.id = inputId;
+            control.className = 'form-control content-field__input';
+            control.dataset.contentKey = field.key;
+            control.maxLength = CONTENT_MAX_LENGTH;
+            control.placeholder = field.fallback ?? '';
+            control.value = savedSiteContent[field.key] ?? '';
+        }
+
+        wrapper.appendChild(control);
+
+        const hint = document.createElement('div');
+        hint.className = 'form-text content-field__hint';
+        hint.textContent = field.hint
+            || (field.target === 'placeholder' ? 'Teks placeholder pada kolom formulir.' : '')
+            || (field.target === 'href' ? 'Harus berupa URL lengkap, contoh https://…' : '')
+            || 'Kosongkan untuk memakai teks bawaan.';
+        wrapper.appendChild(hint);
+
+        return wrapper;
+    }
+
+    function buildContentSection(section) {
+        const details = document.createElement('details');
+        details.className = 'content-section';
+        details.dataset.sectionId = section.id;
+
+        const summary = document.createElement('summary');
+        summary.className = 'content-section__summary';
+
+        const icon = document.createElement('i');
+        icon.className = section.icon || 'ri-file-text-line';
+        icon.setAttribute('aria-hidden', 'true');
+
+        const heading = document.createElement('div');
+        heading.className = 'content-section__heading';
+        const title = document.createElement('strong');
+        title.textContent = section.label;
+        const description = document.createElement('span');
+        description.textContent = section.description || '';
+        heading.append(title, description);
+
+        const badge = document.createElement('span');
+        badge.className = 'content-section__badge';
+        badge.textContent = `${section.fields.length} teks`;
+
+        // Indikator buka/tutup; arah ikon diputar lewat CSS saat [open].
+        const chevron = document.createElement('i');
+        chevron.className = 'ri-arrow-down-s-line content-section__chevron';
+        chevron.setAttribute('aria-hidden', 'true');
+
+        summary.append(icon, heading, badge, chevron);
+        details.appendChild(summary);
+
+        const body = document.createElement('div');
+        body.className = 'content-section__body';
+
+        const grid = document.createElement('div');
+        grid.className = 'content-section__grid';
+        section.fields.forEach((field) => grid.appendChild(buildContentField(field)));
+        body.appendChild(grid);
+
+        const actions = document.createElement('div');
+        actions.className = 'content-section__actions';
+
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'btn btn-sm btn-outline-secondary content-section__reset';
+        resetBtn.innerHTML = '<i class="ri-eraser-line"></i> Kembalikan ke Default';
+
+        const saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'btn btn-sm btn-primary content-section__save';
+        saveBtn.innerHTML = '<i class="ri-save-3-line"></i> Simpan Section';
+
+        actions.append(resetBtn, saveBtn);
+        body.appendChild(actions);
+        details.appendChild(body);
+
+        return details;
+    }
+
+    function renderContentEditor() {
+        const container = document.getElementById('contentEditorAccordion');
+        if (!container) return;
+
+        container.replaceChildren();
+        CONTENT_SECTIONS.forEach((section) => {
+            container.appendChild(buildContentSection(section));
+        });
+        syncListEditorColumns(container);
+    }
+
+    /** Gabungkan konten tersimpan dengan nilai input pada scope tertentu. */
+    function mergeContentFrom(scope) {
+        const next = { ...savedSiteContent };
+
+        scope.querySelectorAll('[data-content-key]').forEach((control) => {
+            const key = control.dataset.contentKey;
+            const field = CONTENT_FIELD_BY_KEY.get(key);
+            if (!field) return;
+
+            const value = String(control.value ?? '').trim();
+            if (!value) {
+                delete next[key];
+                return;
+            }
+
+            next[key] = value.slice(0, CONTENT_MAX_LENGTH);
+        });
+
+        return next;
+    }
+
+    /** Kembalikan pesan error pertama, atau null bila semua field valid. */
+    function findContentError(scope) {
+        let message = null;
+
+        scope.querySelectorAll('[data-content-key]').forEach((control) => {
+            if (message) return;
+
+            const field = CONTENT_FIELD_BY_KEY.get(control.dataset.contentKey);
+            const value = String(control.value ?? '').trim();
+            if (!field || !value) return;
+
+            if (field.target === 'href' && !isSafeUrl(value)) {
+                message = `"${field.label}" harus berupa URL yang valid (http/https).`;
+            } else if (value.length > CONTENT_MAX_LENGTH) {
+                message = `"${field.label}" melebihi ${CONTENT_MAX_LENGTH} karakter.`;
+            }
+        });
+
+        return message;
+    }
+
+    function syncContentInputs() {
+        document.querySelectorAll('#contentEditorAccordion [data-content-key]').forEach((control) => {
+            const field = CONTENT_FIELD_BY_KEY.get(control.dataset.contentKey);
+            const saved = savedSiteContent[control.dataset.contentKey];
+            control.value = saved ?? (field?.type === 'select' ? field.fallback ?? '' : '');
+        });
+
+        // Editor daftar dibangun ulang agar barisnya cocok dengan data tersimpan.
+        document.querySelectorAll('#contentEditorAccordion .content-list-editor').forEach((editor) => {
+            const store = editor.querySelector('.content-list-editor__value');
+            const rows = editor.querySelector('.content-list-editor__rows');
+            if (!store || !rows) return;
+
+            rows.replaceChildren();
+            String(store.value)
+                .split(/\r?\n/)
+                .map((line) => line.trim())
+                .filter(Boolean)
+                .forEach((line) => rows.appendChild(buildListRow(line)));
+
+            syncListEditor(editor);
+        });
+
+        syncListEditorColumns(document.getElementById('contentEditorAccordion'));
+    }
+
+    // ---- Editor daftar: tambah, hapus, geser, dan drag-and-drop ----
+    let draggedListRow = null;
+
+    $(document).on('input', '.content-list-row__input', function () {
+        syncListEditor(this.closest('.content-list-editor'));
+    });
+
+    $(document).on('click', '[data-list-add]', function () {
+        const editor = this.closest('.content-list-editor');
+        const rows = editor?.querySelector('.content-list-editor__rows');
+        if (!rows) return;
+
+        const row = buildListRow('');
+        rows.appendChild(row);
+        row.querySelector('.content-list-row__input')?.focus();
+        syncListEditor(editor);
+    });
+
+    $(document).on('click', '[data-list-remove]', function () {
+        const row = this.closest('.content-list-row');
+        const editor = this.closest('.content-list-editor');
+        row?.remove();
+        syncListEditor(editor);
+    });
+
+    $(document).on('click', '[data-list-move]', function () {
+        const row = this.closest('.content-list-row');
+        const editor = this.closest('.content-list-editor');
+        if (!row) return;
+
+        if (this.dataset.listMove === 'up') {
+            row.previousElementSibling?.before(row);
+        } else {
+            row.nextElementSibling?.after(row);
+        }
+
+        syncListEditor(editor);
+    });
+
+    $(document).on('dragstart', '.content-list-row', function (e) {
+        draggedListRow = this;
+        this.classList.add('is-dragging');
+        const transfer = e.originalEvent?.dataTransfer;
+        if (transfer) {
+            transfer.effectAllowed = 'move';
+            transfer.setData('text/plain', '');
+        }
+    });
+
+    $(document).on('dragend', '.content-list-row', function () {
+        this.classList.remove('is-dragging');
+        draggedListRow = null;
+        syncListEditor(this.closest('.content-list-editor'));
+    });
+
+    $(document).on('dragover', '.content-list-editor__rows', function (e) {
+        if (!draggedListRow || draggedListRow.parentElement !== this) return;
+        e.preventDefault();
+
+        const pointerX = e.originalEvent?.clientX ?? 0;
+        const pointerY = e.originalEvent?.clientY ?? 0;
+
+        // Perbandingan memakai dua sumbu supaya tetap akurat saat baris
+        // tersusun dua kolom, bukan hanya menumpuk vertikal.
+        const target = [...this.querySelectorAll('.content-list-row:not(.is-dragging)')]
+            .find((row) => {
+                const box = row.getBoundingClientRect();
+                const beforeVertically = pointerY < box.top + box.height / 2;
+                const beforeInSameRow = pointerY <= box.bottom && pointerX < box.left + box.width / 2;
+                return beforeVertically || beforeInSameRow;
+            }) || null;
+
+        if (target !== draggedListRow) this.insertBefore(draggedListRow, target);
+    });
+
+    /** Susunan baris editor mengikuti pilihan jumlah kolom pada section. */
+    function syncListEditorColumns(scope) {
+        if (!scope) return;
+
+        scope.querySelectorAll('.content-list-editor').forEach((editor) => {
+            const section = editor.closest('.content-section') || scope;
+            const select = section.querySelector('[data-content-key="inviterColumns"]');
+            editor.dataset.columns = select?.value === '2' ? '2' : '1';
+        });
+    }
+
+    $(document).on('change', '[data-content-key="inviterColumns"]', function () {
+        syncListEditorColumns(this.closest('.content-section'));
+    });
+
+    $(document).on('drop', '.content-list-editor__rows', function (e) {
+        e.preventDefault();
+        syncListEditor(this.closest('.content-list-editor'));
+    });
+
+    function describeContentState() {
+        const total = CONTENT_FIELDS.length;
+        const custom = Object.keys(savedSiteContent).length;
+        return custom
+            ? `${custom} dari ${total} teks memakai versi kustom.`
+            : `Semua ${total} teks masih memakai bawaan halaman undangan.`;
+    }
+
+    async function loadSiteContentEditor(force = false) {
+        if (siteContentLoading) return;
+        if (siteContentLoaded && !force) return;
+
+        siteContentLoading = true;
+        setContentStatus('Memuat konten…', 'loading');
+
+        try {
+            const snapshot = await getDoc(doc(window.db, CONTENT_COLLECTION, CONTENT_DOC_ID));
+            savedSiteContent = snapshot.exists() ? sanitizeContent(snapshot.data()?.content) : {};
+            siteContentLoaded = true;
+
+            renderContentEditor();
+            setContentStatus(describeContentState());
+        } catch (err) {
+            console.error('Gagal memuat konten website:', err);
+            renderContentEditor();
+            setContentStatus('Konten tidak dapat dimuat. Coba Muat Ulang.', 'error');
+        } finally {
+            siteContentLoading = false;
+        }
+    }
+
+    function describeContentError(err) {
+        const code = String(err?.code || '');
+        if (code.includes('permission-denied')) {
+            return 'Akses ditolak Firestore. Pastikan Anda login sebagai admin@soyaarief.site dan rules terbaru sudah dideploy.';
+        }
+        if (code.includes('unauthenticated')) {
+            return 'Token sesi admin kedaluwarsa dan percobaan ulang gagal. Muat ulang halaman lalu simpan lagi.';
+        }
+        if (code.includes('unavailable') || code.includes('network')) {
+            return 'Koneksi ke Firebase sedang bermasalah. Periksa internet lalu coba lagi.';
+        }
+        return 'Konten tidak dapat disimpan. Coba lagi.';
+    }
+
+    async function saveSiteContent(nextContent, trigger, successText) {
+        const originalLabel = trigger?.innerHTML;
+        if (trigger) {
+            trigger.disabled = true;
+            trigger.innerHTML = '<i class="ri-loader-4-line animate-spin"></i> Menyimpan…';
+        }
+        setContentStatus('Menyimpan konten ke Firestore…', 'saving');
+
+        try {
+            const payload = sanitizeContent(nextContent);
+            await runAdminWrite(() => setDoc(doc(window.db, CONTENT_COLLECTION, CONTENT_DOC_ID), {
+                content: payload,
+                updatedAt: serverTimestamp(),
+            }));
+
+            savedSiteContent = payload;
+            syncContentInputs();
+            setContentStatus(describeContentState());
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Konten tersimpan',
+                text: successText,
+                timer: 1700,
+                showConfirmButton: false,
+            });
+        } catch (err) {
+            console.error('Gagal menyimpan konten website:', err);
+            setContentStatus('Konten gagal disimpan.', 'error');
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal menyimpan',
+                text: describeContentError(err),
+                confirmButtonText: 'Mengerti',
+            });
+        } finally {
+            if (trigger) {
+                trigger.disabled = false;
+                trigger.innerHTML = originalLabel;
+            }
+        }
+    }
+
+    $(document).on('click', '.content-section__save', async function () {
+        const section = this.closest('.content-section');
+        if (!section) return;
+
+        const error = findContentError(section);
+        if (error) {
+            Swal.fire({ icon: 'warning', title: 'Periksa isian', text: error });
+            return;
+        }
+
+        const label = section.querySelector('.content-section__heading strong')?.textContent || 'Section';
+        await saveSiteContent(mergeContentFrom(section), this, `Section ${label} berhasil diperbarui.`);
+    });
+
+    $(document).on('click', '#contentSaveAllBtn', async function () {
+        const container = document.getElementById('contentEditorAccordion');
+        if (!container) return;
+
+        const error = findContentError(container);
+        if (error) {
+            Swal.fire({ icon: 'warning', title: 'Periksa isian', text: error });
+            return;
+        }
+
+        await saveSiteContent(mergeContentFrom(container), this, 'Semua section berhasil diperbarui.');
+    });
+
+    $(document).on('click', '.content-section__reset', async function () {
+        const section = this.closest('.content-section');
+        if (!section) return;
+
+        const label = section.querySelector('.content-section__heading strong')?.textContent || 'section ini';
+        const confirmed = await Swal.fire({
+            title: 'Kembalikan ke default?',
+            text: `Semua teks pada ${label} akan mengikuti teks bawaan undangan.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Kembalikan',
+            cancelButtonText: 'Batal',
+        });
+        if (!confirmed.isConfirmed) return;
+
+        section.querySelectorAll('[data-content-key]').forEach((control) => { control.value = ''; });
+        await saveSiteContent(mergeContentFrom(section), this, `${label} kembali memakai teks bawaan.`);
+    });
+
+    $(document).on('click', '#contentReloadBtn', function () {
+        loadSiteContentEditor(true);
+    });
+
+    // Tautan pratinjau mengikuti domain publik yang dipakai link tamu.
+    $('#contentPreviewLink').attr('href', url_domain);
 
 });

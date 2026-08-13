@@ -80,6 +80,9 @@
 
     <!-- Firebase (config dari env VITE_*, dibundel oleh Vite) -->
     <script type="module" src="/src/firebase.js"></script>
+
+    <!-- Teks undangan yang dapat diedit dari /webadmin/ -->
+    <script type="module" src="/src/site-content-public.js"></script>
     
     <!-- Resource hints untuk JavaScript -->
     <link rel="modulepreload" href="assets/js/main.js">
@@ -153,19 +156,19 @@
             <div class="welcome-content">
                 <div class="welcome-body">
                     <div class="welcome-header">
-                        <p class="welcome-title-main" data-aos="fade-down" data-aos-duration="600" data-aos-delay="150">
+                        <p class="welcome-title-main" data-content="welcomeOverline" data-aos="fade-down" data-aos-duration="600" data-aos-delay="150">
                             THE WEDDING OF
                         </p>
-                        <h1 class="latin-title" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="400">
+                        <h1 class="latin-title" data-content="welcomeCouple" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="400">
                             Arief &amp; Soya
                         </h1>
                         <div class="welcome-details">
-                            <p data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Kepada Yth.</p>
-                            <p data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Bapak/Ibu/Saudara/i</p>
+                            <p data-content="welcomeGreetingTitle" data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Kepada Yth.</p>
+                            <p data-content="welcomeGreetingSubtitle" data-aos="fade-up" data-aos-duration="500" data-aos-delay="600">Bapak/Ibu/Saudara/i</p>
                             <p class="welcome-guest-name guest-name" data-aos="fade-up" data-aos-duration="500" data-aos-delay="700">Nama Tamu</p>
                         </div>
                         <div class="welcome-open-invitation" data-aos="fade-down" data-aos-duration="500" data-aos-delay="750">
-                            <button type="button" class="welcome-open-action action-btn" id="startToExplore">
+                            <button type="button" class="welcome-open-action action-btn" id="startToExplore" data-content="welcomeButton">
                                 <i class="icon-mail"></i>
                                 Buka Undangan
                             </button>
@@ -234,11 +237,11 @@
                     </div>
                 </div>
                 <div class="left-content pane-details">
-                    <h2 class="pane-title" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="700">Arief &amp; Soya</h2>
-                    <p class="pane-date" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">Sabtu, 5 September 2026</p>
+                    <h2 class="pane-title" data-content="sidebarCouple" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="700">Arief &amp; Soya</h2>
+                    <p class="pane-date" data-content="sidebarDate" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">Sabtu, 5 September 2026</p>
                     <div class="pane-guest wedding-details" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="1100">
-                        <p>Kepada Yth.</p>
-                        <p>Bapak/Ibu/Saudara/i</p>
+                        <p data-content="sidebarGreetingTitle">Kepada Yth.</p>
+                        <p data-content="sidebarGreetingSubtitle">Bapak/Ibu/Saudara/i</p>
                         <p class="wedding-guest-name guest-name">Nama Tamu</p>
                     </div>
                 </div>
@@ -271,13 +274,13 @@
                         </div>
                     </div>
                     <div class="hero-footer">
-                        <p data-aos="fade-down" data-aos-duration="1200" data-aos-delay="550">
+                        <p data-content="heroOverline" data-aos="fade-down" data-aos-duration="1200" data-aos-delay="550">
                             Wedding Invitation
                         </p>
-                        <h2 class="latin-title" data-aos="fade-in" data-aos-duration="1200" data-aos-delay="200">
+                        <h2 class="latin-title" data-content="heroCouple" data-aos="fade-in" data-aos-duration="1200" data-aos-delay="200">
                             Arief & Soya
                         </h2>
-                        <p class="bottom-text" data-aos="face-down" data-aos-duration="1200" data-aos-offset="50">
+                        <p class="bottom-text" data-content="heroHashtag" data-aos="face-down" data-aos-duration="1200" data-aos-offset="50">
                             #AriefSoya
                         </p>
                     </div>
@@ -371,11 +374,11 @@
                     
                     </div>
                     <div class="quote-area">
-                        <h2 class="latin-title" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="200">We Found Love</h2>
-                        <p data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">“Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar
+                        <h2 class="latin-title" data-content="quoteTitle" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="200">We Found Love</h2>
+                        <p data-content="quoteText" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">“Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar
                         kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sesungguhnya pada
                         yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.”</p>
-                        <p data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150"><strong> (QS. Ar-Rum: 21) </strong></p>
+                        <p data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150"><strong data-content="quoteSource"> (QS. Ar-Rum: 21) </strong></p>
                     </div>
                 </div>
             </section>
@@ -386,8 +389,8 @@
                 </div>
                 <div class="bridegroom-content">
                     <div class="bridegroom-header" data-aos="zoom-in" data-aos-duration="600">
-                        <h2 class="latin-title">We Are Getting Married!</h2>
-                        <p>Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Ya Allah semoga ridho-Mu tercurah mengiringi pernikahan kami:</p>
+                        <h2 class="latin-title" data-content="coupleTitle">We Are Getting Married!</h2>
+                        <p data-content="coupleDescription">Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Ya Allah semoga ridho-Mu tercurah mengiringi pernikahan kami:</p>
                     </div>
                     <div class="bridegroom-body">
                     <div class="sintia-butterfly" aria-hidden="true">
@@ -400,13 +403,13 @@
                         </div>
                         <div class="bridegroom-caption">
                             <div class="bridegroom-info-data">
-                                <h2 class="latin-title" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief</h2>
-                                <p class="bridegroom-name" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief Fadillah</p>
-                                <p class="bridegroom-parents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
+                                <h2 class="latin-title" data-content="groomNickname" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief</h2>
+                                <p class="bridegroom-name" data-content="groomFullname" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Arief Fadillah</p>
+                                <p class="bridegroom-parents" data-content="groomParents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
                                     Putra pertama dari Bapak Zefriadi & Ibu Barkiah
                                 </p>
                                 <div class="bridegroom-link-instagram" data-aos="fade-in" data-aos-duration="800" data-aos-delay="200">
-                                    <a href="https://www.instagram.com/arief_fd_/" target="_blank" class="bridegroom-link">
+                                    <a href="https://www.instagram.com/arief_fd_/" target="_blank" class="bridegroom-link" data-content="groomInstagramLabel" data-content-url="groomInstagramUrl">
                                         <i class="icon-instagram"></i>
                                         @arief_fd_
                                     </a>
@@ -423,14 +426,14 @@
                         </div>
                         <div class="bridegroom-caption">
                             <div class="bridegroom-info-data">
-                                <h2 class="latin-title" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya</h2>
-                                <p class="bridegroom-name" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya Amanda
+                                <h2 class="latin-title" data-content="brideNickname" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya</h2>
+                                <p class="bridegroom-name" data-content="brideFullname" data-aos="zoom-in-up" data-aos-duration="600" data-aos-delay="200">Soya Amanda
                                 </p>
-                                <p class="bridegroom-parents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
+                                <p class="bridegroom-parents" data-content="brideParents" data-aos="fade-in" data-aos-duration="600" data-aos-delay="550">
                                     Putri ketiga dari Bapak Budhi Kristianto & Ibu Cut Dewi Astuti Hasan
                                 </p>
                                 <div class="bridegroom-link-instagram" data-aos="fade-in" data-aos-duration="800" data-aos-delay="200">
-                                    <a href="https://www.instagram.com/soyaamndaa/" target="_blank" class="bridegroom-link">
+                                    <a href="https://www.instagram.com/soyaamndaa/" target="_blank" class="bridegroom-link" data-content="brideInstagramLabel" data-content-url="brideInstagramUrl">
                                         <i class="icon-instagram"></i>
                                         @soyaamndaa
                                     </a>
@@ -447,7 +450,7 @@
                 </div>
                 <div class="save-date">
                     <div class="save-date-head" data-aos="fade-up" data-aos-duration="1200">
-                        <h2 class="latin-title save-date-title">Save The Date</h2>
+                        <h2 class="latin-title save-date-title" data-content="saveDateTitle">Save The Date</h2>
                     </div>
                     <div class="save-date-body">
                         <div class="save-date-icon-wrap top" aria-hidden="true" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="200">
@@ -456,23 +459,23 @@
                         <div class="countdown" data-target-date="2026-09-05T08:00:00+07:00">
                             <div class="count-item" data-aos="fade-right" data-aos-duration="1200" data-aos-delay="500">
                                 <h2 class="count-num count-day">00</h2>
-                                <small class="count-text">Hari</small>
+                                <small class="count-text" data-content="saveDateLabelDay">Hari</small>
                             </div>
                             <div class="count-item" data-aos="fade-down" data-aos-duration="1200" data-aos-delay="600">
                                 <h2 class="count-num count-hour">00</h2>
-                                <small class="count-text">Jam</small>
+                                <small class="count-text" data-content="saveDateLabelHour">Jam</small>
                             </div>
                             <div class="count-item" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="700">
                                 <h2 class="count-num count-minute">00</h2>
-                                <small class="count-text">Menit</small>
+                                <small class="count-text" data-content="saveDateLabelMinute">Menit</small>
                             </div>
                             <div class="count-item" data-aos="fade-left" data-aos-duration="1200" data-aos-delay="800">
                                 <h2 class="count-num count-second">00</h2>
-                                <small class="count-text">Detik</small>
+                                <small class="count-text" data-content="saveDateLabelSecond">Detik</small>
                             </div>
                         </div>
                         <div class="add-to-calendar-wrap add-to-calendar-date" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="800">
-                            <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Arief+%26+Soya&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Arief+dan+Soya." data-apple-calendar="assets/calendar/soya-arief-wedding.ics" target="_blank" rel="nofollow noopener" id="addToCalendar">Tambahkan ke Kalender</a>
+                            <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Arief+%26+Soya&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Arief+dan+Soya." data-apple-calendar="assets/calendar/soya-arief-wedding.ics" target="_blank" rel="nofollow noopener" id="addToCalendar" data-content="saveDateButton">Tambahkan ke Kalender</a>
                         </div>
                         <div class="save-date-icon-wrap bottom" aria-hidden="true" data-aos="fade-up" data-aos-duration="1200" data-aos-delay="900">
                             <img class="save-date-icon" src="assets/images/sintia/save-date-flourish.svg" alt="">
@@ -492,15 +495,15 @@
                                 <img src="assets/images/sintia/kupu-kupu-2.png" alt="">
                             </div>
                         </div>
-                        <h2 class="latin-title agenda-title" data-aos="zoom-in" data-aos-duration="1500">Wedding Day</h2>
-                        <p class="agenda-description" data-aos="fade-up" data-aos-duration="1200">Dengan memohon rahmat dan ridho Allah SWT, kami akan menyelenggarakan pernikahan yang Insya Allah dilaksanakan pada:</p>
+                        <h2 class="latin-title agenda-title" data-content="agendaTitle" data-aos="zoom-in" data-aos-duration="1500">Wedding Day</h2>
+                        <p class="agenda-description" data-content="agendaDescription" data-aos="fade-up" data-aos-duration="1200">Dengan memohon rahmat dan ridho Allah SWT, kami akan menyelenggarakan pernikahan yang Insya Allah dilaksanakan pada:</p>
                     </div>
                     <div class="agenda-body">
                         <div class="event-item" data-aos="fade-up" data-aos-duration="1200">
                             <div class="section-group bottom">
                                 <div class="event-header sintia-event-head">
-                                    <h2 class="event-day" data-aos="fade-up" data-aos-duration="1000">Sabtu</h2>
-                                    <p class="event-date" data-aos="fade-up" data-aos-duration="1000">5 September 2026</p>
+                                    <h2 class="event-day" data-content="agendaEventDay" data-aos="fade-up" data-aos-duration="1000">Sabtu</h2>
+                                    <p class="event-date" data-content="agendaEventDate" data-aos="fade-up" data-aos-duration="1000">5 September 2026</p>
                                 </div>
                                 <div class="sintia-section-separator bottom" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
                                     <img src="assets/images/sintia/orn-section-min.png" alt="">
@@ -534,15 +537,15 @@
                                                 <div data-aos="zoom-in" data-aos-duration="1200">
                                                     <i class="icon-ring activity-icon"></i>
                                                 </div>
-                                                <h3 class="activity-title" data-aos="zoom-in" data-aos-duration="1200">Akad Nikah</h3>
-                                                <p class="activity-time" data-aos="fade-up" data-aos-duration="1000">08.00 WIB s.d. selesai</p>
+                                                <h3 class="activity-title" data-content="agendaEvent1Title" data-aos="zoom-in" data-aos-duration="1200">Akad Nikah</h3>
+                                                <p class="activity-time" data-content="agendaEvent1Time" data-aos="fade-up" data-aos-duration="1000">08.00 WIB s.d. selesai</p>
                                             </div>
                                             <div class="event-details activity-details" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                                                <p class="event-hall">Aula Kampus Widuri</p>
-                                                <p class="event-address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
-                                                <p class="event-city">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
+                                                <p class="event-hall" data-content="agendaEvent1Venue">Aula Kampus Widuri</p>
+                                                <p class="event-address" data-content="agendaEvent1Address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
+                                                <p class="event-city" data-content="agendaEvent1City">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
                                                 <div class="event-link-wrap" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300">
-                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank">
+                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank" data-content="agendaMapsLabel" data-content-url="agendaEvent1MapsUrl">
                                                         <i class="icon-map"></i>
                                                         Buka di Maps
                                                     </a>
@@ -556,15 +559,15 @@
                                                 <div data-aos="zoom-in" data-aos-duration="1200">
                                                     <i class="icon-party activity-icon"></i>
                                                 </div>
-                                                <h3 class="activity-title" data-aos="zoom-in" data-aos-duration="1200">Resepsi</h3>
-                                                <p class="activity-time" data-aos="fade-up" data-aos-duration="1000">11.00 - 14.00 WIB</p>
+                                                <h3 class="activity-title" data-content="agendaEvent2Title" data-aos="zoom-in" data-aos-duration="1200">Resepsi</h3>
+                                                <p class="activity-time" data-content="agendaEvent2Time" data-aos="fade-up" data-aos-duration="1000">11.00 - 14.00 WIB</p>
                                             </div>
                                             <div class="event-details activity-details" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200">
-                                                <p class="event-hall">Aula Kampus Widuri</p>
-                                                <p class="event-address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
-                                                <p class="event-city">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
+                                                <p class="event-hall" data-content="agendaEvent2Venue">Aula Kampus Widuri</p>
+                                                <p class="event-address" data-content="agendaEvent2Address">Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara</p>
+                                                <p class="event-city" data-content="agendaEvent2City">Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480</p>
                                                 <div class="event-link-wrap" data-aos="zoom-in" data-aos-duration="1000" data-aos-delay="300">
-                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank">
+                                                    <a href="https://www.google.com/maps/search/?api=1&amp;query=Aula+Kampus+Widuri+Jl+Palmerah+Barat+No+353+Jakarta+Selatan" class="event-link" target="_blank" data-content="agendaMapsLabel" data-content-url="agendaEvent2MapsUrl">
                                                         <i class="icon-map"></i>
                                                         Buka di Maps
                                                     </a>
@@ -579,6 +582,23 @@
                 </div>
             </section>
 
+            <!-- Turut Mengundang: tersembunyi kecuali tamu ini diberi opsi
+                 "Munculkan Turut Mengundang" dari panel admin. -->
+            <section class="inviter-section inviter-wrap" data-inviter-section hidden style="display: none;" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+                    <img src="assets/images/sintia/orn-section-min.png" alt="">
+                </div>
+                <div class="inviter-content">
+                    <div class="inviter-header" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="200">
+                        <h2 class="latin-title inviter-title" data-content="inviterTitle">Turut Mengundang</h2>
+                        <p class="inviter-description" data-content="inviterDescription"></p>
+                    </div>
+                    <div class="inviter-body" data-aos="fade-in" data-aos-duration="700" data-aos-delay="300">
+                        <div class="inviter-list" data-content="inviterList" data-content-attr="inviterColumns" data-columns="1"></div>
+                    </div>
+                </div>
+            </section>
+
             <section class="rsvp-section rsvp-wrap" data-aos="fade-up" data-aos-duration="800" data-aos-delay="500">
                 <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
                     <img src="assets/images/sintia/orn-section-min.png" alt="">
@@ -587,12 +607,12 @@
 
                     <!-- HEADER -->
                     <div class="rsvp-header">
-                    <h2 class="latin-title" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200">
+                    <h2 class="latin-title" data-content="rsvpTitle" data-aos="fade-up" data-aos-duration="700" data-aos-delay="200">
                         RSVP
                     </h2>
                     <div class="rsvp-info">
-                        <p class="info-text">Mohon konfirmasi kehadiran Anda sebelum,</p>
-                        <p class="info-date">Sabtu, 5 September 2026</p>
+                        <p class="info-text" data-content="rsvpInfoText">Mohon konfirmasi kehadiran Anda sebelum,</p>
+                        <p class="info-date" data-content="rsvpInfoDate">Sabtu, 5 September 2026</p>
                     </div>
                     </div>
 
@@ -606,7 +626,7 @@
 
                                 <h4 class="rsvp-message-title status-title">
                                     <i class="icon-present-rsvp status-icon"></i>
-                                    <span class="status-title-text">Status Kehadiran</span>
+                                    <span class="status-title-text" data-content="rsvpStatusTitle">Status Kehadiran</span>
                                 </h4>
 
                                 <p class="rsvp-message-text status-desc">
@@ -617,7 +637,7 @@
                         </div>
 
                         <div class="rsvp-action">
-                            <button class="action-btn action-rsvp">
+                            <button class="action-btn action-rsvp" data-content="rsvpChangeButton">
                                 <i class="icon-confirm-rsvp"></i>
                                 Ubah Kehadiran
                             </button>
@@ -636,6 +656,7 @@
                             type="text"
                             id="name"
                             name="name"
+                            data-content="rsvpNamePlaceholder"
                             placeholder="Nama Anda"
                             required
                             autocomplete="off"
@@ -644,12 +665,12 @@
 
                         <!-- Status hadir -->
                         <div class="rsvp-status-wrap">
-                            <p class="rsvp-status-caption">Apakah Anda akan hadir?</p>
+                            <p class="rsvp-status-caption" data-content="rsvpAttendQuestion">Apakah Anda akan hadir?</p>
                             <div class="rsvp-confirm-wrap">
 
                             <label>
                                 <input type="radio" name="confirm" value="yes" />
-                                <div class="rsvp-confirm-btn going">
+                                <div class="rsvp-confirm-btn going" data-content="rsvpAttendYes">
                                 <i class="icon-confirm-yes-rsvp"></i>
                                 Akan Hadir
                                 </div>
@@ -657,7 +678,7 @@
 
                             <label>
                                 <input type="radio" name="confirm" value="no" />
-                                <div class="rsvp-confirm-btn not-going">
+                                <div class="rsvp-confirm-btn not-going" data-content="rsvpAttendNo">
                                 <i class="icon-confirm-no-rsvp"></i>
                                 Tidak Hadir
                                 </div>
@@ -668,7 +689,7 @@
 
                         <!-- Jumlah orang -->
                         <div class="rsvp-amount-wrap">
-                            <p class="rsvp-amount-caption">Jumlah Orang Yang Akan Datang</p>
+                            <p class="rsvp-amount-caption" data-content="rsvpAmountCaption">Jumlah Orang Yang Akan Datang</p>
                             <div class="rsvp-amount-controller">
                             <button type="button" class="toggle-btn minus">−</button>
                             <input
@@ -684,7 +705,7 @@
 
                         <!-- Kirim -->
                         <div class="rsvp-confirm-wrap rsvp-confirm-btn-wrap">
-                            <button type="submit" class="rsvp-confirm-btn confirm action-btn">
+                            <button type="submit" class="rsvp-confirm-btn confirm action-btn" data-content="rsvpSubmit">
                             <i class="icon-plane"></i>
                             Kirim Konfirmasi
                             </button>
@@ -704,7 +725,7 @@
                 </div>
                 <div class="photo-content">
                     <div class="photo-header" data-aos="fade-up" data-aos-duration="700" data-aos-delay="150">
-                        <h2 class="latin-title">Photo Gallery</h2>
+                        <h2 class="latin-title" data-content="photoTitle">Photo Gallery</h2>
                     </div>
                     <div class="photo-body">
                         <div id="lightgallery" class="gallery-photos">
@@ -760,32 +781,32 @@
                 <div class="gift-content">
                     <div class="gift-wrapper">
                         <div class="gift-header" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
-                            <h2 class="latin-title">Wedding Gift</h2>
-                            <p>Terima kasih telah menambah semangat kegembiraan pernikahan kami dengan kehadiran dan hadiah indah Anda</p>
+                            <h2 class="latin-title" data-content="giftTitle">Wedding Gift</h2>
+                            <p data-content="giftDescription">Terima kasih telah menambah semangat kegembiraan pernikahan kami dengan kehadiran dan hadiah indah Anda</p>
                         </div>
                         <div class="gift-body">
                             <div class="gift-section-action">
-                                <button class="gift-action" data-type="transfer" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                                <button class="gift-action" data-type="transfer" data-content="giftTransferButton" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
                                     <i class="icon-card"></i>
                                     Transfer
                                 </button>
-                                <button class="gift-action" data-type="gift" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                                <button class="gift-action" data-type="gift" data-content="giftGiftButton" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
                                     <i class="icon-gift"></i>
                                     Kirim Kado
                                 </button>
                             </div>
                             <div class="gift-section-body">
                                 <div class="area-data-transfer" data-aos="fade-up" data-aos-duration="800" style="display: none;">
-                                    <p class="gift-desc">Silakan transfer hadiah melalui nomor rekening berikut:</p>
+                                    <p class="gift-desc" data-content="giftTransferDesc">Silakan transfer hadiah melalui nomor rekening berikut:</p>
                                     <div class="gift-card-body">
                                         <div class="gift-card-item">
                                             <div class="info-card">
-                                                <h2 class="gift-card-title">BANK BCA</h2>
-                                                <h3 class="gift-card-number" data-remote="rekening-1">5500546176</h3>
-                                                <h4 class="gift-card-name">Soya Amanda</h4>
+                                                <h2 class="gift-card-title" data-content="giftBank1Name">BANK BCA</h2>
+                                                <h3 class="gift-card-number" data-remote="rekening-1" data-content="giftBank1Number">5500546176</h3>
+                                                <h4 class="gift-card-name" data-content="giftBank1Holder">Soya Amanda</h4>
                                             </div>
                                             <div class="action-info-card">
-                                                <button class="copy-action" data-copy="rekening-1">
+                                                <button class="copy-action" data-copy="rekening-1" data-content="giftCopyAccount">
                                                     <i class="icon-copy"></i>
                                                     Salin Rekening
                                                 </button>
@@ -793,12 +814,12 @@
                                         </div>
                                         <div class="gift-card-item">
                                             <div class="info-card">
-                                                <h2 class="gift-card-title">BANK BCA</h2>
-                                                <h3 class="gift-card-number" data-remote="rekening-2">7655312871</h3>
-                                                <h4 class="gift-card-name">Arief Fadillah</h4>
+                                                <h2 class="gift-card-title" data-content="giftBank2Name">BANK BCA</h2>
+                                                <h3 class="gift-card-number" data-remote="rekening-2" data-content="giftBank2Number">7655312871</h3>
+                                                <h4 class="gift-card-name" data-content="giftBank2Holder">Arief Fadillah</h4>
                                             </div>
                                             <div class="action-info-card">
-                                                <button class="copy-action" data-copy="rekening-2">
+                                                <button class="copy-action" data-copy="rekening-2" data-content="giftCopyAccount">
                                                     <i class="icon-copy"></i>
                                                     Salin Rekening
                                                 </button>
@@ -807,17 +828,17 @@
                                     </div>
                                 </div>
                                 <div class="area-data-gift" data-aos="fade-up" data-aos-duration="800" style="display: none;">
-                                    <h2 class="gift-send-title">Kirim Kado</h2>
-                                    <p class="gift-desc">Anda dapat mengirim kado ke:</p>
+                                    <h2 class="gift-send-title" data-content="giftSendTitle">Kirim Kado</h2>
+                                    <p class="gift-desc" data-content="giftSendDesc">Anda dapat mengirim kado ke:</p>
                                     <div class="gift-send-body">
-                                        <h3 class="gift-send-name">Soya Amanda</h3>
-                                        <p class="gift-send-address" data-remote="address">
+                                        <h3 class="gift-send-name" data-content="giftSendName">Soya Amanda</h3>
+                                        <p class="gift-send-address" data-remote="address" data-content="giftSendAddress">
                                             Perumahan Bumi Sawangan Indah 2, Jalan Masjid III Blok D3 No. 110,
                                             Sawangan, Kota Depok, Jawa Barat 16518, Indonesia
                                         </p>
                                     </div>
                                     <div class="action-address-card">
-                                    <button class="copy-action" data-copy="address">
+                                    <button class="copy-action" data-copy="address" data-content="giftCopyAddress">
                                         <i class="icon-copy"></i>
                                         Salin Alamat
                                     </button>
@@ -926,22 +947,22 @@
                     </div>
                     <div class="wish-area">
                         <div class="wish-header">
-                            <h2 class="latin-title" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">Best Wishes</h2>
-                            <p class="wish-description" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">Silakan kirimkan ucapan dan doa terbaikmu di sini, sebagai tanda kasih di hari bahagia kami:</p>
+                            <h2 class="latin-title" data-content="wishTitle" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">Best Wishes</h2>
+                            <p class="wish-description" data-content="wishDescription" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">Silakan kirimkan ucapan dan doa terbaikmu di sini, sebagai tanda kasih di hari bahagia kami:</p>
                         </div>
                         <div class="wish-body">
                             <form id="wish-form" class="wish-form">
                                 <div class="form-wish">
-                                    <input type="text" class="form-input-field wish-input" id="nama" name="nama" placeholder="Isikan Nama Anda" required>
-                                    <textarea id="pesan" class="form-input-field wish-input" name="pesan" placeholder="Berikan Ucapan Terbaik" rows="4" required></textarea>
+                                    <input type="text" class="form-input-field wish-input" id="nama" name="nama" data-content="wishNamePlaceholder" placeholder="Isikan Nama Anda" required>
+                                    <textarea id="pesan" class="form-input-field wish-input" name="pesan" data-content="wishMessagePlaceholder" placeholder="Berikan Ucapan Terbaik" rows="4" required></textarea>
                                     <!-- Area sticker terpilih (tampil di bawah textarea komentar) -->
                                     <div id="selectedStickers" class="selected-stickers"></div>
-                                    <button class="btn-sticker" type="button">
+                                    <button class="btn-sticker" type="button" data-content="wishStickerButton">
                                         <i class="icon-emoticon"></i>
                                         Sticker
                                     </button>
                                 </div>
-                                <button type="submit" class="action-btn">
+                                <button type="submit" class="action-btn" data-content="wishSubmit">
                                     <i class="icon-plane"></i>
                                     Kirim Ucapan
                                 </button>
@@ -1022,10 +1043,10 @@
                 </div>
                 <div class="note-content">
                     <div class="note-header">
-                        <h2 class="latin-title" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
+                        <h2 class="latin-title" data-content="noteTitle" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100">
                             Ucapan Akhir
                         </h2>
-                        <p class="note-description" data-aos="fade-up" data-aos-duration="600">
+                        <p class="note-description" data-content="noteDescription" data-aos="fade-up" data-aos-duration="600">
                             Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
                             <br><br>
                             Atas kehadiran dan doa restunya, kami mengucapkan terima kasih.
@@ -1121,21 +1142,21 @@
                             <img src="assets/images/as.png"
                                 alt="AF" class="logo">
                         </div>
-                        <p class="top-text" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
+                        <p class="top-text" data-content="footnoteOverline" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
                             Wedding Invitation
                         </p>
-                        <h2 class="latin-title footnote-title" >
+                        <h2 class="latin-title footnote-title" data-content="footnoteCouple">
                             Arief & Soya
                         </h2>
-                        <p class="bottom-text" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100" data-aos-offset="50">
+                        <p class="bottom-text" data-content="footnoteHashtag" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="100" data-aos-offset="50">
                             #AriefSoya
                         </p>
-                        <p>05.09.2026</p>
+                        <p data-content="footnoteDate">05.09.2026</p>
                     </div>
                 </div>
                 <section class="footer sintia-footer" id="footer-to-top">
                     <div class="footer-inner">
-                        <p>Arief & Soya</p>
+                        <p data-content="footerCouple">Arief & Soya</p>
                         <i class="icon-up"></i>
                     </div>
                 </section>
@@ -1147,7 +1168,7 @@
     <div id="wishPopup" class="wish-popup" aria-hidden="true" inert>
         <div class="wish-popup-inner">
             <button class="popup-close"><i class="icon-times"></i></button>
-            <h3 class="popup-title">Semua Ucapan & Doa</h3>
+            <h3 class="popup-title" data-content="wishPopupTitle">Semua Ucapan & Doa</h3>
             <div class="wish-popup-body">
                 <div id="wishPopupList" class="wish-popup-list"></div>
             </div>
@@ -1159,14 +1180,14 @@
         <div class="sticker-popup-inner">
             <button class="popup-close"><i class="icon-times"></i></button>
 
-            <h3 class="popup-title">Daftar Sticker</h3>
+            <h3 class="popup-title" data-content="stickerPopupTitle">Daftar Sticker</h3>
 
             <div class="sticker-popup-body">
                 <div id="stickerGrid" class="sticker-grid"></div>
             </div>
 
             <div class="popup-footer">
-                <button id="chooseStickers" class="action-btn">
+                <button id="chooseStickers" class="action-btn" data-content="stickerChooseButton">
                     <i class="icon-emoticon"></i>
                     Pilih Sticker
                 </button>

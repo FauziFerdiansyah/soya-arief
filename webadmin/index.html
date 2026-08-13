@@ -25,6 +25,7 @@
               <a href="#" class="list-group-item list-group-item-action bg-primary-light active" data-menu="guests"><i class="ri-contacts-book-fill"></i> Buat Tamu Undangan</a>
               <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="rsvp"><i class="ri-pass-valid-line"></i> RSVP</a>
               <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="comments"><i class="ri-chat-smile-2-line"></i> Comments</a>
+              <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="content"><i class="ri-layout-masonry-line"></i> Konten Website</a>
           </div>
       </div>
       <!-- /#sidebar-wrapper -->
@@ -322,6 +323,23 @@
                               </label>
                             </div>
                           </div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label"><i class="ri-team-line"></i> Turut Mengundang</label>
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="guestShowInviters" id="showInvitersYes" value="true">
+                            <label class="form-check-label" for="showInvitersYes">
+                              <i class="ri-eye-line"></i> Munculkan Turut Mengundang
+                            </label>
+                          </div>
+                          <div class="form-text">Default tersembunyi. Isi daftar namanya di menu Konten Website.</div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="guestMusicSelect" class="form-label"><i class="ri-music-2-line"></i> Lagu Undangan</label>
+                          <select name="guestMusicTrack" class="form-select form-control" id="guestMusicSelect">
+                            <option value="default" selected>Mahalini - Bermuara (default)</option>
+                            <option value="minang">Urang Minang</option>
+                          </select>
                         </div>
                         <!-- <div class="form-settings mt-3 mb-2">
                           <div class="form-text d-flex flex-row align-items-start gap-1">
@@ -682,6 +700,34 @@
             </div>
           </div>
 
+          <!-- Content Editor Section -->
+          <div class="mt-4 pb-5" id="contentSection" style="display: none;">
+            <h1 class="fs-5 mb-3"><i class="ri-layout-masonry-line"></i> Konten Website</h1>
+            <p class="fw-light" style="font-size: 14px;">
+              Ubah semua teks undangan per section. Kolom yang dibiarkan kosong akan memakai teks bawaan halaman.
+            </p>
+
+            <div class="content-editor-toolbar" id="contentEditorToolbar">
+              <div class="content-editor-toolbar__info">
+                <strong>Status konten</strong>
+                <p class="mb-0" id="contentEditorStatus" aria-live="polite">Memuat konten…</p>
+              </div>
+              <div class="content-editor-toolbar__actions">
+                <a class="btn btn-sm btn-outline-secondary" id="contentPreviewLink" href="../" target="_blank" rel="noopener">
+                  <i class="ri-external-link-line"></i> Lihat Undangan
+                </a>
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="contentReloadBtn">
+                  <i class="ri-refresh-line"></i> Muat Ulang
+                </button>
+                <button class="btn btn-sm btn-primary" type="button" id="contentSaveAllBtn">
+                  <i class="ri-save-3-line"></i> Simpan Semua
+                </button>
+              </div>
+            </div>
+
+            <div class="content-editor" id="contentEditorAccordion"></div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -785,6 +831,24 @@
                       </label>
                     </div>
                   </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"><i class="ri-team-line"></i> Turut Mengundang</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="editGuestShowInviters" id="editShowInvitersYes" value="true">
+                    <label class="form-check-label" for="editShowInvitersYes">
+                      <i class="ri-eye-line"></i> Munculkan Turut Mengundang
+                    </label>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label"><i class="ri-music-2-line"></i> Lagu Undangan</label>
+                  <select name="editGuestMusicTrack" class="form-select">
+                    <option value="default">Mahalini - Bermuara (default)</option>
+                    <option value="minang">Urang Minang</option>
+                  </select>
                 </div>
               </div>
 

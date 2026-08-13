@@ -26,39 +26,18 @@ service cloud.firestore {
         && (value == '' || value.matches('^stc-a-([1-9]|1[0-8])\\.gif$'));
     }
 
-    function validGuestData(data) {
-      return data.keys().hasOnly([
-          'name', 'phone', 'instagram', 'maxGuests', 'source', 'sourceName',
-          'isTableVip', 'isSouvenirVip', 'opened', 'openCount',
-          'rsvpStatus', 'rsvpCount', 'createdAt', 'updatedAt', 'openedAt',
-          'lastOpenedAt', 'deviceType', 'lastDevice', 'lastSent', 'sendCount',
-          'adminKey'
-        ])
-        && data.keys().hasAll([
-          'name', 'maxGuests', 'opened', 'openCount', 'rsvpStatus',
-          'rsvpCount', 'createdAt', 'updatedAt'
-        ])
-        && data.name is string && data.name.size() > 0 && data.name.size() <= 100
-        && data.maxGuests is int && data.maxGuests >= 1 && data.maxGuests <= 10
-        && data.opened is bool && data.openCount is int && data.openCount >= 0
-        && data.rsvpStatus is string && data.rsvpStatus.size() <= 20
-        && data.rsvpCount is int && data.rsvpCount >= 0 && data.rsvpCount <= 10
-        && data.createdAt is timestamp && data.updatedAt is timestamp
-        && (!('phone' in data) || (data.phone is string && data.phone.size() <= 30))
-        && (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 50))
-        && (!('source' in data) || (data.source is string && data.source.size() <= 100))
-        && (!('sourceName' in data) || (data.sourceName is string && data.sourceName.size() <= 200));
-    }
-
 
     match /guest/{guestId} {
       allow get: if true;
       allow list: if isAdmin();
+      // Admin adalah pemilik data, jadi tulisannya dipercaya. Validasi bentuk
+      // dokumen tetap diberlakukan ketat untuk tamu anonim di cabang bawah.
+      // Memvalidasi seluruh dokumen pada update admin membuat dokumen tamu
+      // lama (bentuk field berbeda) ikut tertolak.
       allow create: if isAdmin()
-        && validGuestData(request.resource.data)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
-      allow update: if (isAdmin() && validGuestData(request.resource.data))
+      allow update: if isAdmin()
         || (isLinkedGuest(guestId)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'opened', 'openedAt', 'lastOpenedAt', 'openCount', 'deviceType',
@@ -211,6 +190,19 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['allowPublicComments', 'updatedAt'])
         && request.resource.data.keys().hasAll(['allowPublicComments', 'updatedAt'])
         && request.resource.data.allowPublicComments is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // Teks undangan yang diedit dari panel admin. Dibaca publik supaya
+    // halaman undangan dapat menerapkannya, dan hanya admin yang menulis.
+    match /settings/siteContent {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['content', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['content', 'updatedAt'])
+        && request.resource.data.content is map
+        && request.resource.data.content.size() <= 200
         && request.resource.data.updatedAt == request.time;
       allow delete: if isAdmin();
     }

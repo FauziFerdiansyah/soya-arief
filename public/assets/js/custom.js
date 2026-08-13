@@ -1446,10 +1446,32 @@ const CustomInitializer = {
  * BACKSOUND MANAGER — FINAL + STABLE VERSION
  * Autoplay setelah user pernah klik “Buka Undangan”
  */
+const BACKSOUND_TRACKS = {
+  default: "assets/music/backsound.mp3",
+  minang: "assets/music/minang.mp3",
+};
+
 const BacksoundManager = {
   audio: null,
   unlocked: false,
-  src: "assets/music/backsound.mp3",
+  src: BACKSOUND_TRACKS.default,
+
+  /**
+   * Ganti lagu sesuai pilihan pada data tamu. Aman dipanggil sebelum atau
+   * sesudah init(): kalau elemen audio belum siap, init() memakai src terbaru.
+   */
+  setTrack(track) {
+    const url = BACKSOUND_TRACKS[track] || BACKSOUND_TRACKS.default;
+    if (this.src === url) return;
+
+    this.src = url;
+    if (!this.audio) return;
+
+    const wasPlaying = !this.audio.paused;
+    this.audio.src = url;
+    this.audio.load();
+    if (wasPlaying) this.audio.play().catch(() => {});
+  },
 
   init() {
     this.audio = document.getElementById("backsound");
@@ -1725,6 +1747,36 @@ $("#startToExplore").on("click", function (e) {
   let _guestLoaded = false;
   window.validGuest = false;
   window.guestIdentityReady = Promise.resolve(false);
+  window.guestPreferences = { showInviters: false, musicTrack: "default" };
+
+  /**
+   * Section "Turut Mengundang" hanya tampil bila tamu ini diberi opsinya DAN
+   * daftar namanya sudah diisi di panel admin. Dipanggil ulang saat konten
+   * kustom selesai diterapkan karena urutan kedua sumber data tidak pasti.
+   */
+  function syncInviterSection() {
+    const section = document.querySelector("[data-inviter-section]");
+    if (!section) return;
+
+    const list = section.querySelector(".inviter-list");
+    const hasNames = Boolean(list && list.textContent.trim());
+    const visible = window.guestPreferences.showInviters === true && hasNames;
+
+    section.hidden = !visible;
+    section.style.display = visible ? "" : "none";
+  }
+
+  function applyGuestPreferences(guest) {
+    window.guestPreferences = {
+      showInviters: guest?.showInviters === true,
+      musicTrack: guest?.musicTrack === "minang" ? "minang" : "default",
+    };
+
+    BacksoundManager.setTrack(window.guestPreferences.musicTrack);
+    syncInviterSection();
+  }
+
+  window.addEventListener("sitecontent:applied", syncInviterSection);
 
   async function linkGuestAccess(guestId) {
     try {
@@ -1800,6 +1852,7 @@ $("#startToExplore").on("click", function (e) {
       const guest = snap.data();
       window.currentGuest = guest;
       window.currentGuestId = guestId;
+      applyGuestPreferences(guest);
       $('#name, #nama').val(guest.name || '').prop('readonly', true);
       $('.guest-name').text(guest.name || '');
 

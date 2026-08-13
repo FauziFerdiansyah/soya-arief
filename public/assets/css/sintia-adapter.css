@@ -295,7 +295,7 @@ body.sintia a {
 
 .quote-section.quote-wrap {
   min-height: 400px;
-  padding: 30px 24px;
+  padding: 30px 0px;
   background-color: var(--background-secondary);
   background-image: url("../images/sintia/texture.png");
   background-size: 100%;
@@ -313,7 +313,7 @@ body.sintia a {
 }
 
 .quote-section .quote-area {
-  padding: 0px;
+  padding: 0px 24px;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -1381,6 +1381,10 @@ body.sintia :focus-visible {
   color: var(--gold);
 }
 
+.rsvp-section .toggle-btn.minus {
+  color: var(--text-tertiary);
+}
+
 .rsvp-section .toggle-btn:hover,
 .rsvp-section .toggle-btn:focus-visible {
   background: var(--gold);
@@ -1468,12 +1472,27 @@ body.sintia :focus-visible {
 }
 
 @media (max-width: 480px) {
+  .rsvp-section .toggle-btn.minus {
+    color: var(--text-tertiary);
+  }
   .rsvp-section.rsvp-wrap {
-    padding-inline: 14px;
+    padding-inline: 0px;
+    padding-bottom: 50px;
+  }
+
+  .rsvp-section > .sintia-section-separator + .rsvp-content {
+    margin-top: 20px;
+  }
+
+  .rsvp-section .rsvp-body {
+    padding-bottom: 5px;
   }
 
   .rsvp-section .rsvp-content {
     padding: 30px 18px 26px;
+    background-color: transparent;
+    border: 0px;
+    box-shadow: none;
   }
 
   .rsvp-section .rsvp-confirm-wrap {
@@ -2173,7 +2192,7 @@ body.sintia.original {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 24px;
+  padding: 11px 22px;
   border: 1px solid var(--gold);
   border-radius: 12px;
   background: var(--gold);
@@ -2647,7 +2666,7 @@ body.sintia h2.gift-send-title {
 
 /* Preserve the RSVP paper card's existing distance below the divider. */
 .rsvp-section > .sintia-section-separator + .rsvp-content {
-  margin-top: 50px;
+  margin-top: 10px;
 }
 
 

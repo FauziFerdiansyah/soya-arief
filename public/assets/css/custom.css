@@ -1690,7 +1690,7 @@ font-weight: var(--font-weight-bold);
 }
 
 .gift-section-body {
-  margin-top: 50px;
+  margin-top: 30px;
 }
 
 .gift-desc {
@@ -3730,4 +3730,100 @@ button.wish-comment-action { border: 0; background: transparent; color: inherit;
   .wish-item { padding: 12px; }
   .wish-reactions { gap: 4px; }
   .wish-reaction { min-width: 31px; padding: 3px 6px; }
+}
+
+/* ===== TURUT MENGUNDANG (opsional per tamu) ===== */
+.inviter-section {
+  position: relative;
+  overflow: hidden;
+  padding: 14% 0px;
+  background: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.inviter-section .inviter-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.inviter-section .inviter-content .inviter-body {
+  padding-inline: 24px;
+}
+
+.inviter-section .inviter-header {
+  margin-bottom: 24px;
+}
+
+.inviter-section .inviter-title {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  line-height: normal;
+}
+
+.inviter-section .inviter-description {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.inviter-section .inviter-description:empty {
+  display: none;
+}
+
+.inviter-section .inviter-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.inviter-section .inviter-list[data-columns="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.inviter-section .content-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 45px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(var(--text-primary-rgb), 0.07);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+@media screen and (max-width: 600px) {
+  .inviter-section .inviter-list[data-columns="2"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .inviter-section {
+    padding: 18% 0px;
+  }
+}
+
+/* Ornamen pembatas mengikuti ritme section lain: menjorok 30px ke atas,
+   lalu isi section diberi jarak supaya tidak tertimpa. */
+.inviter-section > .sintia-section-separator {
+  margin-top: -30px;
+}
+
+.inviter-section > .sintia-section-separator + .inviter-content {
+  position: relative;
+  z-index: 1;
+  padding-top: 40px;
+}
+
+.inviter-section > .sintia-section-separator.bottom {
+  margin-top: 40px;
 }
