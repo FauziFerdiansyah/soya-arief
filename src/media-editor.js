@@ -8,8 +8,10 @@
 import { DEFAULT_TRANSFORM, sanitizeTransform, applyMediaTransform, cloudinaryUrl } from './site-media.js';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
-const OUTPUT_MAX_EDGE = 1600;
-const OUTPUT_QUALITY = 0.8;
+const OUTPUT_MAX_EDGE = 2000;
+// Kualitas dinaikkan karena foto masih akan dipotong lagi oleh Cloudinary;
+// kompresi yang terlalu keras di tahap ini membuat hasil akhirnya pecah.
+const OUTPUT_QUALITY = 0.88;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 /**
@@ -41,6 +43,24 @@ export async function compressImage(file, maxEdge = OUTPUT_MAX_EDGE) {
 
   if (!blob) throw new Error('Foto tidak dapat diproses di browser ini.');
   return blob;
+}
+
+const GRID_PREF_KEY = 'webadmin:mediaGrid';
+
+function readGridPreference() {
+  try {
+    return localStorage.getItem(GRID_PREF_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function writeGridPreference(enabled) {
+  try {
+    localStorage.setItem(GRID_PREF_KEY, String(enabled));
+  } catch {
+    // Penyimpanan tidak tersedia; preferensi cukup berlaku sesi ini.
+  }
 }
 
 function buildButton(className, icon, label, title = label) {
@@ -80,7 +100,12 @@ export function createMediaEditor({ slot, item = null, onUpload, onSave, onRemov
   guide.setAttribute('aria-hidden', 'true');
   guide.innerHTML = '<i></i><i></i><i></i><i></i>';
 
-  frame.append(image, empty, guide);
+  // Garis bantu kotak-kotak untuk memudahkan menengahkan objek foto.
+  const grid = document.createElement('span');
+  grid.className = 'media-editor__grid';
+  grid.setAttribute('aria-hidden', 'true');
+
+  frame.append(image, empty, guide, grid);
 
   const controls = document.createElement('div');
   controls.className = 'media-editor__controls';
@@ -114,10 +139,35 @@ export function createMediaEditor({ slot, item = null, onUpload, onSave, onRemov
 
   buttons.append(pick, rotateLeft, rotateRight, reset, save, remove);
 
+  // Pilihan garis bantu diingat lintas editor supaya tidak perlu diaktifkan
+  // ulang tiap membuka foto lain.
+  const gridToggleWrap = document.createElement('label');
+  gridToggleWrap.className = 'media-editor__gridtoggle';
+
+  const gridToggle = document.createElement('input');
+  gridToggle.type = 'checkbox';
+  gridToggle.className = 'form-check-input';
+  gridToggle.checked = readGridPreference();
+
+  const gridToggleText = document.createElement('span');
+  gridToggleText.innerHTML = '<i class="ri-grid-line" aria-hidden="true"></i> Garis bantu';
+  gridToggleWrap.append(gridToggle, gridToggleText);
+
+  const applyGridPreference = () => {
+    frame.classList.toggle('has-grid', gridToggle.checked);
+  };
+
+  gridToggle.addEventListener('change', () => {
+    writeGridPreference(gridToggle.checked);
+    applyGridPreference();
+  });
+
+  applyGridPreference();
+
   const status = document.createElement('p');
   status.className = 'media-editor__status';
 
-  controls.append(zoomWrap, buttons, status);
+  controls.append(zoomWrap, gridToggleWrap, buttons, status);
   root.append(frame, controls, file);
 
   function setStatus(message, state = 'idle') {

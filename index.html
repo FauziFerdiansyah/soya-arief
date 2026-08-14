@@ -84,6 +84,10 @@
     <link rel="preconnect" href="https://res.cloudinary.com">
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
 
+    <!-- Firestore REST dipakai untuk memuat foto & teks paling awal. -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="https://firestore.googleapis.com">
+
     <!-- Satu titik masuk saja. Modul ini memuat foto lewat REST lebih dulu,
          lalu mengimpor Firebase dan teks undangan secara dinamis supaya
          bundle SDK tidak menahan tampilnya gambar. -->
@@ -734,7 +738,10 @@
                     <div class="photo-header" data-aos="fade-up" data-aos-duration="700" data-aos-delay="150">
                         <h2 class="latin-title" data-content="photoTitle">Photo Gallery</h2>
                     </div>
-                    <div class="photo-body">
+                    <!-- AOS dipasang di wrapper, bukan di tiap foto. Wrapper
+                         selalu ada di HTML awal sehingga pasti terdaftar AOS,
+                         sementara foto bisa dirender ulang kapan saja. -->
+                    <div class="photo-body" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
                         <div id="lightgallery" class="gallery-photos" data-media-gallery>
                             <span data-aos="zoom-in" data-aos-duration="700" data-aos-delay="150">
                                 <a href="assets/images/prewed/MLK02905-1.jpg">

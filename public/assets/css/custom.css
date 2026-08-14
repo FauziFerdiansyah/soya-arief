@@ -3855,3 +3855,28 @@ img.media-skeleton {
     animation: none;
   }
 }
+
+/* ===== FADE-IN ITEM GALERI (CSS murni, tanpa AOS) =====
+   Item galeri bisa dirender ulang setelah AOS berinisialisasi, sehingga
+   memakai data-aos di tiap foto berisiko membuatnya tertahan opacity 0.
+   Animasi di bawah selalu berakhir pada opacity 1, jadi foto tidak pernah
+   hilang walau JavaScript animasi gagal dimuat. */
+.gallery-photos .gallery-item {
+  animation: galleryItemFadeIn 0.45s ease both;
+}
+
+.gallery-photos .gallery-item:nth-child(2) { animation-delay: 0.05s; }
+.gallery-photos .gallery-item:nth-child(3) { animation-delay: 0.1s; }
+.gallery-photos .gallery-item:nth-child(4) { animation-delay: 0.15s; }
+.gallery-photos .gallery-item:nth-child(n + 5) { animation-delay: 0.2s; }
+
+@keyframes galleryItemFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-photos .gallery-item {
+    animation: none;
+  }
+}

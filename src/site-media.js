@@ -30,7 +30,11 @@ export const MEDIA_SLOTS = [
     aspect: '265 / 350',
     radius: '999px',
     folder: `${MEDIA_STORAGE_ROOT}/hero`,
-    maxEdge: 1400,
+    // maxEdge = batas kompresi saat unggah, sourceMax = acuan lebar kerja
+    // saat memotong di Cloudinary. Keduanya sama supaya tidak ada
+    // pembesaran gambar yang membuat hasilnya pecah.
+    maxEdge: 2400,
+    sourceMax: 2400,
   },
   {
     key: 'groom',
@@ -40,7 +44,8 @@ export const MEDIA_SLOTS = [
     aspect: '1 / 1',
     radius: '50px',
     folder: `${MEDIA_STORAGE_ROOT}/groom`,
-    maxEdge: 1200,
+    maxEdge: 2000,
+    sourceMax: 2000,
   },
   {
     key: 'bride',
@@ -50,7 +55,8 @@ export const MEDIA_SLOTS = [
     aspect: '1 / 1',
     radius: '50px',
     folder: `${MEDIA_STORAGE_ROOT}/bride`,
-    maxEdge: 1200,
+    maxEdge: 2000,
+    sourceMax: 2000,
   },
 ];
 
@@ -60,8 +66,9 @@ export const GALLERY_SLOT = {
   aspect: '1 / 1',
   radius: '0px',
   folder: `${MEDIA_STORAGE_ROOT}/gallery`,
-  // Kotak galeri kecil (grid 2 kolom), jadi 1200px sudah lebih dari cukup.
-  maxEdge: 1200,
+  // Cukup besar untuk lightbox, tetap ringan untuk thumbnail.
+  maxEdge: 1800,
+  sourceMax: 1800,
 };
 
 const SLOT_BY_KEY = new Map(MEDIA_SLOTS.map((slot) => [slot.key, slot]));
@@ -207,25 +214,44 @@ function aspectToRatio(aspect) {
  *   c_crop,w_,h_,x_,y_ -> jendela tampilan sebesar 1/zoom sesuai offset
  *   f_auto,q_auto,w_   -> format & ukuran kirim
  */
-export function mediaDeliveryUrl(url, { transform, aspect, width, quality = 'q_auto' }) {
+export function mediaDeliveryUrl(url, {
+  transform,
+  aspect,
+  width,
+  sourceMax = 2000,
+  quality = 'q_auto',
+}) {
   const composition = sanitizeTransform(transform);
+  const ratio = aspectToRatio(aspect);
   const steps = [];
 
   if (composition.rotation) steps.push(`a_${composition.rotation}`);
-  steps.push(`c_fill,g_center,ar_${aspectToRatio(aspect)},w_1600`);
 
   if (composition.zoom > 1.001) {
-    const window = Number((1 / composition.zoom).toFixed(4));
-    const x = Number(((composition.offsetX / 100) * (1 - window)).toFixed(4));
-    const y = Number(((composition.offsetY / 100) * (1 - window)).toFixed(4));
-    steps.push(`c_crop,w_${window},h_${window},x_${x},y_${y}`);
+    // Perlu dua tahap: samakan rasio dulu, lalu potong jendela zoom.
+    // Lebar kerja mengikuti batas unggah supaya tidak ada pembesaran.
+    const region = Number((1 / composition.zoom).toFixed(4));
+    const x = Number(((composition.offsetX / 100) * (1 - region)).toFixed(4));
+    const y = Number(((composition.offsetY / 100) * (1 - region)).toFixed(4));
+
+    steps.push(`c_fill,g_center,ar_${ratio},w_${sourceMax}`);
+    steps.push(`c_crop,w_${region},h_${region},x_${x},y_${y}`);
+    steps.push(`f_auto,${quality},w_${width},c_limit`);
+  } else {
+    // Tanpa zoom cukup satu tahap. Rantai yang lebih pendek membuat
+    // Cloudinary jauh lebih cepat menghasilkan berkas pada permintaan
+    // pertama, yang belum ada di cache CDN.
+    steps.push(`c_fill,g_center,ar_${ratio},w_${width}`);
+    steps.push(`f_auto,${quality}`);
   }
 
-  steps.push(`f_auto,${quality},w_${width},dpr_auto`);
+  // Tanpa dpr_auto: lebar akhir sudah dibuat lega, jadi pengali DPR hanya
+  // akan meminta ukuran di atas sumbernya dan justru memburamkan gambar.
   return cloudinaryUrl(url, steps.join('/'));
 }
 
-const SLOT_WIDTH = { hero: 700, groom: 600, bride: 600 };
+// Lebar kirim dibuat lega agar tetap tajam di layar beresolusi tinggi.
+const SLOT_WIDTH = { hero: 1100, groom: 900, bride: 900 };
 
 /**
  * Undangan memakai foto yang SUDAH dipotong oleh Cloudinary, lalu gaya
@@ -247,11 +273,13 @@ function applySlot(key, item, root) {
   const url = mediaDeliveryUrl(item.url, {
     transform: item,
     aspect: slot?.aspect ?? '1 / 1',
-    width: SLOT_WIDTH[key] ?? 700,
+    width: SLOT_WIDTH[key] ?? 900,
+    sourceMax: slot?.sourceMax,
   });
 
   image.src = url;
   image.loading = 'eager';
+  image.decoding = 'async';
   image.removeAttribute('srcset');
   markMediaAsLoaded(image, url);
   clearInlineComposition(image);
@@ -259,40 +287,48 @@ function applySlot(key, item, root) {
   return 1;
 }
 
+/**
+ * Item galeri TIDAK memakai atribut AOS.
+ *
+ * CSS AOS membuat elemen ber-data-aos mulai dari opacity 0, dan elemen yang
+ * dibuat setelah AOS berinisialisasi tidak pernah terdaftar sehingga bisa
+ * tetap tersembunyi. Animasi masuk galeri kini ditangani AOS pada wrapper
+ * (.photo-body, ada di HTML awal) plus fade-in CSS murni per item.
+ */
 function buildGalleryItem(item, index) {
   const wrapper = document.createElement('span');
-  wrapper.setAttribute('data-aos', 'zoom-in');
-  wrapper.setAttribute('data-aos-duration', '700');
-  wrapper.setAttribute('data-aos-delay', '150');
+  wrapper.className = 'gallery-item';
 
   // Tautan memakai versi besar; hanya diunduh saat foto dibuka di lightbox.
   const link = document.createElement('a');
   link.href = mediaDeliveryUrl(item.url, {
     transform: item,
     aspect: GALLERY_SLOT.aspect,
-    width: 1600,
+    width: GALLERY_SLOT.sourceMax,
+    sourceMax: GALLERY_SLOT.sourceMax,
   });
 
   const thumbUrl = mediaDeliveryUrl(item.url, {
     transform: item,
     aspect: GALLERY_SLOT.aspect,
-    width: 420,
-    quality: 'q_auto:eco',
+    width: 560,
+    sourceMax: GALLERY_SLOT.sourceMax,
   });
 
   const image = document.createElement('img');
   image.src = thumbUrl;
   image.className = 'img-photo';
   image.alt = `Galeri foto ${index + 1}`;
-  // Semua foto galeri dimuat langsung. Ukurannya sudah kecil (±420px WebP),
-  // jadi menunda pemuatan hanya membuat galeri terlihat kosong saat discroll.
+  // fetchpriority="low" membuat browser menunda unduhan sangat lama, jadi
+  // tidak dipakai. Semua foto dimuat eager dengan prioritas normal; hanya
+  // baris pertama yang ditinggikan.
   image.loading = 'eager';
-  image.setAttribute('fetchpriority', index < 4 ? 'high' : 'auto');
+  if (index < 4) image.setAttribute('fetchpriority', 'high');
   image.decoding = 'async';
   markMediaAsLoaded(image, thumbUrl);
   // Dimensi eksplisit mencegah pergeseran tata letak saat gambar masuk.
-  image.width = 420;
-  image.height = 420;
+  image.width = 560;
+  image.height = 560;
   // Foto sudah dipotong oleh Cloudinary, jadi tidak perlu transformasi CSS.
 
   link.appendChild(image);

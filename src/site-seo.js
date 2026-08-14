@@ -11,6 +11,7 @@ import { sanitizeContent } from './site-content.js';
 import { sanitizeMedia, mediaDeliveryUrl } from './site-media.js';
 
 const OG_IMAGE_SIZE = 600;
+const OG_SOURCE_MAX = 2400;
 
 function setMeta(selector, value) {
   if (!value) return;
@@ -27,6 +28,7 @@ export function resolveOgImage(media) {
     transform: hero,
     aspect: '1 / 1',
     width: OG_IMAGE_SIZE,
+    sourceMax: OG_SOURCE_MAX,
   });
 }
 

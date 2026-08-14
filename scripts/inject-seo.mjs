@@ -73,33 +73,106 @@ async function readDoc(docId) {
   return decodeFields(payload?.fields);
 }
 
-/** Susun URL Cloudinary persegi untuk og:image dari foto hero. */
-function buildOgImage(media) {
-  const hero = media?.slots?.hero;
-  if (!hero?.url || typeof hero.url !== 'string') return '';
+/**
+ * Susun URL Cloudinary dengan komposisi tersimpan. Rumusnya sengaja disamakan
+ * dengan mediaDeliveryUrl() di src/site-media.js agar hasilnya identik.
+ */
+function buildDeliveryUrl(item, { ratio, width, sourceMax }) {
+  if (!item?.url || typeof item.url !== 'string') return '';
 
   const marker = '/image/upload/';
-  const at = hero.url.indexOf(marker);
+  const at = item.url.indexOf(marker);
   if (at < 0) return '';
 
-  const zoom = Number(hero.zoom) > 1 ? Number(hero.zoom) : 1;
+  const zoom = Number(item.zoom) > 1 ? Number(item.zoom) : 1;
   const steps = [];
 
-  if (Number(hero.rotation)) steps.push(`a_${Number(hero.rotation)}`);
-  steps.push('c_fill,g_center,ar_1:1,w_1600');
+  if (Number(item.rotation)) steps.push(`a_${Number(item.rotation)}`);
 
   if (zoom > 1.001) {
-    const window = Number((1 / zoom).toFixed(4));
-    const offsetX = Number.isFinite(Number(hero.offsetX)) ? Number(hero.offsetX) : 50;
-    const offsetY = Number.isFinite(Number(hero.offsetY)) ? Number(hero.offsetY) : 50;
-    const x = Number(((offsetX / 100) * (1 - window)).toFixed(4));
-    const y = Number(((offsetY / 100) * (1 - window)).toFixed(4));
-    steps.push(`c_crop,w_${window},h_${window},x_${x},y_${y}`);
+    // Dua tahap: samakan rasio, lalu potong jendela zoom.
+    const region = Number((1 / zoom).toFixed(4));
+    const offsetX = Number.isFinite(Number(item.offsetX)) ? Number(item.offsetX) : 50;
+    const offsetY = Number.isFinite(Number(item.offsetY)) ? Number(item.offsetY) : 50;
+    const x = Number(((offsetX / 100) * (1 - region)).toFixed(4));
+    const y = Number(((offsetY / 100) * (1 - region)).toFixed(4));
+
+    steps.push(`c_fill,g_center,ar_${ratio},w_${sourceMax}`);
+    steps.push(`c_crop,w_${region},h_${region},x_${x},y_${y}`);
+    steps.push(`f_auto,q_auto,w_${width},c_limit`);
+  } else {
+    // Satu tahap saja supaya berkasnya cepat dihasilkan Cloudinary.
+    steps.push(`c_fill,g_center,ar_${ratio},w_${width}`);
+    steps.push('f_auto,q_auto');
   }
 
-  steps.push(`f_auto,q_auto,w_${OG_SIZE}`);
+  return item.url.slice(0, at + marker.length) + steps.join('/') + '/' + item.url.slice(at + marker.length);
+}
 
-  return hero.url.slice(0, at + marker.length) + steps.join('/') + '/' + hero.url.slice(at + marker.length);
+const SLOT_DELIVERY = {
+  hero: { ratio: '265:350', width: 1100, sourceMax: 2400 },
+  groom: { ratio: '1:1', width: 900, sourceMax: 2000 },
+  bride: { ratio: '1:1', width: 900, sourceMax: 2000 },
+};
+
+const GALLERY_DELIVERY = { ratio: '1:1', width: 560, sourceMax: 1800 };
+const GALLERY_FULL = { ratio: '1:1', width: 1800, sourceMax: 1800 };
+
+/** Tulis src foto slot langsung ke HTML dan lepas kelas placeholder. */
+function injectSlotImages(html, media) {
+  let result = html;
+  let count = 0;
+
+  Object.entries(SLOT_DELIVERY).forEach(([key, options]) => {
+    const url = buildDeliveryUrl(media?.slots?.[key], options);
+    if (!url) return;
+
+    const pattern = new RegExp(`<img[^>]*data-media=["']${key}["'][^>]*>`, 'i');
+    result = result.replace(pattern, (tag) => {
+      count += 1;
+      // Pola harus menghormati jenis kutip pembuka: src bawaan berupa data
+      // URI yang memuat kutip tunggal di dalamnya.
+      return tag
+        .replace(/src=(["'])(?:(?!\1)[\s\S])*\1/i, `src="${escapeAttribute(url)}"`)
+        .replace(/\s*media-skeleton/g, '');
+    });
+  });
+
+  return { html: result, count };
+}
+
+/**
+ * Tulis item galeri ke HTML awal. Tanpa ini galeri baru terbentuk setelah
+ * permintaan Firestore selesai, sehingga gambarnya terasa lama muncul.
+ */
+function injectGallery(html, media) {
+  const gallery = Array.isArray(media?.gallery) ? media.gallery.slice(0, 12) : [];
+  if (!gallery.length) return { html, count: 0 };
+
+  const items = gallery.map((item, index) => {
+    const thumb = buildDeliveryUrl(item, GALLERY_DELIVERY);
+    const full = buildDeliveryUrl(item, GALLERY_FULL);
+    if (!thumb || !full) return '';
+
+    // Tanpa atribut AOS per foto: animasi masuk ditangani wrapper .photo-body
+    // dan fade-in CSS, sehingga foto tidak pernah tertahan opacity 0.
+    return `<span class="gallery-item">`
+      + `<a href="${escapeAttribute(full)}">`
+      + `<img src="${escapeAttribute(thumb)}" class="img-photo lazy-loaded"`
+      + ` data-lazy="${escapeAttribute(thumb)}" alt="Galeri foto ${index + 1}"`
+      + ` width="560" height="560" loading="eager" decoding="async"`
+      + `${index < 4 ? ' fetchpriority="high"' : ''}></a></span>`;
+  }).filter(Boolean);
+
+  if (!items.length) return { html, count: 0 };
+
+  const pattern = /(<div id="lightgallery"[^>]*>)([\s\S]*?)(<\/div>)/i;
+  if (!pattern.test(html)) return { html, count: 0 };
+
+  return {
+    html: html.replace(pattern, (_all, open, _inner, close) => `${open}${items.join('')}${close}`),
+    count: items.length,
+  };
 }
 
 function escapeAttribute(value) {
@@ -145,9 +218,22 @@ async function main() {
   const title = typeof values.seoTitle === 'string' ? values.seoTitle.trim() : '';
   const description = typeof values.seoDescription === 'string' ? values.seoDescription.trim() : '';
   const imageAlt = typeof values.seoImageAlt === 'string' ? values.seoImageAlt.trim() : '';
-  const ogImage = buildOgImage(media);
+  const ogImage = buildDeliveryUrl(media?.slots?.hero, {
+    ratio: '1:1',
+    width: OG_SIZE,
+    sourceMax: 2400,
+  });
 
   const applied = [];
+
+  // Foto ditulis ke HTML awal supaya tampil tanpa menunggu Firestore.
+  const slots = injectSlotImages(html, media);
+  html = slots.html;
+  if (slots.count) applied.push(`${slots.count} foto slot`);
+
+  const gallery = injectGallery(html, media);
+  html = gallery.html;
+  if (gallery.count) applied.push(`${gallery.count} foto galeri`);
 
   if (title) {
     html = html.replace(/<title>[^<]*<\/title>/i, `<title>${escapeAttribute(title)}</title>`);
