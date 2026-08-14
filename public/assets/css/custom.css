@@ -3812,6 +3812,45 @@ button.wish-comment-action { border: 0; background: transparent; color: inherit;
   }
 }
 
+/* ===== ANIMASI MASUK SAAT SCROLL (IntersectionObserver, bukan AOS) =====
+   AOS mengukur posisi elemen saat inisialisasi, sementara section ini baru
+   dibuka dan diisi setelahnya, sehingga data-aos membuat isinya tertahan pada
+   opacity 0. Di sini kondisi bawaannya justru TERLIHAT; keadaan tersembunyi
+   hanya berlaku setelah custom.js memasang .is-reveal-ready, yaitu ketika
+   observer sudah benar-benar aktif. Jadi bila JavaScript gagal atau observer
+   tidak didukung, daftar nama tetap terbaca. */
+.inviter-section.is-reveal-ready .inviter-header,
+.inviter-section.is-reveal-ready .content-list-item {
+  opacity: 0;
+}
+
+.inviter-section.is-reveal-ready.is-inview .inviter-header,
+.inviter-section.is-reveal-ready.is-inview .content-list-item {
+  animation: inviterFadeUp 0.5s ease both;
+}
+
+/* Bertingkat sampai item keenam lalu seragam supaya daftar panjang tidak
+   terasa menunggu. */
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(1) { animation-delay: 0.08s; }
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(2) { animation-delay: 0.14s; }
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(3) { animation-delay: 0.2s; }
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(4) { animation-delay: 0.26s; }
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(5) { animation-delay: 0.32s; }
+.inviter-section.is-reveal-ready.is-inview .content-list-item:nth-child(n + 6) { animation-delay: 0.38s; }
+
+@keyframes inviterFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inviter-section.is-reveal-ready .inviter-header,
+  .inviter-section.is-reveal-ready .content-list-item {
+    opacity: 1;
+    animation: none;
+  }
+}
+
 /* Ornamen pembatas mengikuti ritme section lain: menjorok 30px ke atas,
    lalu isi section diberi jarak supaya tidak tertimpa. */
 .inviter-section > .sintia-section-separator {

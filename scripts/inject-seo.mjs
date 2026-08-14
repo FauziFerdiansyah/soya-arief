@@ -337,6 +337,68 @@ function escapeAttribute(value) {
     .replaceAll('>', '&gt;');
 }
 
+function escapeText(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
+/** Ganti isi teks satu elemen ber-atribut data-content, bila elemennya ada. */
+function replaceContentText(html, key, value) {
+  if (!value) return html;
+
+  const pattern = new RegExp(
+    `(<([a-zA-Z][\\w-]*)[^>]*data-content=["']${key}["'][^>]*>)[\\s\\S]*?(<\\/\\2>)`,
+    'i'
+  );
+
+  if (!pattern.test(html)) return html;
+  return html.replace(pattern, `$1${escapeText(value)}$3`);
+}
+
+/**
+ * Tulis daftar "Turut Mengundang" ke HTML awal.
+ *
+ * Tanpa ini nama-namanya baru muncul setelah permintaan Firestore selesai,
+ * sehingga terasa lama pada koneksi ponsel. Markupnya sengaja dibuat identik
+ * dengan setListItems() di src/site-content.js supaya penerapan ulang saat
+ * runtime tidak mengubah tampilan.
+ */
+const INVITER_MAX_ITEMS = 80;
+
+function injectInviterList(html, values) {
+  const raw = typeof values.inviterList === 'string' ? values.inviterList : '';
+  const names = raw
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, INVITER_MAX_ITEMS);
+
+  if (!names.length) return { html, count: 0 };
+
+  const pattern = /(<div class="inviter-list"[^>]*>)([\s\S]*?)(<\/div>)/i;
+  if (!pattern.test(html)) return { html, count: 0 };
+
+  const columns = values.inviterColumns === '2' ? '2' : '1';
+  const items = names
+    .map((name) => `<span class="content-list-item">${escapeText(name)}</span>`)
+    .join('');
+
+  let result = html.replace(pattern, (_all, open, _inner, close) => {
+    const withColumns = open.replace(
+      /data-columns="[^"]*"/i,
+      `data-columns="${escapeAttribute(columns)}"`
+    );
+    return `${withColumns}${items}${close}`;
+  });
+
+  result = replaceContentText(result, 'inviterTitle', values.inviterTitle);
+  result = replaceContentText(result, 'inviterDescription', values.inviterDescription);
+
+  return { html: result, count: names.length };
+}
+
 /** Ganti isi atribut content pada satu meta tag, bila tag-nya memang ada. */
 function replaceMeta(html, attribute, name, value) {
   if (!value) return html;
@@ -392,6 +454,12 @@ async function main() {
   const visibility = injectVisibility(html, values);
   html = visibility.html;
   if (visibility.count) applied.push(`${visibility.count} elemen disembunyikan`);
+
+  // Daftar "Turut Mengundang" ikut ditulis ke HTML awal. Sectionnya sendiri
+  // tetap tersembunyi sampai diketahui tamu ini memang diberi opsinya.
+  const inviter = injectInviterList(html, values);
+  html = inviter.html;
+  if (inviter.count) applied.push(`${inviter.count} nama pengundang`);
 
   // Data acara: hitung mundur, tautan Google Calendar, dan berkas ICS.
   const times = buildEventTimes(values);

@@ -1915,13 +1915,22 @@ $("#startToExplore").on("click", function (e) {
   let _guestLoaded = false;
   window.validGuest = false;
   window.guestIdentityReady = Promise.resolve(false);
-  window.guestPreferences = { showInviters: false, musicTrack: "default" };
+
+  // Jalur REST awal (site-media-early.js) membaca dokumen tamu tanpa menunggu
+  // Firebase SDK, dan bisa selesai sebelum file ini dieksekusi. Hasilnya
+  // dipakai sebagai nilai awal supaya section opsional tidak menunggu SDK.
+  window.guestPreferences = {
+    showInviters: window.__guestEarly?.showInviters === true,
+    musicTrack: window.__guestEarly?.musicTrack === "minang" ? "minang" : "default",
+  };
 
   /**
    * Section "Turut Mengundang" hanya tampil bila tamu ini diberi opsinya DAN
    * daftar namanya sudah diisi di panel admin. Dipanggil ulang saat konten
    * kustom selesai diterapkan karena urutan kedua sumber data tidak pasti.
    */
+  let inviterObserver = null;
+
   function syncInviterSection() {
     const section = document.querySelector("[data-inviter-section]");
     if (!section) return;
@@ -1929,9 +1938,30 @@ $("#startToExplore").on("click", function (e) {
     const list = section.querySelector(".inviter-list");
     const hasNames = Boolean(list && list.textContent.trim());
     const visible = window.guestPreferences.showInviters === true && hasNames;
+    const wasVisible = !section.hidden;
 
     section.hidden = !visible;
     section.style.display = visible ? "" : "none";
+
+    // Observer hanya berjalan selama section benar-benar tampil. Saat masih
+    // display:none posisinya belum berarti, dan mengamatinya lebih awal
+    // berisiko menyalakan animasi sebelum pengunjung menggulir ke sini.
+    if (visible) {
+      inviterObserver?.observe(section);
+    } else {
+      inviterObserver?.unobserve(section);
+      section.classList.remove("is-inview");
+    }
+
+    // Tinggi halaman berubah begitu section ini muncul, jadi offset AOS milik
+    // section ini beserta semua section di bawahnya perlu dihitung ulang.
+    // Tanpa ini isi section tertahan pada opacity 0 karena posisinya masih
+    // hasil pengukuran saat section masih display:none.
+    if (visible !== wasVisible) {
+      requestAnimationFrame(() => {
+        if (typeof AOS !== "undefined") AOS.refreshHard();
+      });
+    }
   }
 
   function applyGuestPreferences(guest) {
@@ -1944,7 +1974,48 @@ $("#startToExplore").on("click", function (e) {
     syncInviterSection();
   }
 
+  /**
+   * Animasi masuk saat section tergulir ke layar, menggantikan AOS.
+   *
+   * AOS tidak dipakai di sini karena ia mengukur posisi elemen saat
+   * inisialisasi, sementara section ini baru dibuka dan diisi setelahnya.
+   * Kelas .is-reveal-ready baru dipasang setelah observer dipastikan tersedia,
+   * sehingga kondisi tersembunyi di CSS tidak pernah berlaku tanpa ada yang
+   * membatalkannya. Perilakunya mengikuti konfigurasi AOS situs ini
+   * (mirror: true), yaitu animasi berulang setiap kali masuk layar.
+   */
+  function createInviterObserver() {
+    const section = document.querySelector("[data-inviter-section]");
+    if (!section || !("IntersectionObserver" in window)) return null;
+
+    section.classList.add("is-reveal-ready");
+
+    // Bagian bawah root dipangkas seperempat tinggi layar, jadi animasi baru
+    // jalan setelah section cukup masuk ke layar, bukan saat ujungnya baru
+    // menyentuh tepi bawah. Observasinya sendiri dinyalakan syncInviterSection.
+    return new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          section.classList.toggle("is-inview", entry.isIntersecting);
+        });
+      },
+      { threshold: 0, rootMargin: "0px 0px -25% 0px" }
+    );
+  }
+
   window.addEventListener("sitecontent:applied", syncInviterSection);
+
+  // Preferensi tamu dari jalur REST awal. Hanya visibilitas section yang
+  // diambil di sini; nama, RSVP, dan lagu tetap ditangani loadGuestInfo().
+  window.addEventListener("guest:early", (event) => {
+    window.guestPreferences.showInviters = event.detail?.showInviters === true;
+    syncInviterSection();
+  });
+
+  // Kedua event di atas dapat terjadi sebelum file ini dieksekusi, jadi
+  // kondisi yang sudah ada diperiksa sekali di sini.
+  inviterObserver = createInviterObserver();
+  syncInviterSection();
 
   async function linkGuestAccess(guestId) {
     try {

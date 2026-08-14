@@ -1,53 +1,29 @@
 /**
- * Muat foto undangan sedini mungkin.
+ * Muat foto, teks, dan preferensi tamu sedini mungkin.
  *
  * Modul ini sengaja TIDAK mengimpor Firebase SDK. Dengan memakai Firestore
- * REST API lewat fetch biasa, permintaan foto tidak perlu menunggu bundle
- * SDK (ratusan kB) selesai diunduh dan diinisialisasi. Hasilnya gambar
- * galeri mulai terunduh jauh lebih cepat, terutama di koneksi lambat.
+ * REST API lewat fetch biasa, permintaannya tidak perlu menunggu bundle SDK
+ * (ratusan kB) selesai diunduh dan diinisialisasi. Hasilnya foto galeri,
+ * teks undangan, dan section "Turut Mengundang" tampil jauh lebih cepat,
+ * terutama di koneksi dan CPU ponsel yang lambat.
  *
- * Dokumen settings/siteMedia dapat dibaca publik oleh firestore.rules,
- * sehingga cukup memakai API key yang memang sudah publik.
+ * Ketiga dokumen di bawah dapat dibaca publik oleh firestore.rules.
+ * Jalur SDK di site-content-public.js tetap dipertahankan sebagai cadangan
+ * bila permintaan REST gagal, dan untuk hal yang butuh SDK seperti tracking.
  */
 import { MEDIA_DOC_ID, applySiteMedia } from './site-media.js';
+import { CONTENT_COLLECTION, CONTENT_DOC_ID, applySiteContent } from './site-content.js';
+import { fetchDocumentFields } from './firestore-rest.js';
 
-const PROJECT_ID = import.meta.env.VITE_FIREBASE_PROJECT_ID;
-const API_KEY = import.meta.env.VITE_FIREBASE_API_KEY;
-
-/** Ubah satu nilai format REST Firestore menjadi nilai JavaScript biasa. */
-function decodeValue(value) {
-  if (!value || typeof value !== 'object') return undefined;
-  if ('stringValue' in value) return value.stringValue;
-  if ('integerValue' in value) return Number(value.integerValue);
-  if ('doubleValue' in value) return Number(value.doubleValue);
-  if ('booleanValue' in value) return value.booleanValue;
-  if ('nullValue' in value) return null;
-  if ('timestampValue' in value) return value.timestampValue;
-  if ('mapValue' in value) return decodeFields(value.mapValue?.fields);
-  if ('arrayValue' in value) return (value.arrayValue?.values ?? []).map(decodeValue);
-  return undefined;
-}
-
-function decodeFields(fields = {}) {
-  const result = {};
-  Object.entries(fields).forEach(([key, value]) => {
-    result[key] = decodeValue(value);
-  });
-  return result;
+function guestIdFromUrl() {
+  return new URLSearchParams(window.location.search).get('g');
 }
 
 async function loadMediaEarly() {
-  if (!PROJECT_ID || !API_KEY) return;
-
-  const endpoint = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(PROJECT_ID)}`
-    + `/databases/(default)/documents/settings/${MEDIA_DOC_ID}?key=${encodeURIComponent(API_KEY)}`;
-
   try {
-    const response = await fetch(endpoint);
-    if (!response.ok) return; // dokumen belum ada: pakai foto bawaan
+    const media = await fetchDocumentFields(['settings', MEDIA_DOC_ID]);
+    if (!media) return; // dokumen belum ada: pakai foto bawaan
 
-    const payload = await response.json();
-    const media = decodeFields(payload?.fields);
     // Disimpan agar modul SEO dapat memakai foto hero sebagai og:image.
     window.__siteMedia = media;
 
@@ -62,8 +38,57 @@ async function loadMediaEarly() {
   }
 }
 
-// Jalankan permintaan foto lebih dulu, lalu muat Firebase + konten teks
-// secara dinamis. Dengan impor dinamis, bundle SDK yang besar tidak menjadi
-// dependensi statis modul ini, sehingga tidak menahan eksekusinya.
+/**
+ * Teks undangan, termasuk daftar nama "Turut Mengundang". SEO dan data acara
+ * tetap ditangani jalur SDK karena keduanya butuh foto yang mungkin belum
+ * selesai dimuat saat fungsi ini berjalan.
+ */
+async function loadContentEarly() {
+  try {
+    const fields = await fetchDocumentFields([CONTENT_COLLECTION, CONTENT_DOC_ID]);
+    if (!fields?.content) return; // belum pernah disimpan: pakai teks markup
+
+    const applied = applySiteContent(fields.content);
+    if (!applied) return;
+
+    window.siteContentApplied = true;
+    window.dispatchEvent(new CustomEvent('sitecontent:applied', { detail: { applied } }));
+    window.AOS?.refreshHard?.();
+  } catch (error) {
+    console.warn('Teks kustom tidak dapat dimuat, memakai teks bawaan:', error);
+  }
+}
+
+/**
+ * Preferensi tampilan tamu. Hanya dipakai untuk memutuskan section opsional,
+ * jadi kegagalannya tidak mengganggu apa pun: custom.js tetap membaca dokumen
+ * tamu yang sama lewat SDK untuk nama, RSVP, dan tracking.
+ */
+async function loadGuestEarly() {
+  const guestId = guestIdFromUrl();
+  if (!guestId) return;
+
+  try {
+    const guest = await fetchDocumentFields(['guest', guestId]);
+    if (!guest) return;
+
+    const preferences = {
+      showInviters: guest.showInviters === true,
+      musicTrack: guest.musicTrack === 'minang' ? 'minang' : 'default',
+    };
+
+    // custom.js bisa dieksekusi sebelum atau sesudah fetch ini selesai, jadi
+    // hasilnya ditinggalkan di global sekaligus disiarkan sebagai event.
+    window.__guestEarly = preferences;
+    window.dispatchEvent(new CustomEvent('guest:early', { detail: preferences }));
+  } catch (error) {
+    console.warn('Preferensi tamu belum dapat dibaca lebih awal:', error);
+  }
+}
+
+// Ketiganya berjalan paralel, lalu Firebase + jalur SDK dimuat dinamis supaya
+// bundle SDK yang besar tidak menjadi dependensi statis modul ini.
 loadMediaEarly();
+loadContentEarly();
+loadGuestEarly();
 import('./site-content-public.js');

@@ -598,16 +598,20 @@
 
             <!-- Turut Mengundang: tersembunyi kecuali tamu ini diberi opsi
                  "Munculkan Turut Mengundang" dari panel admin. -->
-            <section class="inviter-section inviter-wrap" data-inviter-section hidden style="display: none;" data-aos="fade-up" data-aos-duration="700" data-aos-delay="100">
-                <div class="sintia-section-separator" aria-hidden="true" data-aos="zoom-out" data-aos-duration="1500" data-aos-delay="300">
+            <!-- Section ini baru dibuka JavaScript setelah AOS berinisialisasi, jadi
+                 animasinya memakai CSS keyframes (lihat custom.css) dan bukan data-aos.
+                 Animasi CSS selalu berakhir pada opacity 1, sehingga isinya tidak
+                 pernah tertahan tak terlihat seperti kasus item galeri. -->
+            <section class="inviter-section inviter-wrap" data-inviter-section hidden style="display: none;">
+                <div class="sintia-section-separator" aria-hidden="true">
                     <img src="assets/images/sintia/orn-section-min.png" alt="">
                 </div>
                 <div class="inviter-content">
-                    <div class="inviter-header" data-aos="zoom-in" data-aos-duration="700" data-aos-delay="200">
+                    <div class="inviter-header">
                         <h2 class="latin-title inviter-title" data-content="inviterTitle">Turut Mengundang</h2>
                         <p class="inviter-description" data-content="inviterDescription"></p>
                     </div>
-                    <div class="inviter-body" data-aos="fade-in" data-aos-duration="700" data-aos-delay="300">
+                    <div class="inviter-body">
                         <div class="inviter-list" data-content="inviterList" data-content-attr="inviterColumns" data-columns="1"></div>
                     </div>
                 </div>

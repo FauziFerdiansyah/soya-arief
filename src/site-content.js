@@ -499,13 +499,14 @@ function setListItems(element, value) {
     .map((line) => line.trim())
     .filter(Boolean);
 
+  // Tanpa atribut AOS. Item ini dibuat setelah AOS selesai mengukur posisi,
+  // sehingga data-aos membuatnya tertahan pada opacity 0 sampai ada refresh
+  // berikutnya. Animasi masuknya ditangani CSS yang selalu berakhir di
+  // opacity 1, mengikuti pola yang sudah dipakai item galeri.
   const fragment = document.createDocumentFragment();
-  items.forEach((text, index) => {
+  items.forEach((text) => {
     const item = document.createElement('span');
     item.className = 'content-list-item';
-    item.setAttribute('data-aos', 'zoom-in-up');
-    item.setAttribute('data-aos-duration', '300');
-    item.setAttribute('data-aos-delay', String((index + 1) * 70));
     item.textContent = text;
     fragment.appendChild(item);
   });

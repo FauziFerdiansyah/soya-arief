@@ -311,7 +311,6 @@ function buildOverlay() {
             id="admin-gate-username"
             name="username"
             type="text"
-            value="${ADMIN_USERNAME}"
             placeholder="Masukkan username"
             autocomplete="username"
             required

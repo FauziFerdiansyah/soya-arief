@@ -668,9 +668,20 @@ body.sintia a {
 }
 
 .gallery-photos {
+  --gallery-gap: 4px;
+
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
+  gap: var(--gallery-gap);
+}
+
+/* Jumlah foto ganjil: foto terakhir direntangkan ke dua kolom lalu dipusatkan
+   dengan lebar tetap satu kolom, supaya tidak menggantung di sisi kiri.
+   :nth-child(odd) pada elemen terakhir hanya benar bila jumlahnya ganjil. */
+.gallery-photos > span:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - (var(--gallery-gap) / 2));
 }
 
 .gallery-photos span {
