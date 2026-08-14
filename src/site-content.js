@@ -117,7 +117,7 @@ const SECTIONS_OPENING = [
     fields: [
       { key: 'heroOverline', label: 'Teks atas', type: 'text', fallback: 'Wedding Invitation' },
       { key: 'heroCouple', label: 'Nama pasangan', type: 'text', fallback: 'Arief & Soya' },
-      { key: 'heroHashtag', label: 'Hashtag', type: 'text', fallback: '#AriefSoya' },
+      { key: 'heroHashtag', label: 'Hashtag', type: 'text', fallback: '#ArifinitelySoya' },
     ],
   },
   {
@@ -325,7 +325,7 @@ const SECTIONS_DETAIL = [
         label: 'Alamat penerima kado',
         type: 'textarea',
         rows: 3,
-        fallback: 'Perumahan Bumi Sawangan Indah 2, Jalan Masjid III Blok D3 No. 110, Sawangan, Kota Depok, Jawa Barat 16518, Indonesia',
+        fallback: 'Jalan Anggrek Cendrawasih VIII Blok K14, RT.2/ RW.3 , Kemanggisan Palmerah, Kota Jakarta Barat , Dki Jakarta Barat , Id 11410',
       },
       { key: 'giftCopyAddress', label: 'Tombol salin alamat', type: 'text', target: 'label', fallback: 'Salin Alamat' },
       {
@@ -414,7 +414,7 @@ const SECTIONS_DETAIL = [
     fields: [
       { key: 'footnoteOverline', label: 'Teks atas', type: 'text', fallback: 'Wedding Invitation' },
       { key: 'footnoteCouple', label: 'Nama pasangan', type: 'text', fallback: 'Arief & Soya' },
-      { key: 'footnoteHashtag', label: 'Hashtag', type: 'text', fallback: '#AriefSoya' },
+      { key: 'footnoteHashtag', label: 'Hashtag', type: 'text', fallback: '#ArifinitelySoya' },
       { key: 'footnoteDate', label: 'Tanggal singkat', type: 'text', fallback: '05.09.2026' },
       { key: 'footerCouple', label: 'Teks footer', type: 'text', fallback: 'Arief & Soya' },
     ],
