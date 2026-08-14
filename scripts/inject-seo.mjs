@@ -9,11 +9,121 @@
  * Konsekuensinya: setelah mengubah SEO atau foto di panel admin, situs perlu
  * dideploy ulang agar pratinjau tautan mengikuti data terbaru.
  */
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 
 const DIST_FILE = 'dist/index.html';
+const ICS_FILE = 'dist/assets/calendar/soya-arief-wedding.ics';
 const OG_SIZE = 600;
+const TIME_ZONE = 'Asia/Jakarta';
+const UTC_OFFSET = '+07:00';
+
+// Nilai bawaan harus sama dengan fallback pada src/site-content.js.
+const EVENT_DEFAULTS = {
+  eventDate: '2026-09-05',
+  eventStartTime: '08:00',
+  eventEndTime: '14:00',
+  eventCalendarTitle: 'The Wedding of Arief & Soya',
+  eventCalendarDescription: 'Kami mengundang Anda untuk hadir di hari bahagia Arief dan Soya.',
+  eventCalendarLocation: 'Aula Kampus Widuri, Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara, Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480',
+  eventReminder: 'P1D',
+};
+
+const REMINDER_TOKENS = ['PT1H', 'PT3H', 'P1D', 'P2D', 'P1W'];
+
+const EVENT_PATTERNS = {
+  eventDate: /^\d{4}-\d{2}-\d{2}$/,
+  eventStartTime: /^([01]\d|2[0-3]):[0-5]\d$/,
+  eventEndTime: /^([01]\d|2[0-3]):[0-5]\d$/,
+};
+
+function eventValue(values, key) {
+  const raw = typeof values[key] === 'string' ? values[key].trim() : '';
+  if (!raw) return EVENT_DEFAULTS[key];
+  if (EVENT_PATTERNS[key] && !EVENT_PATTERNS[key].test(raw)) return EVENT_DEFAULTS[key];
+  return raw;
+}
+
+function buildEventTimes(values) {
+  const date = eventValue(values, 'eventDate');
+  const start = eventValue(values, 'eventStartTime');
+  const end = eventValue(values, 'eventEndTime');
+  const compactDate = date.replaceAll('-', '');
+
+  return {
+    compactDate,
+    startIso: `${date}T${start}:00${UTC_OFFSET}`,
+    compactStart: `${compactDate}T${start.replace(':', '')}00`,
+    compactEnd: `${compactDate}T${end.replace(':', '')}00`,
+  };
+}
+
+function buildGoogleCalendarUrl(values) {
+  const times = buildEventTimes(values);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: eventValue(values, 'eventCalendarTitle'),
+    dates: `${times.compactStart}/${times.compactEnd}`,
+    ctz: TIME_ZONE,
+    location: eventValue(values, 'eventCalendarLocation'),
+    details: eventValue(values, 'eventCalendarDescription'),
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function escapeIcsText(value) {
+  return String(value)
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r?\n/g, '\\n');
+}
+
+/**
+ * ICS dihasilkan sebagai berkas nyata, bukan blob di browser, karena Safari
+ * iOS tidak dapat diandalkan membuka blob: atau data: sebagai kalender.
+ */
+/** VALARM: pengingat sebelum acara, mis. -P1D berarti 1 hari sebelumnya. */
+function buildAlarmLines(values, title) {
+  const reminder = eventValue(values, 'eventReminder');
+  if (!REMINDER_TOKENS.includes(reminder)) return [];
+
+  return [
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    `DESCRIPTION:${escapeIcsText(title)}`,
+    `TRIGGER;RELATED=START:-${reminder}`,
+    'END:VALARM',
+  ];
+}
+
+function buildIcsContent(values) {
+  const times = buildEventTimes(values);
+  const title = eventValue(values, 'eventCalendarTitle');
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Arief & Soya//Wedding Invitation//ID',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:wedding-${times.compactDate}@soyaarief.site`,
+    `DTSTAMP:${times.compactStart}Z`,
+    `DTSTART;TZID=${TIME_ZONE}:${times.compactStart}`,
+    `DTEND;TZID=${TIME_ZONE}:${times.compactEnd}`,
+    `SUMMARY:${escapeIcsText(title)}`,
+    `DESCRIPTION:${escapeIcsText(eventValue(values, 'eventCalendarDescription'))}`,
+    `LOCATION:${escapeIcsText(eventValue(values, 'eventCalendarLocation'))}`,
+    'STATUS:CONFIRMED',
+    ...buildAlarmLines(values, title),
+    'END:VEVENT',
+    'END:VCALENDAR',
+    '',
+  ].join('\r\n');
+}
 
 /**
  * Node tidak memuat .env.local seperti Vite, jadi file env dibaca manual
@@ -117,6 +227,29 @@ const SLOT_DELIVERY = {
 
 const GALLERY_DELIVERY = { ratio: '1:1', width: 560, sourceMax: 1800 };
 const GALLERY_FULL = { ratio: '1:1', width: 1800, sourceMax: 1800 };
+
+// Toggle tampil/sembunyi yang juga diterapkan saat build supaya tidak ada
+// kedipan konten yang sebenarnya disembunyikan admin.
+const VISIBILITY_KEYS = ['giftShowPhone', 'giftShowConfirm'];
+
+function injectVisibility(html, values) {
+  let result = html;
+  let count = 0;
+
+  VISIBILITY_KEYS.forEach((key) => {
+    const value = typeof values[key] === 'string' ? values[key].trim() : '';
+    if (value !== 'hide') return;
+
+    const pattern = new RegExp(`<([a-zA-Z]+)([^>]*data-content-toggle=["']${key}["'][^>]*)>`);
+    result = result.replace(pattern, (tag, tagName, attributes) => {
+      if (/\shidden(\s|=|$)/i.test(attributes)) return tag;
+      count += 1;
+      return `<${tagName}${attributes} hidden>`;
+    });
+  });
+
+  return { html: result, count };
+}
 
 /** Tulis src foto slot langsung ke HTML dan lepas kelas placeholder. */
 function injectSlotImages(html, media) {
@@ -234,6 +367,25 @@ async function main() {
   const gallery = injectGallery(html, media);
   html = gallery.html;
   if (gallery.count) applied.push(`${gallery.count} foto galeri`);
+
+  const visibility = injectVisibility(html, values);
+  html = visibility.html;
+  if (visibility.count) applied.push(`${visibility.count} elemen disembunyikan`);
+
+  // Data acara: hitung mundur, tautan Google Calendar, dan berkas ICS.
+  const times = buildEventTimes(values);
+  html = html.replace(
+    /(<div class="countdown"[^>]*data-target-date=")[^"]*(")/i,
+    `$1${escapeAttribute(times.startIso)}$2`
+  );
+  html = html.replace(
+    /(<a[^>]*id="addToCalendar"[^>]*)/i,
+    (tag) => tag.replace(/href="[^"]*"/i, `href="${escapeAttribute(buildGoogleCalendarUrl(values))}"`)
+  );
+
+  await mkdir(dirname(ICS_FILE), { recursive: true });
+  await writeFile(ICS_FILE, buildIcsContent(values), 'utf8');
+  applied.push('kalender & ICS');
 
   if (title) {
     html = html.replace(/<title>[^<]*<\/title>/i, `<title>${escapeAttribute(title)}</title>`);

@@ -3646,3 +3646,64 @@ p {
 #mediaEditorModalBody .media-editor__gridtoggle {
   justify-content: center;
 }
+
+/* ---------- Kotak grup dengan toggle ---------- */
+#page-content-wrapper .content-toggle-group {
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-muted);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+#page-content-wrapper .content-toggle-group.is-off {
+  background-color: var(--surface);
+  border-style: dashed;
+}
+
+#page-content-wrapper .content-toggle-group__head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+#page-content-wrapper .content-toggle-group__switch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: auto;
+  margin: 0;
+  padding-left: 2.6rem;
+}
+
+#page-content-wrapper .content-toggle-group__switch .form-check-input {
+  margin-left: -2.6rem;
+  width: 2.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+}
+
+#page-content-wrapper .content-toggle-group__switch .form-check-label {
+  color: var(--black);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#page-content-wrapper .content-toggle-group__hint {
+  margin: 0;
+  padding-left: 2.6rem;
+  color: var(--black3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#page-content-wrapper .content-toggle-group__body {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+#page-content-wrapper .content-toggle-group__body[hidden] {
+  display: none;
+}

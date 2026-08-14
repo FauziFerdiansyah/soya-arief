@@ -39,6 +39,57 @@ const SECTIONS_OPENING = [
     ],
   },
   {
+    id: 'event',
+    label: 'Data Acara & Kalender',
+    icon: 'ri-calendar-2-line',
+    description: 'Sumber tunggal untuk hitung mundur, tombol kalender, dan file ICS.',
+    fields: [
+      { key: 'eventDate', label: 'Tanggal acara', type: 'date', target: 'config', pattern: 'date', fallback: '2026-09-05' },
+      { key: 'eventStartTime', label: 'Jam mulai (WIB)', type: 'time', target: 'config', pattern: 'time', fallback: '08:00' },
+      { key: 'eventEndTime', label: 'Jam selesai (WIB)', type: 'time', target: 'config', pattern: 'time', fallback: '14:00' },
+      {
+        key: 'eventCalendarTitle',
+        label: 'Judul acara di kalender',
+        type: 'text',
+        target: 'config',
+        fallback: 'The Wedding of Arief & Soya',
+      },
+      {
+        key: 'eventCalendarDescription',
+        label: 'Keterangan acara di kalender',
+        type: 'textarea',
+        rows: 2,
+        target: 'config',
+        fallback: 'Kami mengundang Anda untuk hadir di hari bahagia Arief dan Soya.',
+      },
+      {
+        key: 'eventReminder',
+        label: 'Pengingat sebelum acara',
+        type: 'select',
+        target: 'config',
+        options: [
+          { value: 'none', label: 'Tanpa pengingat' },
+          { value: 'PT1H', label: '1 jam sebelum' },
+          { value: 'PT3H', label: '3 jam sebelum' },
+          { value: 'P1D', label: '1 hari sebelum' },
+          { value: 'P2D', label: '2 hari sebelum' },
+          { value: 'P1W', label: '1 minggu sebelum' },
+        ],
+        hint: 'Berlaku pada berkas ICS (Apple Calendar dan Outlook). Google Calendar memakai pengaturan pengingat milik tamu.',
+        fallback: 'P1D',
+      },
+      {
+        key: 'eventCalendarLocation',
+        label: 'Lokasi acara di kalender',
+        type: 'textarea',
+        rows: 3,
+        target: 'config',
+        hint: 'Dipakai pada Google Calendar dan file ICS untuk pengguna Apple.',
+        fallback: 'Aula Kampus Widuri, Jl. Palmerah Barat No. 353, RT. 3/RW. 5, Grogol Utara, Kebayoran Lama, Jakarta Selatan, DKI Jakarta 11480',
+      },
+    ],
+  },
+  {
     id: 'welcome',
     label: 'Halaman Pembuka',
     icon: 'ri-mail-open-line',
@@ -254,6 +305,27 @@ const SECTIONS_DETAIL = [
       { key: 'giftSendDesc', label: 'Deskripsi kirim kado', type: 'text', fallback: 'Anda dapat mengirim kado ke:' },
       { key: 'giftSendName', label: 'Nama penerima kado', type: 'text', fallback: 'Soya Amanda' },
       {
+        key: 'giftSendPhone',
+        label: 'Nomor HP penerima kado',
+        type: 'text',
+        hint: 'Dipakai juga sebagai tujuan konfirmasi WhatsApp. Tulis format lokal, contoh 08996530109.',
+        fallback: '08996530109',
+      },
+      {
+        key: 'giftShowPhone',
+        label: 'Tampilkan nomor HP di alamat kado',
+        type: 'toggle',
+        target: 'visibility',
+        // Field di bawah ini hanya tampil saat toggle aktif.
+        controls: ['giftSendPhone'],
+        options: [
+          { value: 'show', label: 'Tampilkan' },
+          { value: 'hide', label: 'Sembunyikan' },
+        ],
+        hint: 'Nomor tetap dipakai untuk konfirmasi WhatsApp meski disembunyikan.',
+        fallback: 'show',
+      },
+      {
         key: 'giftSendAddress',
         label: 'Alamat penerima kado',
         type: 'textarea',
@@ -261,6 +333,42 @@ const SECTIONS_DETAIL = [
         fallback: 'Perumahan Bumi Sawangan Indah 2, Jalan Masjid III Blok D3 No. 110, Sawangan, Kota Depok, Jawa Barat 16518, Indonesia',
       },
       { key: 'giftCopyAddress', label: 'Tombol salin alamat', type: 'text', target: 'label', fallback: 'Salin Alamat' },
+      {
+        key: 'giftShowConfirm',
+        label: 'Tampilkan konfirmasi kado',
+        type: 'toggle',
+        target: 'visibility',
+        controls: [
+          'giftConfirmTitle',
+          'giftConfirmDesc',
+          'giftConfirmPlaceholder',
+          'giftConfirmButton',
+          'giftConfirmMessage',
+        ],
+        options: [
+          { value: 'show', label: 'Tampilkan' },
+          { value: 'hide', label: 'Sembunyikan' },
+        ],
+        hint: 'Menyembunyikan seluruh form konfirmasi WhatsApp pada bagian kirim kado.',
+        fallback: 'show',
+      },
+      { key: 'giftConfirmTitle', label: 'Judul konfirmasi hadiah', type: 'text', fallback: 'Sudah mengirim hadiah?' },
+      {
+        key: 'giftConfirmDesc',
+        label: 'Deskripsi konfirmasi hadiah',
+        type: 'text',
+        fallback: 'Isi nama Anda, lalu konfirmasi lewat WhatsApp.',
+      },
+      { key: 'giftConfirmPlaceholder', label: 'Placeholder nama pengirim', type: 'text', target: 'placeholder', fallback: 'Nama Anda' },
+      { key: 'giftConfirmButton', label: 'Tombol konfirmasi WhatsApp', type: 'text', target: 'label', fallback: 'Konfirmasi via WhatsApp' },
+      {
+        key: 'giftConfirmMessage',
+        label: 'Template pesan WhatsApp',
+        type: 'textarea',
+        rows: 3,
+        hint: 'Gunakan [Nama] untuk menyisipkan nama pengirim.',
+        fallback: 'Hai, saya [Nama]. Ingin mengonfirmasi pemberian hadiah. Mohon dibantu untuk dicek ya. Terima kasih.',
+      },
     ],
   },
   {
@@ -329,11 +437,18 @@ const FIELD_BY_KEY = new Map(CONTENT_FIELDS.map((field) => [field.key, field]));
 const ATTRIBUTE_BY_TARGET = {
   href: 'data-content-url',
   attr: 'data-content-attr',
+  visibility: 'data-content-toggle',
 };
 
 // Field SEO tidak terikat ke elemen di halaman; penerapannya diurus
 // site-seo.js (meta tag) dan scripts/inject-seo.mjs (saat build).
-const NON_DOM_TARGETS = new Set(['seo']);
+const NON_DOM_TARGETS = new Set(['seo', 'config']);
+
+// Validasi format untuk field terstruktur.
+const VALUE_PATTERNS = {
+  date: /^\d{4}-\d{2}-\d{2}$/,
+  time: /^([01]\d|2[0-3]):[0-5]\d$/,
+};
 
 /** URL hanya diterima untuk skema yang aman dipakai di atribut href. */
 export function isSafeUrl(value) {
@@ -361,6 +476,7 @@ export function sanitizeContent(raw) {
     if (!trimmed) return;
     if (field.target === 'href' && !isSafeUrl(trimmed)) return;
     if (field.options && !field.options.some((option) => option.value === trimmed)) return;
+    if (field.pattern && !VALUE_PATTERNS[field.pattern]?.test(trimmed)) return;
 
     clean[key] = trimmed;
   });
@@ -421,6 +537,12 @@ function applyToElement(element, field, value) {
     case 'attr':
       if (field.attrName) element.setAttribute(field.attrName, value);
       break;
+    case 'visibility': {
+      const visible = value === 'show';
+      element.hidden = !visible;
+      element.style.display = visible ? '' : 'none';
+      break;
+    }
     case 'label':
       setLabelText(element, value);
       break;

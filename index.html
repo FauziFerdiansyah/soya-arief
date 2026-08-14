@@ -485,6 +485,9 @@
                                 <small class="count-text" data-content="saveDateLabelSecond">Detik</small>
                             </div>
                         </div>
+                        <!-- Menggantikan countdown pada hari acara dan sesudahnya,
+                             supaya tidak menampilkan angka 00 yang tidak bermakna. -->
+                        <p class="countdown-status" data-countdown-status hidden></p>
                         <div class="add-to-calendar-wrap add-to-calendar-date" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="800">
                             <a class="to-calendar add-to-calendar" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=The+Wedding+of+Arief+%26+Soya&amp;dates=20260905T080000/20260905T140000&amp;ctz=Asia%2FJakarta&amp;location=Aula+Kampus+Widuri%2C+Jl.+Palmerah+Barat+No.+353%2C+Jakarta+Selatan&amp;details=Kami+mengundang+Anda+untuk+hadir+di+hari+bahagia+Arief+dan+Soya." data-apple-calendar="assets/calendar/soya-arief-wedding.ics" target="_blank" rel="nofollow noopener" id="addToCalendar" data-content="saveDateButton">Tambahkan ke Kalender</a>
                         </div>
@@ -846,6 +849,7 @@
                                     <p class="gift-desc" data-content="giftSendDesc">Anda dapat mengirim kado ke:</p>
                                     <div class="gift-send-body">
                                         <h3 class="gift-send-name" data-content="giftSendName">Soya Amanda</h3>
+                                        <p class="gift-send-phone" data-remote="gift-phone" data-content="giftSendPhone" data-content-toggle="giftShowPhone">08996530109</p>
                                         <p class="gift-send-address" data-remote="address" data-content="giftSendAddress">
                                             Perumahan Bumi Sawangan Indah 2, Jalan Masjid III Blok D3 No. 110,
                                             Sawangan, Kota Depok, Jawa Barat 16518, Indonesia
@@ -856,6 +860,31 @@
                                         <i class="icon-copy"></i>
                                         Salin Alamat
                                     </button>
+                                    </div>
+
+                                    <!-- Konfirmasi pengiriman hadiah via WhatsApp -->
+                                    <div class="gift-confirm" data-content-toggle="giftShowConfirm">
+                                        <p class="gift-confirm-title" data-content="giftConfirmTitle">Sudah mengirim hadiah?</p>
+                                        <p class="gift-confirm-desc" data-content="giftConfirmDesc">Isi nama Anda, lalu konfirmasi lewat WhatsApp.</p>
+                                        <form class="gift-confirm-form" id="giftConfirmForm">
+                                            <input
+                                                type="text"
+                                                class="form-input-field gift-confirm-input"
+                                                id="giftConfirmName"
+                                                name="giftConfirmName"
+                                                data-content="giftConfirmPlaceholder"
+                                                placeholder="Nama Anda"
+                                                autocomplete="name"
+                                                required
+                                            >
+                                            <button type="submit" class="action-btn gift-confirm-action" data-content="giftConfirmButton">
+                                                <i class="icon-whatsapp"></i>
+                                                Konfirmasi via WhatsApp
+                                            </button>
+                                        </form>
+                                        <!-- Template pesan WhatsApp; disimpan di DOM agar dapat
+                                             diubah dari panel admin. [Nama] diganti otomatis. -->
+                                        <span class="gift-confirm-template" data-content="giftConfirmMessage" hidden>Hai, saya [Nama]. Ingin mengonfirmasi pemberian hadiah. Mohon dibantu untuk dicek ya. Terima kasih.</span>
                                     </div>
                                 </div>
                             </div>

@@ -151,6 +151,7 @@ File ini berisi:
  */
   const CountdownManager = {
     targetDate: null,
+    eventDayStart: null,
     countdownInterval: null,
     elements: {
       days: null,
@@ -194,6 +195,8 @@ File ini berisi:
       return;
     }
     
+    this.eventDayStart = this.resolveEventDayStart(targetDateStr);
+
     // Start countdown
     this.startCountdown();
     
@@ -204,6 +207,14 @@ File ini berisi:
      * Start countdown timer
      */
     startCountdown() {
+      // Hentikan timer lama lebih dulu. init() bisa dipanggil ulang saat data
+      // acara dari panel admin tiba, dan tanpa ini akan ada dua interval
+      // berjalan bersamaan.
+      if (this.countdownInterval) {
+        clearInterval(this.countdownInterval);
+        this.countdownInterval = null;
+      }
+
       // Update immediately
       this.updateCountdown();
       
@@ -216,10 +227,72 @@ File ini berisi:
     /**
      * Update countdown display
      */
+    /**
+     * Awal hari acara menurut waktu acara (WIB), bukan waktu perangkat tamu.
+     * Dipakai untuk memutuskan kapan countdown berhenti ditampilkan.
+     */
+    resolveEventDayStart(targetDateStr) {
+      const parsed = String(targetDateStr).match(/^(\d{4}-\d{2}-\d{2})T[\d:]+([+-]\d{2}:\d{2}|Z)$/);
+
+      if (parsed) {
+        const offset = parsed[2] === 'Z' ? '+00:00' : parsed[2];
+        const dayStart = new Date(`${parsed[1]}T00:00:00${offset}`);
+        if (!Number.isNaN(dayStart.getTime())) return dayStart;
+      }
+
+      // Cadangan: pakai tengah malam menurut zona waktu perangkat.
+      const fallback = new Date(this.targetDate);
+      fallback.setHours(0, 0, 0, 0);
+      return fallback;
+    },
+
+    /** "1 hari", "2 minggu", "3 bulan", "1 tahun". */
+    formatElapsed(days) {
+      if (days < 7) return `${days} hari`;
+      if (days < 30) return `${Math.floor(days / 7)} minggu`;
+      if (days < 365) return `${Math.floor(days / 30)} bulan`;
+      return `${Math.floor(days / 365)} tahun`;
+    },
+
+    /**
+     * Pada hari acara dan sesudahnya, angka countdown tidak lagi bermakna.
+     * Countdown dan tombol kalender disembunyikan, diganti satu baris teks.
+     */
+    showEventStatus(text) {
+      const countdown = document.querySelector('.countdown');
+      const calendar = document.querySelector('.add-to-calendar-wrap');
+      const status = document.querySelector('[data-countdown-status]');
+
+      if (countdown) countdown.hidden = true;
+      if (calendar) calendar.hidden = true;
+
+      if (status) {
+        status.hidden = false;
+        if (status.textContent !== text) status.textContent = text;
+      }
+    },
+
     updateCountdown() {
       const now = new Date().getTime();
       const distance = this.targetDate.getTime() - now;
-      
+
+      // Sejak tengah malam hari acara, tampilkan status alih-alih angka.
+      if (this.eventDayStart) {
+        const dayStart = this.eventDayStart.getTime();
+        const dayEnd = dayStart + 24 * 60 * 60 * 1000;
+
+        if (now >= dayEnd) {
+          const elapsedDays = Math.floor((now - dayStart) / (24 * 60 * 60 * 1000));
+          this.showEventStatus(`Acara ${this.formatElapsed(elapsedDays)} lalu`);
+          return;
+        }
+
+        if (now >= dayStart) {
+          this.showEventStatus('Acara Sedang Berlangsung');
+          return;
+        }
+      }
+
       // Check if countdown is finished
       if (distance < 0) {
         this.handleCountdownFinished();
@@ -900,6 +973,14 @@ const CustomInitializer = {
       CalendarLinkManager.init();
       // RSVPFormManager.init();
       CountdownManager.init();
+
+      // Data acara dari panel admin datang secara asinkron. Saat tiba,
+      // hitung mundur dan tautan kalender dihitung ulang agar tidak memakai
+      // tanggal bawaan yang mungkin sudah berubah.
+      window.addEventListener('siteevent:applied', () => {
+        CountdownManager.init();
+        CalendarLinkManager.init();
+      });
       
       // Setup additional interactions
       this.setupAdditionalInteractions();
@@ -935,7 +1016,72 @@ const CustomInitializer = {
       init() {
         this.setupGiftTabs();
         this.setupCopyActions();
+        this.setupGiftConfirm();
         this.createSnackbarContainer();
+      },
+
+      /**
+       * Ubah nomor lokal menjadi format internasional WhatsApp.
+       * 08996530109 -> 628996530109
+       */
+      normalizeWhatsAppNumber(raw) {
+        let digits = String(raw || '').replace(/\D/g, '');
+        if (!digits) return '';
+
+        if (digits.startsWith('0')) {
+          digits = `62${digits.slice(1)}`;
+        } else if (!digits.startsWith('62')) {
+          digits = `62${digits}`;
+        }
+
+        return digits;
+      },
+
+      /** Konfirmasi pengiriman hadiah lewat WhatsApp. */
+      setupGiftConfirm() {
+        const form = document.getElementById('giftConfirmForm');
+        if (!form) return;
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+
+          const input = document.getElementById('giftConfirmName');
+          const name = String(input?.value || '').trim();
+
+          if (!name) {
+            window.showSnackbar?.('Isi nama Anda terlebih dahulu');
+            input?.focus();
+            return;
+          }
+
+          const phoneSource = document.querySelector('[data-content="giftSendPhone"]');
+          const phone = this.normalizeWhatsAppNumber(phoneSource?.textContent);
+
+          if (!phone) {
+            window.showSnackbar?.('Nomor WhatsApp tujuan belum tersedia');
+            return;
+          }
+
+          const template = document.querySelector('[data-content="giftConfirmMessage"]')?.textContent?.trim()
+            || 'Hai, saya [Nama]. Ingin mengonfirmasi pemberian hadiah. Mohon dibantu untuk dicek ya. Terima kasih.';
+
+          const message = template.replaceAll('[Nama]', name);
+          const url = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+
+          // Di ponsel, navigasi pada tab yang sama membuat aplikasi WhatsApp
+          // terbuka langsung; tab baru sering ditahan browser atau berhenti
+          // di halaman web WhatsApp.
+          const isMobile = window.matchMedia('(max-width: 1024px)').matches
+            || /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+
+          if (isMobile) {
+            window.location.href = url;
+            return;
+          }
+
+          const opened = window.open(url, '_blank', 'noopener');
+          if (!opened) window.location.href = url;
+        });
       },
 
       setupGiftTabs() {

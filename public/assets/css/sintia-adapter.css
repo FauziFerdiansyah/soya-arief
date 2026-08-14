@@ -2582,7 +2582,7 @@ body.sintia h2.gift-card-title {
   font-size: .95rem !important;
 }
 
-body.sintia h2.gift-send-title {
+body.sintia h2.gift-send-title, .gift-confirm-title {
   font-size: 1.35rem !important;
   font-weight: 600;
 }

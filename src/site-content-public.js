@@ -20,6 +20,7 @@ import {
   applySiteMedia,
 } from './site-media.js';
 import { applySiteSeo } from './site-seo.js';
+import { applySiteEvent } from './site-event.js';
 
 /** Elemen hasil render dinamis perlu dihitung ulang oleh AOS. */
 function refreshAos() {
@@ -40,6 +41,7 @@ async function loadSiteContent() {
 
     const content = snapshot.data()?.content;
     applySiteSeo(content, window.__siteMedia);
+    applySiteEvent(content);
 
     const applied = applySiteContent(content);
     if (!applied) return;

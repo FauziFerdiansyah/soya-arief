@@ -3880,3 +3880,105 @@ img.media-skeleton {
     animation: none;
   }
 }
+
+/* ===== KIRIM KADO: NOMOR HP & KONFIRMASI WHATSAPP ===== */
+.gift-send-phone {
+  margin: 2px 0 8px;
+  color: var(--text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+}
+
+.gift-send-phone:empty {
+  display: none;
+}
+
+.gift-confirm {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(155, 164, 152, 0.28);
+  text-align: center;
+}
+
+.gift-confirm-title {
+  margin: 0;
+  color: var(--text-tertiary) !important;
+  font-size: var(--font-size-lg) !important;
+  font-weight: var(--font-weight-bold) !important;
+}
+
+.gift-confirm-desc {
+  margin: 4px 0 14px;
+  color: var(--text-tertiary) !important;
+  font-size: var(--font-size-base) !important;
+}
+
+.form-input-field.gift-confirm-input::placeholder {
+  color: rgba(var(--background-primary-rgb), 0.5);
+}
+
+.form-input-field.gift-confirm-input:focus {
+  outline: none !important;
+}
+
+.gift-confirm-desc:empty {
+  display: none;
+}
+
+.gift-confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+}
+
+.gift-confirm-input {
+  width: 100%;
+  text-align: center;
+}
+
+.gift-confirm-action {
+  width: 100%;
+}
+
+/* ===== STATUS ACARA (pengganti countdown) ===== */
+.countdown-status {
+  margin: 8px auto 4px;
+  padding: 0 16px;
+  /* !important karena sintia-adapter.css dimuat setelah berkas ini dan
+     menetapkan font untuk elemen teks section. */
+  font-family: "Afacad Flux", sans-serif !important;
+  font-size: var(--font-size-xl) !important;
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.countdown-status[hidden] {
+  display: none;
+}
+
+/* .countdown memakai display:flex, sehingga atribut [hidden] saja tidak
+   cukup untuk menyembunyikannya. */
+.countdown[hidden],
+.add-to-calendar-wrap[hidden] {
+  display: none !important;
+}
+
+/* ===== IKON WHATSAPP =====
+   Memakai CSS mask, bukan background-image, karena SVG-nya memakai
+   fill="currentColor" yang tidak dapat diresolusi di dalam background-image.
+   Dengan mask, warna ikon otomatis mengikuti warna teks tombolnya. */
+.icon-whatsapp {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMzIgMzIiPgoJPHBhdGggZD0iTTAgMGgzMnYzMkgweiIgZmlsbD0ibm9uZSIgLz4KCTxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIzLjMyOCAxOS4xNzdjLS40MDEtLjIwMy0yLjM1NC0xLjE1Ni0yLjcxOS0xLjI5MmMtLjM2NS0uMTMtLjYzLS4xOTgtLjg5Ni4yMDNjLS4yNi4zOTEtMS4wMjYgMS4yODYtMS4yNiAxLjU0N3MtLjQ2NC4yODEtLjg1OS4xMDRjLS40MDEtLjIwMy0xLjY4Mi0uNjItMy4yMDMtMS45ODRjLTEuMTg4LTEuMDU3LTEuOTc5LTIuMzU5LTIuMjE0LTIuNzZjLS4yMzQtLjM5Ni0uMDI2LS42Mi4xNzItLjgxOGMuMTgyLS4xODIuNDAxLS40NTguNjA0LS42OThjLjE5My0uMjQuMjU1LS40MDEuMzk2LS42NjFjLjEzLS4yODEuMDYzLS41LS4wMzYtLjY5OHMtLjg5Ni0yLjE2MS0xLjIyOS0yLjk0M2MtLjMxOC0uNzc2LS42NTEtLjY3Ny0uODk2LS42NzdjLS4yMjktLjAyMS0uNDk1LS4wMjEtLjc2LS4wMjFzLS42OTguMDk5LTEuMDYzLjQ3OWMtLjM2NS40MDEtMS4zOTYgMS4zNTktMS4zOTYgMy4yOTdjMCAxLjk0MyAxLjQyNyAzLjgyMyAxLjYyNSA0LjEwNGMuMjAzLjI2IDIuODA3IDQuMjYgNi44MDIgNS45NzljLjk1My40MDEgMS42OTMuNjQxIDIuMjcxLjgzOWMuOTUzLjMwMiAxLjgyMy4yNiAyLjUxLjE2MWMuNzYtLjEyNSAyLjM1NC0uOTY0IDIuNjg4LTEuOTAxYy4zMzktLjk0My4zMzktMS43MjQuMjQtMS45MDFjLS4wOTktLjE4Mi0uMzU5LS4yODEtLjc2LS40NTh6TTE2LjA4MyAyOWgtLjAyMWMtMi4zNjUgMC00LjcwMy0uNjQxLTYuNzQ1LTEuODM5bC0uNDc5LS4yODZsLTUgMS4zMDJsMS4zNDQtNC44NjVsLS4zMjMtLjVhMTMuMTcgMTMuMTcgMCAwIDEtMi4wMjEtNy4wMWMwLTcuMjYgNS45NDMtMTMuMTgyIDEzLjI1NS0xMy4xODJjMy41NDIgMCA2Ljg2NSAxLjM4IDkuMzY1IDMuODhhMTMuMDYgMTMuMDYgMCAwIDEgMy44OCA5LjMyM0MyOS4zMjggMjMuMDc4IDIzLjM5IDI5IDE2LjA4OCAyOXpNMjcuMzU5IDQuNTk5QzI0LjMxNyAxLjY2MSAyMC4zMTcgMCAxNi4wNjIgMEM3LjI4NiAwIC4xNCA3LjExNS4xMzUgMTUuODU5YzAgMi43OTIuNzI5IDUuNTE2IDIuMTI1IDcuOTI3TDAgMzJsOC40NDgtMi4yMDNhMTYuMSAxNi4xIDAgMCAwIDcuNjE1IDEuOTMyaC4wMDVjOC43ODEgMCAxNS45MjctNy4xMTUgMTUuOTMyLTE1Ljg2NWMwLTQuMjM0LTEuNjUxLTguMjE5LTQuNjYxLTExLjIxNHoiIC8+Cjwvc3ZnPgo=") center / contain no-repeat;
+  mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxZW0iIGhlaWdodD0iMWVtIiB2aWV3Qm94PSIwIDAgMzIgMzIiPgoJPHBhdGggZD0iTTAgMGgzMnYzMkgweiIgZmlsbD0ibm9uZSIgLz4KCTxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTIzLjMyOCAxOS4xNzdjLS40MDEtLjIwMy0yLjM1NC0xLjE1Ni0yLjcxOS0xLjI5MmMtLjM2NS0uMTMtLjYzLS4xOTgtLjg5Ni4yMDNjLS4yNi4zOTEtMS4wMjYgMS4yODYtMS4yNiAxLjU0N3MtLjQ2NC4yODEtLjg1OS4xMDRjLS40MDEtLjIwMy0xLjY4Mi0uNjItMy4yMDMtMS45ODRjLTEuMTg4LTEuMDU3LTEuOTc5LTIuMzU5LTIuMjE0LTIuNzZjLS4yMzQtLjM5Ni0uMDI2LS42Mi4xNzItLjgxOGMuMTgyLS4xODIuNDAxLS40NTguNjA0LS42OThjLjE5My0uMjQuMjU1LS40MDEuMzk2LS42NjFjLjEzLS4yODEuMDYzLS41LS4wMzYtLjY5OHMtLjg5Ni0yLjE2MS0xLjIyOS0yLjk0M2MtLjMxOC0uNzc2LS42NTEtLjY3Ny0uODk2LS42NzdjLS4yMjktLjAyMS0uNDk1LS4wMjEtLjc2LS4wMjFzLS42OTguMDk5LTEuMDYzLjQ3OWMtLjM2NS40MDEtMS4zOTYgMS4zNTktMS4zOTYgMy4yOTdjMCAxLjk0MyAxLjQyNyAzLjgyMyAxLjYyNSA0LjEwNGMuMjAzLjI2IDIuODA3IDQuMjYgNi44MDIgNS45NzljLjk1My40MDEgMS42OTMuNjQxIDIuMjcxLjgzOWMuOTUzLjMwMiAxLjgyMy4yNiAyLjUxLjE2MWMuNzYtLjEyNSAyLjM1NC0uOTY0IDIuNjg4LTEuOTAxYy4zMzktLjk0My4zMzktMS43MjQuMjQtMS45MDFjLS4wOTktLjE4Mi0uMzU5LS4yODEtLjc2LS40NTh6TTE2LjA4MyAyOWgtLjAyMWMtMi4zNjUgMC00LjcwMy0uNjQxLTYuNzQ1LTEuODM5bC0uNDc5LS4yODZsLTUgMS4zMDJsMS4zNDQtNC44NjVsLS4zMjMtLjVhMTMuMTcgMTMuMTcgMCAwIDEtMi4wMjEtNy4wMWMwLTcuMjYgNS45NDMtMTMuMTgyIDEzLjI1NS0xMy4xODJjMy41NDIgMCA2Ljg2NSAxLjM4IDkuMzY1IDMuODhhMTMuMDYgMTMuMDYgMCAwIDEgMy44OCA5LjMyM0MyOS4zMjggMjMuMDc4IDIzLjM5IDI5IDE2LjA4OCAyOXpNMjcuMzU5IDQuNTk5QzI0LjMxNyAxLjY2MSAyMC4zMTcgMCAxNi4wNjIgMEM3LjI4NiAwIC4xNCA3LjExNS4xMzUgMTUuODU5YzAgMi43OTIuNzI5IDUuNTE2IDIuMTI1IDcuOTI3TDAgMzJsOC40NDgtMi4yMDNhMTYuMSAxNi4xIDAgMCAwIDcuNjE1IDEuOTMyaC4wMDVjOC43ODEgMCAxNS45MjctNy4xMTUgMTUuOTMyLTE1Ljg2NWMwLTQuMjM0LTEuNjUxLTguMjE5LTQuNjYxLTExLjIxNHoiIC8+Cjwvc3ZnPgo=") center / contain no-repeat;
+}

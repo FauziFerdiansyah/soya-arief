@@ -3178,9 +3178,20 @@ Alfira & Fauzi`;
 
         let control;
 
-        if (field.editor === 'sortable-list') {
+        if (field.type === 'toggle') {
+            // Ditangani buildToggleGroup; label sudah menempel pada switch.
+            label.remove();
+            control = document.createElement('div');
+        } else if (field.editor === 'sortable-list') {
             control = buildListEditor(field);
             label.removeAttribute('for');
+        } else if (field.type === 'date' || field.type === 'time') {
+            control = document.createElement('input');
+            control.type = field.type;
+            control.id = inputId;
+            control.className = 'form-control content-field__input';
+            control.dataset.contentKey = field.key;
+            control.value = savedSiteContent[field.key] ?? field.fallback ?? '';
         } else if (field.type === 'select') {
             control = document.createElement('select');
             control.className = 'form-select content-field__input';
@@ -3225,6 +3236,71 @@ Alfira & Fauzi`;
         return wrapper;
     }
 
+    /**
+     * Kotak grup dengan satu switch di atas. Field yang dikendalikan hanya
+     * tampil saat switch aktif, jadi form tidak penuh oleh isian yang
+     * sedang tidak dipakai.
+     */
+    function buildToggleGroup(field, fieldByKey) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'content-field content-field--wide content-toggle-group';
+
+        const head = document.createElement('div');
+        head.className = 'content-toggle-group__head';
+
+        const inputId = `content-input-${field.key}`;
+        const switchWrap = document.createElement('div');
+        switchWrap.className = 'form-check form-switch content-toggle-group__switch';
+
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.className = 'form-check-input';
+        input.setAttribute('role', 'switch');
+        input.id = inputId;
+        input.dataset.contentKey = field.key;
+        input.checked = (savedSiteContent[field.key] ?? field.fallback ?? 'hide') === 'show';
+
+        const label = document.createElement('label');
+        label.className = 'form-check-label';
+        label.setAttribute('for', inputId);
+        label.textContent = field.label;
+
+        switchWrap.append(input, label);
+        head.appendChild(switchWrap);
+
+        if (field.hint) {
+            const hint = document.createElement('p');
+            hint.className = 'content-toggle-group__hint';
+            hint.textContent = field.hint;
+            head.appendChild(hint);
+        }
+
+        wrapper.appendChild(head);
+
+        const body = document.createElement('div');
+        body.className = 'content-toggle-group__body';
+
+        const grid = document.createElement('div');
+        grid.className = 'content-section__grid';
+        (field.controls || []).forEach((key) => {
+            const child = fieldByKey.get(key);
+            if (child) grid.appendChild(buildContentField(child));
+        });
+
+        body.appendChild(grid);
+        wrapper.appendChild(body);
+
+        const syncGroup = () => {
+            body.hidden = !input.checked;
+            wrapper.classList.toggle('is-off', !input.checked);
+        };
+
+        input.addEventListener('change', syncGroup);
+        syncGroup();
+
+        return wrapper;
+    }
+
     function buildContentSection(section) {
         const details = document.createElement('details');
         details.className = 'content-section';
@@ -3262,7 +3338,24 @@ Alfira & Fauzi`;
 
         const grid = document.createElement('div');
         grid.className = 'content-section__grid';
-        section.fields.forEach((field) => grid.appendChild(buildContentField(field)));
+
+        // Field yang dikendalikan sebuah toggle dipindah ke dalam kotak grup,
+        // bukan ikut tampil di daftar utama.
+        const fieldByKey = new Map(section.fields.map((field) => [field.key, field]));
+        const controlledKeys = new Set(
+            section.fields.flatMap((field) => field.controls || [])
+        );
+
+        section.fields.forEach((field) => {
+            if (controlledKeys.has(field.key)) return;
+
+            grid.appendChild(
+                field.controls?.length
+                    ? buildToggleGroup(field, fieldByKey)
+                    : buildContentField(field)
+            );
+        });
+
         body.appendChild(grid);
 
         // Section tertentu punya foto; editor fotonya menyimpan sendiri
@@ -3310,6 +3403,12 @@ Alfira & Fauzi`;
             const field = CONTENT_FIELD_BY_KEY.get(key);
             if (!field) return;
 
+            // Toggle disimpan sebagai 'show' / 'hide', bukan nilai checkbox.
+            if (control.type === 'checkbox') {
+                next[key] = control.checked ? 'show' : 'hide';
+                return;
+            }
+
             const value = String(control.value ?? '').trim();
             if (!value) {
                 delete next[key];
@@ -3329,6 +3428,8 @@ Alfira & Fauzi`;
         scope.querySelectorAll('[data-content-key]').forEach((control) => {
             if (message) return;
 
+            if (control.type === 'checkbox') return;
+
             const field = CONTENT_FIELD_BY_KEY.get(control.dataset.contentKey);
             const value = String(control.value ?? '').trim();
             if (!field || !value) return;
@@ -3347,6 +3448,14 @@ Alfira & Fauzi`;
         document.querySelectorAll('#contentEditorAccordion [data-content-key]').forEach((control) => {
             const field = CONTENT_FIELD_BY_KEY.get(control.dataset.contentKey);
             const saved = savedSiteContent[control.dataset.contentKey];
+
+            if (control.type === 'checkbox') {
+                control.checked = (saved ?? field?.fallback ?? 'hide') === 'show';
+                // Beri tahu grup agar isian ikut ditampilkan atau disembunyikan.
+                control.dispatchEvent(new Event('change'));
+                return;
+            }
+
             control.value = saved ?? (field?.type === 'select' ? field.fallback ?? '' : '');
         });
 
