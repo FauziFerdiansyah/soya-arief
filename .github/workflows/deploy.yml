@@ -43,6 +43,7 @@ jobs:
           VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
           VITE_BASE: ${{ vars.VITE_BASE || '/' }}
           VITE_PUBLIC_URL: ${{ vars.VITE_PUBLIC_URL }}
+          VITE_CALENDAR_WORKER_URL: ${{ vars.VITE_CALENDAR_WORKER_URL }}
           # Username UI dan email internal Firebase Auth adalah nilai publik.
           VITE_ADMIN_USERNAME: ${{ vars.VITE_ADMIN_USERNAME || 'admin' }}
           VITE_ADMIN_EMAIL: ${{ vars.VITE_ADMIN_EMAIL || 'admin@soyaarief.site' }}

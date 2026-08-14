@@ -30,8 +30,6 @@ const EVENT_DEFAULTS = {
   eventReminder: 'P1D',
 };
 
-const REMINDER_TOKENS = ['PT1H', 'PT3H', 'P1D', 'P2D', 'P1W'];
-
 const EVENT_PATTERNS = {
   eventDate: /^\d{4}-\d{2}-\d{2}$/,
   eventStartTime: /^([01]\d|2[0-3]):[0-5]\d$/,
@@ -54,6 +52,7 @@ function buildEventTimes(values) {
   return {
     compactDate,
     startIso: `${date}T${start}:00${UTC_OFFSET}`,
+    endIso: `${date}T${end}:00${UTC_OFFSET}`,
     compactStart: `${compactDate}T${start.replace(':', '')}00`,
     compactEnd: `${compactDate}T${end.replace(':', '')}00`,
   };
@@ -85,25 +84,45 @@ function escapeIcsText(value) {
  * ICS dihasilkan sebagai berkas nyata, bukan blob di browser, karena Safari
  * iOS tidak dapat diandalkan membuka blob: atau data: sebagai kalender.
  */
-/** VALARM: pengingat sebelum acara, mis. -P1D berarti 1 hari sebelumnya. */
-function buildAlarmLines(values, title) {
-  const reminder = eventValue(values, 'eventReminder');
-  if (!REMINDER_TOKENS.includes(reminder)) return [];
-
+/** VALARM ditetapkan satu hari sebelum acara. */
+function buildAlarmLines(title) {
   return [
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
     `DESCRIPTION:${escapeIcsText(title)}`,
-    `TRIGGER;RELATED=START:-${reminder}`,
+    'TRIGGER;RELATED=START:-P1D',
     'END:VALARM',
   ];
+}
+
+function utcCalendarStamp(value) {
+  return new Date(value).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function foldIcsLine(line) {
+  const parts = [];
+  let part = '';
+  let limit = 75;
+
+  for (const character of line) {
+    if (part && Buffer.byteLength(part + character, 'utf8') > limit) {
+      parts.push(part);
+      part = character;
+      limit = 74;
+    } else {
+      part += character;
+    }
+  }
+
+  if (part || !parts.length) parts.push(part);
+  return parts.map((value, index) => `${index ? ' ' : ''}${value}`).join('\r\n');
 }
 
 function buildIcsContent(values) {
   const times = buildEventTimes(values);
   const title = eventValue(values, 'eventCalendarTitle');
-
-  return [
+  const stamp = utcCalendarStamp(new Date());
+  const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Arief & Soya//Wedding Invitation//ID',
@@ -111,18 +130,20 @@ function buildIcsContent(values) {
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
     `UID:wedding-${times.compactDate}@soyaarief.site`,
-    `DTSTAMP:${times.compactStart}Z`,
-    `DTSTART;TZID=${TIME_ZONE}:${times.compactStart}`,
-    `DTEND;TZID=${TIME_ZONE}:${times.compactEnd}`,
+    `DTSTAMP:${stamp}`,
+    `LAST-MODIFIED:${stamp}`,
+    `DTSTART:${utcCalendarStamp(times.startIso)}`,
+    `DTEND:${utcCalendarStamp(times.endIso)}`,
     `SUMMARY:${escapeIcsText(title)}`,
     `DESCRIPTION:${escapeIcsText(eventValue(values, 'eventCalendarDescription'))}`,
     `LOCATION:${escapeIcsText(eventValue(values, 'eventCalendarLocation'))}`,
     'STATUS:CONFIRMED',
-    ...buildAlarmLines(values, title),
+    ...buildAlarmLines(title),
     'END:VEVENT',
     'END:VCALENDAR',
-    '',
-  ].join('\r\n');
+  ];
+
+  return `${lines.map(foldIcsLine).join('\r\n')}\r\n`;
 }
 
 /**
@@ -380,7 +401,10 @@ async function main() {
   );
   html = html.replace(
     /(<a[^>]*id="addToCalendar"[^>]*)/i,
-    (tag) => tag.replace(/href="[^"]*"/i, `href="${escapeAttribute(buildGoogleCalendarUrl(values))}"`)
+    (tag) => tag.replace(
+      /data-google-calendar="[^"]*"/i,
+      `data-google-calendar="${escapeAttribute(buildGoogleCalendarUrl(values))}"`
+    )
   );
 
   await mkdir(dirname(ICS_FILE), { recursive: true });

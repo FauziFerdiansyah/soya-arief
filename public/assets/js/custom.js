@@ -945,11 +945,27 @@ const CalendarLinkManager = {
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
     if (isAppleMobile) {
+      // Jika tersedia, iOS menerima ICS HTTP dari Cloudflare Worker.
+      // Generator lokal dan ICS statis tetap menjadi fallback gratis.
       calendarLink.href = calendarLink.dataset.appleCalendar;
       calendarLink.removeAttribute('target');
       calendarLink.removeAttribute('rel');
+      if (calendarLink.href.startsWith('blob:')) {
+        calendarLink.download = calendarLink.dataset.appleCalendarFilename || 'wedding.ics';
+      } else {
+        calendarLink.removeAttribute('download');
+      }
       calendarLink.setAttribute('aria-label', 'Tambahkan acara ke Kalender Apple');
+      return;
     }
+
+    // Google Calendar tidak mengimpor VALARM dari URL template, tetapi ini
+    // adalah alur paling andal di Android dan memakai preferensi notifikasi akun.
+    calendarLink.href = calendarLink.dataset.googleCalendar;
+    calendarLink.removeAttribute('download');
+    calendarLink.target = '_blank';
+    calendarLink.rel = 'nofollow noopener';
+    calendarLink.setAttribute('aria-label', 'Tambahkan acara ke Google Calendar');
   }
 };
 

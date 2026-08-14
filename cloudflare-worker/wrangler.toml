@@ -1,0 +1,8 @@
+name = "soya-arief-calendar"
+main = "worker.js"
+compatibility_date = "2026-08-14"
+workers_dev = true
+
+[vars]
+FIREBASE_PROJECT_ID = "wedding-arief-soya"
+CACHE_SECONDS = "60"

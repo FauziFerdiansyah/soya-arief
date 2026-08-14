@@ -68,14 +68,9 @@ const SECTIONS_OPENING = [
         type: 'select',
         target: 'config',
         options: [
-          { value: 'none', label: 'Tanpa pengingat' },
-          { value: 'PT1H', label: '1 jam sebelum' },
-          { value: 'PT3H', label: '3 jam sebelum' },
           { value: 'P1D', label: '1 hari sebelum' },
-          { value: 'P2D', label: '2 hari sebelum' },
-          { value: 'P1W', label: '1 minggu sebelum' },
         ],
-        hint: 'Berlaku pada berkas ICS (Apple Calendar dan Outlook). Google Calendar memakai pengaturan pengingat milik tamu.',
+        hint: 'Ditetapkan 1 hari sebelumnya untuk ICS (Apple Calendar/Outlook). Google Calendar memakai pengaturan notifikasi akun tamu.',
         fallback: 'P1D',
       },
       {
