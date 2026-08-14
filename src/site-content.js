@@ -20,6 +20,25 @@ export const CONTENT_MAX_LENGTH = 3000;
 
 const SECTIONS_OPENING = [
   {
+    id: 'seo',
+    label: 'SEO & Pratinjau Tautan',
+    icon: 'ri-global-line',
+    description: 'Judul dan deskripsi saat tautan undangan dibagikan.',
+    fields: [
+      { key: 'seoTitle', label: 'Judul halaman', type: 'text', target: 'seo', fallback: 'The Wedding of Arief & Soya' },
+      {
+        key: 'seoDescription',
+        label: 'Deskripsi',
+        type: 'textarea',
+        rows: 3,
+        target: 'seo',
+        hint: 'Tampil di bawah judul saat tautan dibagikan ke WhatsApp atau media sosial.',
+        fallback: 'Sabtu, 5 September 2026 | Wedding Invitation',
+      },
+      { key: 'seoImageAlt', label: 'Teks alternatif gambar', type: 'text', target: 'seo', fallback: 'Arief & Soya' },
+    ],
+  },
+  {
     id: 'welcome',
     label: 'Halaman Pembuka',
     icon: 'ri-mail-open-line',
@@ -312,6 +331,10 @@ const ATTRIBUTE_BY_TARGET = {
   attr: 'data-content-attr',
 };
 
+// Field SEO tidak terikat ke elemen di halaman; penerapannya diurus
+// site-seo.js (meta tag) dan scripts/inject-seo.mjs (saat build).
+const NON_DOM_TARGETS = new Set(['seo']);
+
 /** URL hanya diterima untuk skema yang aman dipakai di atribut href. */
 export function isSafeUrl(value) {
   try {
@@ -420,6 +443,8 @@ export function applySiteContent(values, root = document) {
 
   Object.entries(clean).forEach(([key, value]) => {
     const field = FIELD_BY_KEY.get(key);
+    if (NON_DOM_TARGETS.has(field.target)) return;
+
     const attribute = ATTRIBUTE_BY_TARGET[field.target] ?? 'data-content';
 
     root.querySelectorAll(`[${attribute}="${key}"]`).forEach((element) => {

@@ -46,6 +46,9 @@ jobs:
           # Username UI dan email internal Firebase Auth adalah nilai publik.
           VITE_ADMIN_USERNAME: ${{ vars.VITE_ADMIN_USERNAME || 'admin' }}
           VITE_ADMIN_EMAIL: ${{ vars.VITE_ADMIN_EMAIL || 'admin@soyaarief.site' }}
+          # Unsigned upload preset Cloudinary; keduanya nilai publik.
+          VITE_CLOUDINARY_CLOUD_NAME: ${{ vars.VITE_CLOUDINARY_CLOUD_NAME }}
+          VITE_CLOUDINARY_UPLOAD_PRESET: ${{ vars.VITE_CLOUDINARY_UPLOAD_PRESET }}
         run: npm run build
 
       - name: Setup Pages

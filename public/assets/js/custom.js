@@ -1129,7 +1129,13 @@ const CustomInitializer = {
     // Initialize lightGallery
     const galleryElement = document.getElementById('lightgallery');
     if (galleryElement) {
-      lightGallery(galleryElement, {
+      // Galeri bisa diganti dari panel admin setelah init, jadi instance-nya
+      // disimpan supaya daftar itemnya dapat dipindai ulang.
+      window.addEventListener('sitemedia:applied', () => {
+        window.lightGalleryInstance?.refresh?.();
+      });
+
+      window.lightGalleryInstance = lightGallery(galleryElement, {
         speed: 500,
         download: false,
         counter: false,

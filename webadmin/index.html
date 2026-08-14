@@ -26,6 +26,7 @@
               <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="rsvp"><i class="ri-pass-valid-line"></i> RSVP</a>
               <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="comments"><i class="ri-chat-smile-2-line"></i> Comments</a>
               <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="content"><i class="ri-layout-masonry-line"></i> Konten Website</a>
+              <a href="#" class="list-group-item list-group-item-action bg-primary-light" data-menu="gallery"><i class="ri-image-2-line"></i> Galeri Foto</a>
           </div>
       </div>
       <!-- /#sidebar-wrapper -->
@@ -728,10 +729,58 @@
             <div class="content-editor" id="contentEditorAccordion"></div>
           </div>
 
+          <!-- Gallery Section -->
+          <div class="mt-4 pb-5" id="gallerySection" style="display: none;">
+            <h1 class="fs-5 mb-3"><i class="ri-image-2-line"></i> Galeri Foto</h1>
+            <p class="fw-light" style="font-size: 14px;">
+              Maksimal 12 foto. Atur posisi, zoom, dan rotasi tiap foto, lalu geser kartunya untuk mengubah urutan tampil.
+            </p>
+
+            <div class="content-editor-toolbar" id="galleryToolbar">
+              <div class="content-editor-toolbar__info">
+                <strong>Status galeri</strong>
+                <p class="mb-0" id="galleryStatus" aria-live="polite">Memuat galeri…</p>
+                <p class="mb-0 mt-1 content-editor-toolbar__note">
+                  Foto otomatis dikompres jadi WebP saat diunggah. Menghapus foto melepasnya dari undangan;
+                  berkasnya tetap tersimpan di Cloudinary.
+                </p>
+              </div>
+              <div class="content-editor-toolbar__actions">
+                <a class="btn btn-sm btn-outline-secondary" id="galleryPreviewLink" href="../" target="_blank" rel="noopener">
+                  <i class="ri-external-link-line"></i> Lihat Undangan
+                </a>
+                <button class="btn btn-sm btn-outline-secondary" type="button" id="galleryReloadBtn">
+                  <i class="ri-refresh-line"></i> Muat Ulang
+                </button>
+                <button class="btn btn-sm btn-primary" type="button" id="galleryAddBtn">
+                  <i class="ri-add-line"></i> Tambah Foto
+                </button>
+              </div>
+            </div>
+
+            <input type="file" id="galleryFileInput" accept="image/jpeg,image/png,image/webp" hidden multiple>
+            <div class="media-grid" id="galleryGrid"></div>
+          </div>
+
         </div>
       </div>
     </div>
     <!-- /#wrapper -->
+
+    <!-- ======================
+    ✅ EDITOR FOTO (popup untuk foto konten website)
+    ======================= -->
+    <div class="modal fade" id="mediaEditorModal" tabindex="-1" aria-labelledby="mediaEditorModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="mediaEditorModalTitle">Atur Foto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+          </div>
+          <div class="modal-body" id="mediaEditorModalBody"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- ======================
     ✅ DETAIL POPUP (mode kartu / mobile)

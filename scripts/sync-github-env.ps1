@@ -31,7 +31,9 @@ $asVariables = @(
     'VITE_BASE',
     'VITE_PUBLIC_URL',
     'VITE_ADMIN_USERNAME',
-    'VITE_ADMIN_EMAIL'
+    'VITE_ADMIN_EMAIL',
+    'VITE_CLOUDINARY_CLOUD_NAME',
+    'VITE_CLOUDINARY_UPLOAD_PRESET'
 )
 
 # Seluruh VITE_* di atas adalah nilai publik yang ikut masuk ke bundle.

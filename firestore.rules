@@ -194,6 +194,20 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // Foto undangan: tautan Firebase Storage beserta komposisinya.
+    match /settings/siteMedia {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['slots', 'gallery', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['slots', 'gallery', 'updatedAt'])
+        && request.resource.data.slots is map
+        && request.resource.data.slots.size() <= 10
+        && request.resource.data.gallery is list
+        && request.resource.data.gallery.size() <= 12
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
     // Teks undangan yang diedit dari panel admin. Dibaca publik supaya
     // halaman undangan dapat menerapkannya, dan hanya admin yang menulis.
     match /settings/siteContent {

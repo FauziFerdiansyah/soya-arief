@@ -8,6 +8,21 @@ import {
     sanitizeContent,
     isSafeUrl,
 } from './site-content.js';
+import {
+    MEDIA_COLLECTION,
+    MEDIA_DOC_ID,
+    MEDIA_GALLERY_MAX,
+    MEDIA_SLOTS,
+    GALLERY_SLOT,
+    DEFAULT_TRANSFORM,
+    DELIVERY,
+    sanitizeMedia,
+    sanitizeTransform,
+    applyMediaTransform,
+    cloudinaryUrl,
+} from './site-media.js';
+import { createMediaEditor, compressImage } from './media-editor.js';
+import { uploadToCloudinary, isCloudinaryConfigured } from './cloudinary.js';
 
 // Never initialize the panel or read Firestore before the Firebase-authenticated
 // admin gate resolves. Login can happen later without reloading this module.
@@ -253,7 +268,7 @@ $(document).ready(function () {
         $(this).addClass("active");
         
         // Hide all sections
-        $("#guestsSection, #rsvpSection, #commentsSection, #contentSection").hide();
+        $("#guestsSection, #rsvpSection, #commentsSection, #contentSection, #gallerySection").hide();
         
         // Show selected section
         if (menu === "guests") {
@@ -268,6 +283,9 @@ $(document).ready(function () {
         } else if (menu === "content") {
             $("#contentSection").show();
             loadSiteContentEditor();
+        } else if (menu === "gallery") {
+            $("#gallerySection").show();
+            loadGalleryEditor();
         }
         
         console.log(`📍 Navigated to: ${menu}`);
@@ -3247,6 +3265,11 @@ Alfira & Fauzi`;
         section.fields.forEach((field) => grid.appendChild(buildContentField(field)));
         body.appendChild(grid);
 
+        // Section tertentu punya foto; editor fotonya menyimpan sendiri
+        // karena datanya terpisah dari teks.
+        const mediaGroup = buildSectionMediaGroup(section.id);
+        if (mediaGroup) body.appendChild(mediaGroup);
+
         const actions = document.createElement('div');
         actions.className = 'content-section__actions';
 
@@ -3461,6 +3484,9 @@ Alfira & Fauzi`;
             savedSiteContent = snapshot.exists() ? sanitizeContent(snapshot.data()?.content) : {};
             siteContentLoaded = true;
 
+            // Editor foto per section ikut dirender, jadi datanya harus siap.
+            await loadSiteMediaDoc(force);
+
             renderContentEditor();
             setContentStatus(describeContentState());
         } catch (err) {
@@ -3580,6 +3606,418 @@ Alfira & Fauzi`;
     });
 
     // Tautan pratinjau mengikuti domain publik yang dipakai link tamu.
-    $('#contentPreviewLink').attr('href', url_domain);
+    $('#contentPreviewLink, #galleryPreviewLink').attr('href', url_domain);
+
+
+    // ==============================
+    // FOTO WEBSITE (slot + galeri)
+    // ==============================
+    // Berkas gambar disimpan di Firebase Storage, sedangkan komposisinya
+    // (zoom, posisi, rotasi) dan urutan galeri disimpan di settings/siteMedia.
+    let savedSiteMedia = { slots: {}, gallery: [] };
+    let siteMediaLoaded = false;
+
+    /**
+     * Foto dikompres di browser menjadi WebP, lalu diunggah ke Cloudinary.
+     * Ukuran maksimalnya mengikuti kotak tempat foto itu tampil.
+     */
+    async function uploadMediaFile(file, slot) {
+        const blob = await compressImage(file, slot.maxEdge);
+        return uploadToCloudinary(blob, slot.folder);
+    }
+
+    async function saveSiteMediaDoc() {
+        const payload = sanitizeMedia(savedSiteMedia);
+
+        await runAdminWrite(() => setDoc(doc(window.db, MEDIA_COLLECTION, MEDIA_DOC_ID), {
+            slots: payload.slots,
+            gallery: payload.gallery,
+            updatedAt: serverTimestamp(),
+        }));
+
+        savedSiteMedia = payload;
+    }
+
+    async function loadSiteMediaDoc(force = false) {
+        if (siteMediaLoaded && !force) return savedSiteMedia;
+
+        try {
+            const snapshot = await getDoc(doc(window.db, MEDIA_COLLECTION, MEDIA_DOC_ID));
+            savedSiteMedia = snapshot.exists() ? sanitizeMedia(snapshot.data()) : { slots: {}, gallery: [] };
+            siteMediaLoaded = true;
+        } catch (err) {
+            console.error('Gagal memuat foto website:', err);
+            savedSiteMedia = { slots: {}, gallery: [] };
+        }
+
+        return savedSiteMedia;
+    }
+
+    let activeSlotModalEditor = null;
+
+    /** Perbarui thumbnail kartu slot dari data tersimpan. */
+    function refreshSlotPreview(card, slot) {
+        const item = savedSiteMedia.slots[slot.key];
+        const image = card.querySelector('.media-slot__thumb img');
+        const empty = card.querySelector('.media-slot__thumb-empty');
+        // Selektor harus khusus tombolnya. Sebelumnya [data-slot-edit] juga
+        // cocok dengan thumbnail, sehingga labelnya tertulis ke dalam foto.
+        const editBtn = card.querySelector('.media-slot__edit');
+
+        if (item?.url) {
+            image.src = cloudinaryUrl(item.url, DELIVERY.adminThumb);
+            applyMediaTransform(image, item);
+            image.hidden = false;
+            empty.hidden = true;
+            editBtn.innerHTML = '<i class="ri-crop-line"></i> Atur / Ganti Foto';
+        } else {
+            image.hidden = true;
+            empty.hidden = false;
+            editBtn.innerHTML = '<i class="ri-upload-2-line"></i> Unggah Foto';
+        }
+    }
+
+    function openSlotModal(slot, card) {
+        const modalEl = document.getElementById('mediaEditorModal');
+        const body = document.getElementById('mediaEditorModalBody');
+        const titleEl = document.getElementById('mediaEditorModalTitle');
+        if (!modalEl || !body) return;
+
+        titleEl.textContent = slot.label;
+        body.replaceChildren();
+
+        activeSlotModalEditor = createMediaEditor({
+            slot,
+            item: savedSiteMedia.slots[slot.key] ?? null,
+            onUpload: async (file, transform) => {
+                const uploaded = await uploadMediaFile(file, slot);
+                const item = { ...uploaded, ...sanitizeTransform(transform ?? DEFAULT_TRANSFORM) };
+                savedSiteMedia.slots[slot.key] = item;
+                await saveSiteMediaDoc();
+                refreshSlotPreview(card, slot);
+                return savedSiteMedia.slots[slot.key];
+            },
+            onSave: async (transform) => {
+                const item = savedSiteMedia.slots[slot.key];
+                if (!item) throw new Error('Unggah foto terlebih dahulu.');
+                savedSiteMedia.slots[slot.key] = { ...item, ...sanitizeTransform(transform) };
+                await saveSiteMediaDoc();
+                refreshSlotPreview(card, slot);
+            },
+            onRemove: async () => {
+                delete savedSiteMedia.slots[slot.key];
+                await saveSiteMediaDoc();
+                refreshSlotPreview(card, slot);
+            },
+        });
+
+        body.appendChild(activeSlotModalEditor.element);
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+
+    function buildMediaSlotEditor(slot) {
+        const card = document.createElement('div');
+        card.className = 'media-slot';
+
+        const heading = document.createElement('div');
+        heading.className = 'media-slot__heading';
+        const title = document.createElement('strong');
+        title.textContent = slot.label;
+        const hint = document.createElement('span');
+        hint.textContent = slot.hint || '';
+        heading.append(title, hint);
+
+        const thumb = document.createElement('button');
+        thumb.type = 'button';
+        thumb.className = 'media-slot__thumb';
+        thumb.style.aspectRatio = slot.aspect;
+        thumb.style.borderRadius = slot.radius;
+        thumb.setAttribute('data-slot-edit', '');
+        thumb.title = 'Atur foto';
+
+        const image = document.createElement('img');
+        image.alt = '';
+        image.hidden = true;
+        const empty = document.createElement('span');
+        empty.className = 'media-slot__thumb-empty';
+        empty.textContent = 'Belum ada';
+        thumb.append(image, empty);
+
+        const editBtn = document.createElement('button');
+        editBtn.type = 'button';
+        editBtn.className = 'btn btn-sm btn-outline-primary media-slot__edit';
+        editBtn.setAttribute('data-slot-edit', '');
+
+        // Thumbnail kecil di kiri, keterangan dan tombol di kanan, supaya
+        // section teks tidak terdorong oleh kotak foto yang besar.
+        const body = document.createElement('div');
+        body.className = 'media-slot__body';
+        body.append(heading, editBtn);
+
+        card.append(thumb, body);
+
+        [thumb, editBtn].forEach((el) => {
+            el.addEventListener('click', () => openSlotModal(slot, card));
+        });
+
+        refreshSlotPreview(card, slot);
+        return card;
+    }
+
+    function buildSectionMediaGroup(sectionId) {
+        const slots = MEDIA_SLOTS.filter((slot) => slot.sectionId === sectionId);
+        if (!slots.length) return null;
+
+        const group = document.createElement('div');
+        group.className = 'media-slot-group';
+
+        const label = document.createElement('h3');
+        label.className = 'media-slot-group__title';
+        label.innerHTML = '<i class="ri-image-line" aria-hidden="true"></i> Foto section ini';
+        group.appendChild(label);
+
+        const grid = document.createElement('div');
+        grid.className = 'media-slot-group__grid';
+        slots.forEach((slot) => grid.appendChild(buildMediaSlotEditor(slot)));
+        group.appendChild(grid);
+
+        return group;
+    }
+
+
+    // ---- Galeri foto ----
+    function setGalleryStatus(message, state = 'ready') {
+        $('#galleryStatus').text(message);
+        document.getElementById('galleryToolbar')?.setAttribute('data-state', state);
+    }
+
+    function describeGalleryState() {
+        const total = savedSiteMedia.gallery.length;
+        return total
+            ? `${total} dari ${MEDIA_GALLERY_MAX} foto terpakai.`
+            : `Belum ada foto kustom. Undangan memakai galeri bawaan.`;
+    }
+
+    function findGalleryIndex(publicId) {
+        return savedSiteMedia.gallery.findIndex((item) => item.publicId === publicId);
+    }
+
+    function buildGalleryCard(item, index) {
+        const card = document.createElement('div');
+        card.className = 'media-card';
+        card.draggable = true;
+        card.dataset.publicId = item.publicId;
+
+        const head = document.createElement('div');
+        head.className = 'media-card__head';
+        head.innerHTML = `
+            <span class="media-card__handle" title="Tarik untuk mengubah urutan">
+                <i class="ri-draggable" aria-hidden="true"></i>
+            </span>
+            <strong>Foto ${index + 1}</strong>
+        `;
+        card.appendChild(head);
+
+        const editor = createMediaEditor({
+            slot: GALLERY_SLOT,
+            item,
+            compact: true,
+            previewTransform: DELIVERY.adminThumb,
+            onUpload: async (file, transform) => {
+                const position = findGalleryIndex(card.dataset.publicId);
+                if (position < 0) throw new Error('Foto ini sudah tidak ada di daftar.');
+
+                const uploaded = await uploadMediaFile(file, GALLERY_SLOT);
+                const next = { ...uploaded, ...sanitizeTransform(transform ?? DEFAULT_TRANSFORM) };
+
+                savedSiteMedia.gallery[position] = next;
+                await saveSiteMediaDoc();
+
+                card.dataset.publicId = next.publicId;
+                setGalleryStatus(describeGalleryState());
+                return next;
+            },
+            onSave: async (transform) => {
+                const position = findGalleryIndex(card.dataset.publicId);
+                if (position < 0) throw new Error('Foto ini sudah tidak ada di daftar.');
+
+                savedSiteMedia.gallery[position] = {
+                    ...savedSiteMedia.gallery[position],
+                    ...sanitizeTransform(transform),
+                };
+                await saveSiteMediaDoc();
+            },
+            onRemove: async () => {
+                const position = findGalleryIndex(card.dataset.publicId);
+                if (position < 0) throw new Error('Foto ini sudah tidak ada di daftar.');
+
+                savedSiteMedia.gallery.splice(position, 1);
+                await saveSiteMediaDoc();
+
+                renderGalleryEditor();
+                setGalleryStatus(describeGalleryState());
+            },
+        });
+
+        card.appendChild(editor.element);
+        return card;
+    }
+
+    function renderGalleryEditor() {
+        const grid = document.getElementById('galleryGrid');
+        if (!grid) return;
+
+        grid.replaceChildren();
+
+        if (!savedSiteMedia.gallery.length) {
+            const empty = document.createElement('p');
+            empty.className = 'media-grid__empty';
+            empty.textContent = 'Belum ada foto. Tekan "Tambah Foto" untuk mengunggah.';
+            grid.appendChild(empty);
+        } else {
+            savedSiteMedia.gallery.forEach((item, index) => {
+                grid.appendChild(buildGalleryCard(item, index));
+            });
+        }
+
+        const addButton = document.getElementById('galleryAddBtn');
+        if (addButton) addButton.disabled = savedSiteMedia.gallery.length >= MEDIA_GALLERY_MAX;
+    }
+
+    async function loadGalleryEditor(force = false) {
+        setGalleryStatus('Memuat galeri…', 'loading');
+        await loadSiteMediaDoc(force);
+        renderGalleryEditor();
+
+        if (!isCloudinaryConfigured()) {
+            setGalleryStatus(
+                'Cloudinary belum dikonfigurasi. Isi VITE_CLOUDINARY_CLOUD_NAME dan VITE_CLOUDINARY_UPLOAD_PRESET.',
+                'error'
+            );
+            return;
+        }
+
+        setGalleryStatus(describeGalleryState());
+    }
+
+    $(document).on('click', '#galleryAddBtn', function () {
+        document.getElementById('galleryFileInput')?.click();
+    });
+
+    $(document).on('change', '#galleryFileInput', async function () {
+        const files = [...(this.files || [])];
+        this.value = '';
+        if (!files.length) return;
+
+        const room = MEDIA_GALLERY_MAX - savedSiteMedia.gallery.length;
+        if (room <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Galeri penuh',
+                text: `Maksimal ${MEDIA_GALLERY_MAX} foto. Hapus salah satu foto lebih dulu.`,
+            });
+            return;
+        }
+
+        const queue = files.slice(0, room);
+        setGalleryStatus(`Mengunggah ${queue.length} foto…`, 'busy');
+
+        let failed = 0;
+        for (const file of queue) {
+            try {
+                const uploaded = await uploadMediaFile(file, GALLERY_SLOT);
+                savedSiteMedia.gallery.push({ ...uploaded, ...DEFAULT_TRANSFORM });
+                await saveSiteMediaDoc();
+            } catch (err) {
+                failed += 1;
+                console.error('Gagal mengunggah foto galeri:', err);
+            }
+        }
+
+        renderGalleryEditor();
+        setGalleryStatus(describeGalleryState(), failed ? 'error' : 'ready');
+
+        if (failed) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Sebagian foto gagal',
+                text: `${failed} foto tidak dapat diunggah. Periksa format, ukuran, dan koneksi.`,
+            });
+        } else if (files.length > room) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Sebagian foto dilewati',
+                text: `Hanya ${room} foto yang bisa ditambahkan karena batasnya ${MEDIA_GALLERY_MAX}.`,
+            });
+        }
+    });
+
+    $(document).on('click', '#galleryReloadBtn', function () {
+        loadGalleryEditor(true);
+    });
+
+    // ---- Urutan galeri lewat drag-and-drop ----
+    let draggedMediaCard = null;
+
+    $(document).on('dragstart', '.media-card', function (e) {
+        draggedMediaCard = this;
+        this.classList.add('is-dragging');
+        const transfer = e.originalEvent?.dataTransfer;
+        if (transfer) {
+            transfer.effectAllowed = 'move';
+            transfer.setData('text/plain', '');
+        }
+    });
+
+    $(document).on('dragover', '#galleryGrid', function (e) {
+        if (!draggedMediaCard || draggedMediaCard.parentElement !== this) return;
+        e.preventDefault();
+
+        const pointerX = e.originalEvent?.clientX ?? 0;
+        const pointerY = e.originalEvent?.clientY ?? 0;
+
+        const target = [...this.querySelectorAll('.media-card:not(.is-dragging)')]
+            .find((card) => {
+                const box = card.getBoundingClientRect();
+                return pointerY < box.top + box.height / 2
+                    || (pointerY <= box.bottom && pointerX < box.left + box.width / 2);
+            }) || null;
+
+        if (target !== draggedMediaCard) this.insertBefore(draggedMediaCard, target);
+    });
+
+    $(document).on('dragend', '.media-card', async function () {
+        this.classList.remove('is-dragging');
+        draggedMediaCard = null;
+
+        const grid = document.getElementById('galleryGrid');
+        if (!grid) return;
+
+        const order = [...grid.querySelectorAll('.media-card')].map((card) => card.dataset.publicId);
+        const reordered = order
+            .map((publicId) => savedSiteMedia.gallery.find((item) => item.publicId === publicId))
+            .filter(Boolean);
+
+        if (reordered.length !== savedSiteMedia.gallery.length) return;
+
+        const unchanged = reordered.every((item, index) => item === savedSiteMedia.gallery[index]);
+        if (unchanged) return;
+
+        savedSiteMedia.gallery = reordered;
+        setGalleryStatus('Menyimpan urutan foto…', 'busy');
+
+        try {
+            await saveSiteMediaDoc();
+            renderGalleryEditor();
+            setGalleryStatus(describeGalleryState());
+        } catch (err) {
+            console.error('Gagal menyimpan urutan galeri:', err);
+            setGalleryStatus('Urutan foto gagal disimpan.', 'error');
+        }
+    });
+
+    $(document).on('drop', '#galleryGrid', function (e) {
+        e.preventDefault();
+    });
 
 });

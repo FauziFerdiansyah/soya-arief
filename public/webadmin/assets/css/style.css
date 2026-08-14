@@ -3008,3 +3008,585 @@ p {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ============================================================
+   EDITOR FOTO (slot section & galeri)
+   ============================================================ */
+#page-content-wrapper .media-slot-group {
+  margin-top: 1.25rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+#page-content-wrapper .media-slot-group__title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.9rem;
+  color: var(--link-color);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#page-content-wrapper .media-slot-group__grid,
+#page-content-wrapper .media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+#page-content-wrapper .media-grid__empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-muted);
+  color: var(--black3);
+  font-size: 13px;
+  text-align: center;
+}
+
+#page-content-wrapper .media-slot,
+#page-content-wrapper .media-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+#page-content-wrapper .media-card.is-dragging {
+  opacity: 0.5;
+  border-color: var(--primary-color);
+}
+
+#page-content-wrapper .media-slot__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+#page-content-wrapper .media-slot__heading strong {
+  font-size: 13.5px;
+  color: var(--black);
+}
+
+#page-content-wrapper .media-slot__heading span {
+  font-size: 12px;
+  color: var(--black3);
+}
+
+#page-content-wrapper .media-card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 13px;
+  color: var(--black);
+}
+
+#page-content-wrapper .media-card__handle {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: var(--radius-sm);
+  color: var(--black3);
+  cursor: grab;
+}
+
+#page-content-wrapper .media-card__handle:hover {
+  background-color: var(--gray);
+  color: var(--primary-color);
+}
+
+#page-content-wrapper .media-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+#page-content-wrapper .media-editor__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  background-color: var(--gray);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#page-content-wrapper .media-editor__frame.is-empty {
+  cursor: default;
+  border-style: dashed;
+}
+
+#page-content-wrapper .media-editor__frame.is-dragging {
+  cursor: grabbing;
+  border-color: var(--primary-color);
+}
+
+#page-content-wrapper .media-editor__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+#page-content-wrapper .media-editor__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--black3);
+  font-size: 12.5px;
+}
+
+#page-content-wrapper .media-editor__zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black3);
+}
+
+#page-content-wrapper .media-editor__zoom span {
+  white-space: nowrap;
+}
+
+#page-content-wrapper .media-editor__zoom .form-range {
+  flex: 1 1 auto;
+}
+
+#page-content-wrapper .media-editor__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+#page-content-wrapper .media-editor__buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 12.5px;
+}
+
+#page-content-wrapper .media-editor__status {
+  margin: 0;
+  color: var(--black3);
+  font-size: 12px;
+}
+
+#page-content-wrapper .media-editor[data-state="dirty"] .media-editor__status,
+#page-content-wrapper .media-editor[data-state="busy"] .media-editor__status {
+  color: var(--primary-color);
+}
+
+#page-content-wrapper .media-editor[data-state="saved"] .media-editor__status {
+  color: #198754;
+}
+
+#page-content-wrapper .media-editor[data-state="error"] .media-editor__status {
+  color: #dc3545;
+}
+
+@media (max-width: 576px) {
+  #page-content-wrapper .media-slot-group__grid,
+  #page-content-wrapper .media-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+#page-content-wrapper .content-editor-toolbar__note {
+  max-width: 46ch;
+  color: var(--black3);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* ============================================================
+   REDESAIN GALERI ADMIN
+   ============================================================ */
+#page-content-wrapper #galleryGrid.media-grid {
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.85rem;
+}
+
+#page-content-wrapper #galleryGrid .media-card {
+  gap: 0.5rem;
+  padding: 0.6rem;
+  border-radius: var(--radius-md);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+#page-content-wrapper #galleryGrid .media-card:hover {
+  border-color: var(--primary-color-light);
+  box-shadow: var(--shadow-pop);
+}
+
+#page-content-wrapper #galleryGrid .media-card__head {
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--black3);
+}
+
+#page-content-wrapper #galleryGrid .media-card__head strong {
+  order: -1;
+  color: var(--black);
+}
+
+/* Tombol pada kartu galeri jadi ikon saja supaya kartunya ringkas. */
+#page-content-wrapper #galleryGrid .media-editor--compact .media-editor__buttons {
+  gap: 0.3rem;
+}
+
+#page-content-wrapper #galleryGrid .media-editor--compact .media-editor__buttons .btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+
+#page-content-wrapper #galleryGrid .media-editor--compact .media-editor__buttons .btn span {
+  display: none;
+}
+
+#page-content-wrapper #galleryGrid .media-editor--compact .media-editor__zoom span {
+  font-size: 11px;
+}
+
+#page-content-wrapper #galleryGrid .media-editor__frame {
+  border-radius: var(--radius-sm);
+}
+
+/* Bingkai preview oval untuk hero mengikuti bentuk di undangan. */
+#page-content-wrapper .media-editor__frame {
+  background:
+    linear-gradient(45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.04) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.04) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+
+/* ---------- Kartu slot foto konten (buka editor via popup) ---------- */
+/* Layout mendatar: thumbnail kecil + keterangan, jadi tidak memakan ruang
+   dan tidak mengubah proporsi section teks. */
+#page-content-wrapper .media-slot {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+#page-content-wrapper .media-slot__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#page-content-wrapper .media-slot__thumb {
+  position: relative;
+  flex: 0 0 auto;
+  height: 84px;
+  width: auto;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  background:
+    linear-gradient(45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.04) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,0.04) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#page-content-wrapper .media-slot__thumb:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-card);
+}
+
+#page-content-wrapper .media-slot__thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+#page-content-wrapper .media-slot__thumb-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 4px;
+  color: var(--black3);
+  font-size: 11px;
+  text-align: center;
+}
+
+#page-content-wrapper .media-slot-group__grid {
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+}
+
+/* Editor di dalam modal: tinggi dibatasi viewport, lebar mengikuti rasio. */
+#mediaEditorModalBody .media-editor__frame {
+  width: auto;
+  height: min(52vh, 380px);
+  margin-inline: auto;
+}
+
+#mediaEditorModalBody .media-editor__buttons {
+  justify-content: center;
+}
+
+#mediaEditorModalBody .media-editor__status {
+  text-align: center;
+}
+
+/* ---------- Indikator area pangkas (sudut kotak) ---------- */
+#page-content-wrapper .media-editor__guide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#page-content-wrapper .media-editor__guide i {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+#page-content-wrapper .media-editor__guide i:nth-child(1) {
+  top: 6px; left: 6px; border-right: 0; border-bottom: 0;
+}
+#page-content-wrapper .media-editor__guide i:nth-child(2) {
+  top: 6px; right: 6px; border-left: 0; border-bottom: 0;
+}
+#page-content-wrapper .media-editor__guide i:nth-child(3) {
+  bottom: 6px; left: 6px; border-right: 0; border-top: 0;
+}
+#page-content-wrapper .media-editor__guide i:nth-child(4) {
+  bottom: 6px; right: 6px; border-left: 0; border-top: 0;
+}
+
+/* ---------- Popup editor foto: ringkas & rapi ---------- */
+#mediaEditorModal .modal-dialog {
+  max-width: 400px;
+}
+
+#mediaEditorModal .modal-body {
+  padding: 1rem 1.15rem 1.25rem;
+}
+
+#mediaEditorModalBody .media-editor__frame {
+  width: auto;
+  height: min(38vh, 260px);
+  margin-inline: auto;
+  /* Area pangkas selalu kotak; pembulatan hanya terjadi di undangan. */
+  border-radius: var(--radius-sm) !important;
+}
+
+#mediaEditorModalBody .media-editor__zoom {
+  margin-top: 0.25rem;
+}
+
+#mediaEditorModalBody .media-editor__buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+#mediaEditorModalBody .media-editor__buttons .btn {
+  justify-content: center;
+  white-space: nowrap;
+}
+
+/* Simpan paling menonjol, dibuat selebar dua kolom. */
+#mediaEditorModalBody .media-editor__buttons .btn-primary {
+  grid-column: 1 / -1;
+  order: 5;
+}
+
+#mediaEditorModalBody .media-editor__buttons .btn-outline-danger {
+  grid-column: 1 / -1;
+  order: 6;
+}
+
+/* Perbaikan kartu slot: label tombol tidak lagi masuk ke thumbnail. */
+#page-content-wrapper .media-slot__edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   EDITOR FOTO — GAYA DASAR TANPA SCOPE #page-content-wrapper
+   ------------------------------------------------------------
+   Modal Bootstrap dirender sebagai anak <body>, di luar
+   #page-content-wrapper, sehingga aturan yang diawali selektor itu
+   tidak berlaku di dalam popup. Blok ini membuat editor tampil benar
+   di mana pun ia dipasang.
+   ============================================================ */
+.media-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.media-editor__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #dbe3ef;
+  border-radius: 9px;
+  background-color: #f7f8fb;
+  background-image:
+    linear-gradient(45deg, rgba(0, 0, 0, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0, 0, 0, 0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.05) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.media-editor__frame.is-dragging {
+  cursor: grabbing;
+  border-color: #007bff;
+}
+
+.media-editor__frame.is-empty {
+  cursor: default;
+  border-style: dashed;
+}
+
+.media-editor__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+.media-editor__empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #84878f;
+  font-size: 12.5px;
+}
+
+/* Indikator area pangkas: empat sudut kotak, seperti pemotong foto profil. */
+.media-editor__guide {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+}
+
+.media-editor__guide i {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #fff;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.55));
+}
+
+.media-editor__guide i:nth-child(1) { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+.media-editor__guide i:nth-child(2) { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+.media-editor__guide i:nth-child(3) { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+.media-editor__guide i:nth-child(4) { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+.media-editor__zoom {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  color: #84878f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.media-editor__zoom span { white-space: nowrap; }
+.media-editor__zoom .form-range { flex: 1 1 auto; }
+
+.media-editor__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.media-editor__buttons .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 12.5px;
+}
+
+.media-editor__status {
+  margin: 0;
+  color: #84878f;
+  font-size: 12px;
+}
+
+.media-editor[data-state="dirty"] .media-editor__status,
+.media-editor[data-state="busy"] .media-editor__status { color: #007bff; }
+.media-editor[data-state="saved"] .media-editor__status { color: #198754; }
+.media-editor[data-state="error"] .media-editor__status { color: #dc3545; }
+
+/* ---------- Ukuran khusus di dalam popup ---------- */
+#mediaEditorModal .modal-dialog { max-width: 420px; }
+#mediaEditorModal .modal-body { padding: 1rem 1.15rem 1.25rem; }
+
+#mediaEditorModalBody .media-editor__frame {
+  width: auto;
+  max-width: 100%;
+  height: min(40vh, 280px);
+  margin-inline: auto;
+}
+
+#mediaEditorModalBody .media-editor__buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+#mediaEditorModalBody .media-editor__buttons .btn {
+  justify-content: center;
+  white-space: nowrap;
+}
+
+#mediaEditorModalBody .media-editor__buttons .btn-primary { grid-column: 1 / -1; order: 5; }
+#mediaEditorModalBody .media-editor__buttons .btn-outline-danger { grid-column: 1 / -1; order: 6; }
+#mediaEditorModalBody .media-editor__status { text-align: center; }

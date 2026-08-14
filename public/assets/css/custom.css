@@ -3827,3 +3827,31 @@ button.wish-comment-action { border: 0; background: transparent; color: inherit;
 .inviter-section > .sintia-section-separator.bottom {
   margin-top: 40px;
 }
+
+/* ===== PLACEHOLDER FOTO (menunggu foto dari panel admin) =====
+   Foto hero dan mempelai sengaja kosong secara bawaan. Selama foto asli
+   belum selesai dimuat, elemen gambar menampilkan animasi skeleton
+   sehingga tata letak tidak melompat dan area foto tetap terlihat rapi. */
+img.media-skeleton {
+  background-color: var(--bg-light-primary);
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 28%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  background-repeat: no-repeat;
+  background-size: 220% 100%;
+  animation: mediaSkeletonShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes mediaSkeletonShimmer {
+  from { background-position: 160% 0; }
+  to { background-position: -60% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img.media-skeleton {
+    animation: none;
+  }
+}

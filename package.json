@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/inject-seo.mjs",
     "preview": "vite preview",
     "env:sync": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-github-env.ps1",
     "rules:deploy": "firebase deploy --only firestore:rules",
