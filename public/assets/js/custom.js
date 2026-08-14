@@ -121,13 +121,19 @@ document.addEventListener('preloaderHidden', () => {
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      if (typeof replayHeroAOS === 'function') {
-        replayHeroAOS();
-      }
-
+      // refreshHard() lebih dulu, replay hero terakhir. refreshHard menyusun
+      // ulang daftar elemen AOS dan dapat melepas aos-animate, jadi kalau
+      // replay dijalankan sebelumnya hasilnya bisa langsung terhapus dan foto
+      // hero tidak terlihat.
       if (typeof AOS !== 'undefined') {
         AOS.refreshHard();
       }
+
+      requestAnimationFrame(() => {
+        if (typeof replayHeroAOS === 'function') {
+          replayHeroAOS();
+        }
+      });
     });
   });
 });
@@ -1477,6 +1483,11 @@ const CustomInitializer = {
 
   // Enhanced function to prevent scrolling when welcome section is active
   function preventScrollWhenWelcomeActive() {
+    // Undangan sudah dibuka: jangan pernah memasang kunci lagi. Event load
+    // menunggu seluruh gambar, jadi di ponsel ia bisa tiba setelah pengguna
+    // menekan "Buka Undangan" dan mengunci halaman yang seharusnya bebas.
+    if (window.__welcomeClosed) return;
+
     const welcomeSection = document.querySelector('.welcome-section');
     const rightSide = document.querySelector('.right-side');
     
@@ -1495,22 +1506,8 @@ const CustomInitializer = {
     }
   }
 
-  // Function to restore scrolling when welcome section is hidden
-  function restoreScroll() {
-    const rightSide = document.querySelector('.right-side');
-    
-    // Restore scrolling on the main content
-    if (rightSide) {
-      rightSide.style.overflowY = 'auto';
-    }
-    
-    // Restore scrolling on the body
-    document.body.style.overflow = '';
-    document.body.style.touchAction = '';
-    document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.height = '';
-  }
+  // Pemulihan scroll memakai restoreInvitationScroll() di lingkup atas berkas
+  // ini, supaya hanya ada satu tempat yang melepas kunci.
 
   // Call the function on load and resize
   window.addEventListener('load', function() {
@@ -1743,7 +1740,20 @@ const BacksoundManager = {
 //  ANIMASI WELCOME DIPISAH → gesture tidak terganggu
 // ====================================================
 
+let welcomeExitStarted = false;
+
 function runWelcomeExitAnimation() {
+  // Tombol dapat ditekan dua kali, atau ditekan tepat saat auto-click jalan.
+  // Tanpa penjaga ini dua rantai animasi berjalan tumpang tindih dan saling
+  // menimpa gaya scroll, yang membuat halaman kadang tidak bisa digulir.
+  if (welcomeExitStarted) return;
+  welcomeExitStarted = true;
+
+  // Menandai undangan sudah dibuka. Dibaca preventScrollWhenWelcomeActive()
+  // supaya event load atau resize yang datang belakangan tidak memasang
+  // kunci scroll lagi setelah undangan terbuka.
+  window.__welcomeClosed = true;
+
   const $rightSide = $(".right-side");
   const $welcomeSection = $(".welcome-section");
   const $welcomeContent = $(".welcome-content");
@@ -1772,24 +1782,58 @@ function runWelcomeExitAnimation() {
         "pointer-events": "none"
       });
 
-      $rightSide[0].style.overflowY = "auto";
-
-      document.body.style.removeProperty("overflow");
-      document.body.style.removeProperty("position");
-      document.body.style.removeProperty("height");
-      document.body.style.removeProperty("touch-action");
+      restoreInvitationScroll();
 
       // Force reflow
-      void $rightSide[0].clientHeight;
+      if ($rightSide[0]) void $rightSide[0].clientHeight;
 
-      // Reset AOS
+      // Reset AOS. Urutannya penting: refreshHard() menyusun ulang daftar
+      // elemen AOS dan dapat MELEPAS aos-animate dari elemen yang dianggap
+      // belum masuk layar. Karena itu replay hero harus menjadi langkah
+      // terakhir, dijalankan pada frame berikutnya supaya perhitungan posisi
+      // milik AOS sudah selesai. Tanpa ini foto hero bisa tertinggal tanpa
+      // aos-animate, yang berarti tidak terlihat sama sekali.
       setTimeout(() => {
         if (typeof AOS !== "undefined") AOS.refreshHard();
+
+        requestAnimationFrame(() => {
+          if (typeof replayHeroAOS === "function") replayHeroAOS();
+        });
       }, 10);
     }, 800);
 
   }, 600);
 };
+
+/**
+ * Buka kunci scroll dan pastikan tetap terbuka.
+ *
+ * Rantai setTimeout di atas dapat tertunda jauh bila pengguna sempat pindah
+ * aplikasi, karena timer di browser ponsel diperlambat saat halaman tidak
+ * terlihat. Karena itu pemulihannya dibuat idempoten dan ditegaskan ulang
+ * setiap halaman kembali terlihat, supaya tidak ada keadaan halaman terbuka
+ * tetapi tidak bisa digulir.
+ */
+function restoreInvitationScroll() {
+  const rightSide = document.querySelector(".right-side");
+
+  if (rightSide) {
+    rightSide.style.overflow = "auto";
+    rightSide.style.overflowY = "auto";
+    rightSide.style.overflowX = "hidden";
+    rightSide.style.pointerEvents = "auto";
+  }
+
+  document.body.style.removeProperty("overflow");
+  document.body.style.removeProperty("position");
+  document.body.style.removeProperty("width");
+  document.body.style.removeProperty("height");
+  document.body.style.removeProperty("touch-action");
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && window.__welcomeClosed) restoreInvitationScroll();
+});
 
 /**
  * Handler tombol "Buka Undangan"
@@ -1800,7 +1844,7 @@ function runWelcomeExitAnimation() {
 let autoClickTriggered = false;
 const autoClickTimeout = setTimeout(() => {
   if (!autoClickTriggered) {
-    console.log("⏰ Auto-click triggered after 6 seconds");
+    console.log("⏰ Auto-click triggered after 10 seconds");
     $("#startToExplore").trigger("click");
     autoClickTriggered = true;
   }
@@ -1823,69 +1867,13 @@ $("#startToExplore").on("click", function (e) {
     console.warn("gesture play failed:", err);
   }
 
-  // ✅ 2. Delay sedikit biar browser finalize gesture
+  // ✅ 2. Delay sedikit biar browser finalize gesture.
+  // Hanya satu rantai animasi. Sebelumnya rantai yang sama juga ditulis ulang
+  // di sini, sehingga dua rantai berjalan bersamaan dan saling menimpa gaya
+  // scroll pada milidetik yang berdekatan.
   setTimeout(() => {
     runWelcomeExitAnimation();
   }, 50);
-
-  const $rightSide = $(".right-side");
-  const $welcomeSection = $(".welcome-section");
-  const $welcomeContent = $(".welcome-content");
-
-  // Fade konten welcome
-  $welcomeContent.css({
-    transition: "opacity 0.6s ease, transform 0.6s ease",
-    opacity: "0",
-    transform: "translate3d(0, 30px, 0)",
-  });
-
-  // Setelah fade selesai
-  setTimeout(() => {
-    $welcomeSection.css({
-      transition: "opacity 0.8s ease, transform 0.8s ease",
-      opacity: "0",
-      transform: "translate3d(0, -100%, 0)",
-    });
-
-    // Setelah welcome keluar layar - CRITICAL TIMING
-    setTimeout(() => {
-      // 1. Remove dari DOM completely
-      $welcomeSection.css({
-        "visibility": "hidden",
-        "display": "none",
-        "position": "absolute",
-        "pointer-events": "none"
-      });
-      
-      // 2. Restore scroll IMMEDIATELY dengan force
-      $rightSide[0].style.overflow = 'auto';
-      $rightSide[0].style.overflowY = 'auto';
-      $rightSide[0].style.overflowX = 'hidden';
-      
-      // 3. Clear body styles that block scroll
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('touch-action');
-      document.body.style.removeProperty('position');
-      document.body.style.removeProperty('width');
-      document.body.style.removeProperty('height');
-      
-      // 4. Force browser reflow - CRITICAL!
-      void $rightSide[0].scrollTop;
-      void $rightSide[0].clientHeight;
-      
-      // 5. Trigger pointer events immediately
-      $rightSide[0].style.pointerEvents = 'auto';
-      
-      // 6. AOS refresh dengan minimal delay
-      setTimeout(() => {
-        replayHeroAOS();
-        if (typeof AOS !== "undefined") {
-          AOS.refreshHard();
-        }
-      }, 10);
-
-    }, 800);
-  }, 600);
 });
 
 /**
