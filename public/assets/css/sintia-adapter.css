@@ -176,7 +176,7 @@ body.sintia a {
 
 .hero-section.cover {
   min-height: var(--body-height);
-  padding: 0 0 60px;
+  padding: 0 0 45px;
   background-color: var(--background-primary);
   overflow: hidden;
 }
