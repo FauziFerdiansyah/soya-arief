@@ -181,6 +181,20 @@ body.sintia a {
   overflow: hidden;
 }
 
+
+/* Translucent Rumah Gadang decoration at the bottom of the hero. */
+.hero-section.cover::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(180px, 55vw, 320px);
+  background: url("../images/sintia/rumah-gadang-overlay.png") no-repeat center bottom / 100% auto;
+  pointer-events: none;
+  z-index: 2;
+}
 .hero-section .cover-bg,
 .hero-section .hero-content::before {
   display: none;
@@ -193,10 +207,24 @@ body.sintia a {
   z-index: 3;
 }
 
+@keyframes batikSlide {
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 8% center;
+  }
+}
+
 .sintia-batik-separator .image-wrap {
   width: 100%;
   height: 100%;
-  background: url("../images/sintia/batik.png") repeat-x center/contain;
+  background: url(../images/minang-line-1.png) repeat-x 0% center / contain;
+  transform: scaleY(-1) !important;
+  opacity: 0.3;
+  filter: contrast(0.5);
+  animation: batikSlide 6s linear infinite;
 }
 
 .sintia-batik-separator img {
@@ -214,7 +242,7 @@ body.sintia a {
 }
 
 .hero-section .hero-header {
-  padding: 10px 10px 0;
+  padding: 0 10px 0;
   gap: 4px;
 }
 

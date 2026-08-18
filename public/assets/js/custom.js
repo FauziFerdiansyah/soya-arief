@@ -119,6 +119,10 @@ PreloaderManager.init();
 document.addEventListener('preloaderHidden', () => {
   if (!window.matchMedia('(min-width: 961px)').matches) return;
 
+  // Footer sebelumnya menunggu scroll pertama sehingga dapat tetap opacity: 0
+  // setelah refresh. Aktifkan saat hero desktop benar-benar sudah terbuka.
+  HeroFooterAOSManager.activate();
+
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       // refreshHard() lebih dulu, replay hero terakhir. refreshHard menyusun
@@ -1786,6 +1790,10 @@ function runWelcomeExitAnimation() {
 
       // Force reflow
       if ($rightSide[0]) void $rightSide[0].clientHeight;
+
+      // Footer ditunda selama welcome masih menutupi hero. Aktifkan sekarang,
+      // sebelum refreshHard(), supaya tidak tertinggal dengan opacity: 0.
+      HeroFooterAOSManager.activate();
 
       // Reset AOS. Urutannya penting: refreshHard() menyusun ulang daftar
       // elemen AOS dan dapat MELEPAS aos-animate dari elemen yang dianggap
