@@ -176,7 +176,7 @@ body.sintia a {
 
 .hero-section.cover {
   min-height: var(--body-height);
-  padding: 0 0 45px;
+  padding: 0 0 40px;
   background-color: var(--background-primary);
   overflow: hidden;
 }
@@ -303,6 +303,33 @@ body.sintia a {
   animation: sintia-kupu-kupu 7s ease-in-out infinite;
   transform-origin: 100% 100%;
 }
+
+.sintia-butterfly.second img {
+  animation-duration: 9.1s;
+  animation-delay: -4.7s;
+  animation-timing-function: ease-in-out;
+}
+
+/* Kupu-kupu kedua pada hero: di sisi kanan, menghadap kiri, ukuran lebih kecil.
+   Flip dipasang pada container karena AOS mengendalikan transform .image-wrap
+   dan animasi kepak mengendalikan transform <img>. */
+.hero-section .hero-body > .sintia-butterfly.hero-butterfly-left {
+  left: auto;
+  right: 22px;
+  top: 50px;
+  width: 30px;
+  transform: scaleX(-1);
+}
+
+/* Setiap kupu-kupu memakai durasi dan titik mulai sendiri. animation-delay
+   negatif membuat tiap kupu-kupu langsung berada di fase berbeda, jadi tidak
+   ada dua yang mengepak seirama. */
+.hero-section .hero-body > .sintia-butterfly.hero-butterfly-left img {
+  animation-name: sintia-kupu-kupu-alt;
+  animation-duration: 5.4s;
+  animation-delay: -1.6s;
+  animation-timing-function: ease-in-out;
+}
 .sintia-section-separator {
   position: relative;
   width: 100%;
@@ -385,6 +412,43 @@ body.sintia a {
   top: 0;
   width: 30px;
   transform: scaleX(-1);
+}
+
+.bridegroom-section .bridegroom-body > .sintia-butterfly img {
+  animation-duration: 8.3s;
+  animation-delay: -3.2s;
+}
+
+/* Kupu-kupu mempelai wanita. Aturan di atas menempatkan semua kupu-kupu pada
+   koordinat yang sama, sehingga milik mempelai wanita tertimpa milik mempelai
+   pria dan tampak tidak muncul. Elemen ini dibiarkan mengikuti alur dokumen
+   tepat sebelum foto mempelai wanita, lalu .image-wrap ditempatkan absolut di
+   sisi kanan foto. Flip memakai keyframes tersendiri karena transform pada
+   container dikendalikan aturan di atas, transform .image-wrap dikendalikan
+   AOS, dan transform <img> dikendalikan animasi kepak. */
+.bridegroom-section .bridegroom-body > .sintia-butterfly.bride-butterfly-left {
+  position: relative;
+  left: auto;
+  right: auto;
+  top: auto;
+  width: min(100%, 400px);
+  height: 0;
+  margin: 0 auto;
+  transform: none;
+}
+
+.bridegroom-section .bridegroom-body > .sintia-butterfly.bride-butterfly-left .image-wrap {
+  position: absolute;
+  left: 120px;
+  width: 30px;
+  transform: scaleX(-1);
+  top: 15px;
+}
+
+.bridegroom-section .bridegroom-body > .sintia-butterfly.bride-butterfly-left img {
+  animation-name: sintia-kupu-kupu-flip;
+  animation-duration: 6.2s;
+  animation-delay: -2.4s;
 }
 
 .bridegroom-section .bridegroom-image {
@@ -918,6 +982,36 @@ body.sintia a {
   80% { transform: translate(-15px,-15px) scale(1) skew(0deg); }
   90% { transform: translate(0) scale(.8) skew(-5deg,-5deg); }
   100% { transform: translate(0) scale(1) skew(0deg); }
+}
+
+/* Jalur kepak alternatif: melayang lebih pendek dan condong ke arah berbeda,
+   dipakai kupu-kupu hero sisi kanan supaya gerakannya tidak menyalin
+   kupu-kupu sisi kiri. */
+@keyframes sintia-kupu-kupu-alt {
+  0% { transform: translate(0) scale(1) skew(0deg); }
+  15% { transform: translate(-6px,-6px) scale(.86) skew(4deg,3deg); }
+  30% { transform: translate(-10px,-2px) scale(1) skew(0deg); }
+  45% { transform: translate(-4px,-12px) scale(.84) skew(5deg,4deg); }
+  60% { transform: translate(8px,-8px) scale(1) skew(0deg); }
+  75% { transform: translate(10px,-3px) scale(.88) skew(4deg,3deg); }
+  90% { transform: translate(3px,-5px) scale(1) skew(0deg); }
+  100% { transform: translate(0) scale(1) skew(0deg); }
+}
+
+/* Versi menghadap kiri dari sintia-kupu-kupu. scaleX(-1) harus ikut di setiap
+   keyframe, sebab animasi menimpa properti transform sepenuhnya. */
+@keyframes sintia-kupu-kupu-flip {
+  0% { transform: scaleX(-1) translate(0) scale(1) skew(0deg); }
+  10% { transform: scaleX(-1) translate(5px,-10px) scale(.8) skew(-5deg,-5deg); }
+  20% { transform: scaleX(-1) translate(5px,-10px) scale(1) skew(0deg); }
+  30% { transform: scaleX(-1) translate(5px,-10px) scale(.8) skew(-5deg,-5deg); }
+  40% { transform: scaleX(-1) translate(5px,-10px) scale(1) skew(0deg); }
+  50% { transform: scaleX(-1) translate(-15px,-15px) scale(.8) skew(-5deg,-5deg); }
+  60% { transform: scaleX(-1) translate(-15px,-15px) scale(1) skew(0deg); }
+  70% { transform: scaleX(-1) translate(-15px,-15px) scale(.8) skew(-5deg,-5deg); }
+  80% { transform: scaleX(-1) translate(-15px,-15px) scale(1) skew(0deg); }
+  90% { transform: scaleX(-1) translate(0) scale(.8) skew(-5deg,-5deg); }
+  100% { transform: scaleX(-1) translate(0) scale(1) skew(0deg); }
 }
 
 @media (min-width: 961px) {
